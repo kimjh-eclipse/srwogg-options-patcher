@@ -4,6 +4,7 @@ import sys,struct,json,hashlib,zlib,base64,bisect,zipfile
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from catalog import Master,u16
 from spirit_policy_25 import POLICY,apply_to_row
+from party_policy_25 import edits_for_master,native_recovery,NATIVE_RECOVERY
 from inspect_iso import ROOT,OUT,SOURCE,read,u32,inventory,lice
 from audit_story_layout import TARGET,loadarc
 from story_scripts_25 import records,rebuild_logo,command,NONE
@@ -13,10 +14,11 @@ sys.path.insert(0,str(ROOT/'upstream_base'))
 from source_image import source_image,DATA as BASE_INFO,CHANGES as BASE_CHANGES
 
 HERE=Path(__file__).resolve().parent
-VERSION='v20261106.2'
+VERSION='v20261106.3'
 DIST=ROOT/('release_'+VERSION)
 OLD_PACK=ROOT/'release_v20261106/patcher/OGG_options.bin'
-PREVIOUS_PACK=ROOT/'release_v20261106.1/patcher/OGG_options.bin'
+PREVIOUS_PACK=ROOT/'release_v20261106.2/patcher/OGG_options.bin'
+OLDER_PACK=ROOT/'release_v20261106.1/patcher/OGG_options.bin'
 PATCHER=DIST/'patcher'
 OPTIONS=[
  ('25편성 분산 합류·추가 시나리오','3화부터 전이 대화, 4~31화 합류. 추가 기체·파일럿 밸런스 포함'),
@@ -59,12 +61,14 @@ def plan():
   ix=next(i for i,r in enumerate(records(new)) if r[0]==0xba and r[2:5]==[0x100c1,63,7])
   new=insert_commands(new,ix,[command(op,key,0) for op,key,name in EARLY])
   allocation=0x1b480000;assert not any(read(current,allocation,len(new))) and allocation+len(new)<0x1b594000
+  recovery,recovery_ptr=native_recovery(original,la);common.append((NATIVE_RECOVERY,recovery))
   common.append((allocation,new));newptr=struct.pack('<II',allocation-la['directory'],len(new))
   for slot,a in [(13,ua),(14,la)]:
    for chapter in story['chapters']:
     if slot==13 and not chapter['recruits']:continue
     at=dp(a,chapter['key']);zero=read(original,at,8);one=read(current,at,8)
     if slot==14 and chapter['key']==2003:zero=newptr
+    if slot==14 and chapter['key']==2026:zero=recovery_ptr
     switch(0,at,zero,one)
   # Both chapter-three variants contain a guarded supply block. Disabling the
   # option compares a 0/1 flag to 2, so the whole block remains unreachable.
@@ -133,7 +137,10 @@ def plan():
     idx=u16(master.b,master.tables['PTbl'][0]+12+item['new_key']*2);pos=master.tables['Plot'][0]+12+idx*148
     row=bytes(master.b[pos:pos+148]);balanced=apply_to_row(name,row)
     common.append((entry['offset']+pos+0x6c,balanced[0x6c:0x80]))
-  proof.update(spirit_balanced_pilots=len(POLICY),native_supply_script_offset=allocation,native_supply_script_size=len(new),native_supply_messages=note['messages'],story_directory_edits=len(features[0]),enemy_record_edits=len([x for x in features[4] if len(x[1])==24]))
+  for archive in ['SHARED.BIN','IM.BIN']:
+   entry,master=rawmaster(current,archive)
+   for at,old,replacement,key in edits_for_master(master.b,[r['key'] for ch in json.loads((ROOT/'story_25_prepared.json').read_text(encoding='utf-8'))['chapters'] for r in ch['recruits']]):common.append((entry['offset']+at,replacement))
+  proof.update(party_preservation=True,native_recovery_script_offset=NATIVE_RECOVERY,native_recovery_script_size=len(recovery),spirit_balanced_pilots=len(POLICY),native_supply_script_offset=allocation,native_supply_script_size=len(new),native_supply_messages=note['messages'],story_directory_edits=len(features[0]),enemy_record_edits=len([x for x in features[4] if len(x[1])==24]))
  # Deduplicate aliases and require independent options to touch disjoint bytes.
  for lists in [features,off]:
   for i,es in enumerate(lists):
@@ -180,7 +187,7 @@ def load_pack(path):
 def load_old_pack():return load_pack(OLD_PACK)[:2]
 
 def build():
- PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();old=load_old_pack();previous_pack=load_pack(PREVIOUS_PACK);spans=[(p,p+len(b)) for p,b in old[0]]+[(p,p+len(b)) for p,b,a in BASE_CHANGES]+[(p,p+len(b)) for p,b in previous_pack[0]];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
+ PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();old=load_old_pack();previous_pack=load_pack(PREVIOUS_PACK);older_pack=load_pack(OLDER_PACK);spans=[(p,p+len(b)) for p,b in old[0]]+[(p,p+len(b)) for p,b,a in BASE_CHANGES]+[(p,p+len(b)) for p,b in previous_pack[0]]+[(p,p+len(b)) for p,b in older_pack[0]];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
  print('Scanning original and canonical ISO without creating images...',flush=True)
  with source_image() as a,TARGET.open('rb') as b:
   pos=0
@@ -212,9 +219,9 @@ def build():
  legacy_inputs={fingerprint(ranges,legacy):127}
  # Recognize the earlier canonical states before base/SP/price updates.
  previous=[bytearray(b) for b in legacy]
- for name in ['spirit_balance_25_journal.json','upstream_rebase_journal.json','sp_and_prices_revision_journal.json']:
+ for name in ['party_25_journal.json','spirit_balance_25_journal.json','upstream_rebase_journal.json','sp_and_prices_revision_journal.json']:
   journal=json.loads((ROOT/name).read_text(encoding='utf-8'))
-  for e in journal['edits']:setbytes(previous,e['offset'],bytes.fromhex(e['before']))
+  for e in journal['edits']:setbytes(previous,e['offset'],unpack(e,'before'))
   legacy_inputs[fingerprint(ranges,previous)]=127
  with SOURCE.open('rb') as old_source:old_original=[read(old_source,p,len(b)) for p,b,_ in ranges]
  legacy_inputs[fingerprint(ranges,old_original)]=0
@@ -225,7 +232,7 @@ def build():
   if len(b)==1:setbytes(canonical_after,at,b)
  for at,b in features[6]:setbytes(canonical_after,at,b)
  legacy_inputs[fingerprint(ranges,canonical_after)]=127
- for regions,fs,base_hash in [load_pack(OLD_PACK),previous_pack]:
+ for regions,fs,base_hash in [load_pack(OLD_PACK),older_pack,previous_pack]:
   source_data=old_original if base_hash!=sh.digest() else [r[1] for r in ranges]
   for mask in range(1<<len(fs)):
    data=[bytearray(b) for b in source_data]

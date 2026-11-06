@@ -3,7 +3,7 @@ from pathlib import Path
 import sys,struct,zlib,io,json,bisect,hashlib
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from inspect_iso import SOURCE,OUT,inventory,u32
-from build_options import rawmaster,load_old_pack,source_image,load_pack,OLD_PACK,PREVIOUS_PACK
+from build_options import rawmaster,load_old_pack,source_image,load_pack,OLD_PACK,PREVIOUS_PACK,OLDER_PACK
 from audit_story_layout import loadarc
 from story_scripts_25 import records
 from campaign_bonus_scripts import EARLY
@@ -15,7 +15,7 @@ HERE=Path(__file__).resolve().parent
 
 class Profiles:
  def __init__(self):
-  f=io.BytesIO((HERE.parent/'release_v20261106.2/patcher/OGG_options.bin').read_bytes())
+  f=io.BytesIO((HERE.parent/'release_v20261106.3/patcher/OGG_options.bin').read_bytes())
   def n(fmt):return struct.unpack(fmt,f.read(struct.calcsize(fmt)))
   def blob():return f.read(n('<I')[0])
   assert f.read(8)==b'OGGOPT01';assert n('<I')[0]==1
@@ -119,7 +119,7 @@ def legacy_set_checks(p,path):
  return count
 
 def legacy_checks(p):
- return {'previous_8_option_profiles_recognized':legacy_set_checks(p,OLD_PACK),'previous_7_option_profiles_recognized':legacy_set_checks(p,PREVIOUS_PACK),'removed_SP_bit_not_exposed':True}
+ return {'previous_8_option_profiles_recognized':legacy_set_checks(p,OLD_PACK),'v20261106_1_profiles_recognized':legacy_set_checks(p,OLDER_PACK),'v20261106_2_profiles_recognized':legacy_set_checks(p,PREVIOUS_PACK),'removed_SP_bit_not_exposed':True}
 
 def price_and_sp_checks(p):
  from catalog import u16
@@ -159,10 +159,30 @@ def price_and_sp_checks(p):
   a.f.close()
  return {'native_SP_accessor_checks':cases,'native_cost_sum_checks':price_cases,'ten_stage_totals':[88000,88000,105600,176000,176000],'role_based_clone_SP_in_all_profiles':True,'price_option_preserves_weapon_growth':True}
 
+def party_profile_checks(p):
+ from inspect_iso import lice,read
+ from party_policy_25 import edits_for_master,STORY_RECOVERY,NATIVE_RECOVERY
+ keys=[r['key'] for ch in json.loads((HERE.parent/'story_25_prepared.json').read_text(encoding='utf-8'))['chapters'] for r in ch['recruits']]
+ cases=0
+ for mask in range(128):
+  image=Image(p,mask)
+  try:
+   entry=next(e for e in inventory(image) if e['name']=='MAP.BIN;1');outer=lice(image,entry['offset'],entry['size']);parent=outer['entries'][14];archive=lice(image,parent['offset'],parent['size'])
+   recovery=next(e for e in archive['entries'] if 2026 in e['keys'])
+   assert recovery['offset']==(STORY_RECOVERY if mask&1 else NATIVE_RECOVERY)
+   rows=records(read(image,recovery['offset'],recovery['size']))
+   assert sum(r[0]==0x4a and r[2:5]==[0x100bd,0x701,1] for r in rows)==1
+   for name in ['SHARED.BIN','IM.BIN']:
+    _,master=rawmaster(image,name);assert not edits_for_master(master.b,keys)
+   cases+=1
+  finally:image.f.close()
+ return {'profiles':cases,'all_MAP14_pointers_within_declared_span':True,'private_family_identity_in_both_archives':True,'chapter28_existing_clone_recovery_story_on_and_off':True}
+
 def main():
  p=Profiles();result={'passed':True,'supply_story_independence':supply_checks(p)}
  result['sp_costs_and_upgrade_prices']=price_and_sp_checks(p)
  result['legacy_inputs']=legacy_checks(p)
+ result['party_profiles']=party_profile_checks(p)
  # Test each native arithmetic feature while its independent neighbor is off/on.
  r={mask:ram(p,mask) for mask in [0,8,16,24]}
  result['rewards_enemy_off']=reward_checks([r[0],r[8]])

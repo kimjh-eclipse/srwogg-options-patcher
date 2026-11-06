@@ -1,0 +1,77 @@
+{
+  "version": "v20261106.3",
+  "original_iso_sha256": "e819f1e524513bc7e273b004ba02e3977dd4fff365a5887b4eb1c8a9fc9d1e04",
+  "canonical_iso_sha256": "43c0c812e422775c045bc98ff16aa0558b265093d3e0950e2e1ad745a5347c17",
+  "iso_size": 4666294272,
+  "defaults": 0,
+  "options": [
+    {
+      "bit": 0,
+      "name": "25편성 분산 합류·추가 시나리오",
+      "description": "3화부터 전이 대화, 4~31화 합류. 추가 기체·파일럿 밸런스 포함"
+    },
+    {
+      "bit": 1,
+      "name": "숨겨진 요소 자동 습득",
+      "description": "6·13·25·30화 보상 조건 해제. 미롱가는 양쪽 루트에서 입수"
+    },
+    {
+      "bit": 2,
+      "name": "3화 추가 보급 8종",
+      "description": "시시오 블레이드·부스트 해머와 강화파츠 6종을 각 1개 지급"
+    },
+    {
+      "bit": 3,
+      "name": "전투 보상: PP 2배·자금 +20%",
+      "description": "기존 보너스와 분배 계산 후 적용. 자금 소수점 버림"
+    },
+    {
+      "bit": 4,
+      "name": "적 강화",
+      "description": "전투 능력치 +5, 기체·무장 개조 +2, 기본 HP 2만 미만 +10%"
+    },
+    {
+      "bit": 5,
+      "name": "공통 무장 밸런스",
+      "description": "OGs 공통 무장 조정 이식. 외전 고유의 강화분 유지"
+    },
+    {
+      "bit": 6,
+      "name": "무장 개조비 할인",
+      "description": "OGs 최종 비용표: 0·1등급 동일, 10단계 88,000 / 105,600 / 176,000"
+    }
+  ],
+  "profile_count": 128,
+  "managed_ranges": 65,
+  "managed_bytes": 6639616,
+  "pack_sha256": "c661b84e9eeeafba42609b73e89c0872df60af6e56640eb7597d0a20ecf787a2",
+  "pack_size": 1763919,
+  "legacy_profiles": 519,
+  "sp_cost_policy": "native with 13 allied-clone role corrections",
+  "weapon_cost_steps": [
+    1600,
+    1600,
+    1920,
+    3200,
+    3200
+  ],
+  "upstream_base": {
+    "passed": true,
+    "official_repository": "https://github.com/z3oo3z/PS2-SRWOGG-KPatch",
+    "release": "SRWOGG",
+    "version": "1.4.3s",
+    "source_md5": "cb7dc4485f46f220c46095c966a3aad0",
+    "base_sha256": "e819f1e524513bc7e273b004ba02e3977dd4fff365a5887b4eb1c8a9fc9d1e04",
+    "base_md5": "a5254cd5d4deabc57e03a3dcbb6a88d7",
+    "bytes": 4666294272,
+    "xdelta_target_checksums_verified": true,
+    "verified_windows": 557,
+    "changed_pages_from_previous_base": 64,
+    "extra_full_ISOs_created": 0
+  },
+  "executable_sha256": "fcf5bbbb1f75e4d8785c4f187d83a4bbd5a836bd3bb58bd1b4b348c47a8d7705",
+  "canonical_iso_preserved_during_option_tests": true,
+  "canonical_revision_applied": true,
+  "source_iso_preserved": true,
+  "live_playthrough": false
+}

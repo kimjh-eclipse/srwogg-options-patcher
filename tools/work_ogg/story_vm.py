@@ -7,8 +7,8 @@ RAM=OUT/'terrain_fresh_ram.bin'
 TABLE=0x572d40
 
 class VM:
- def __init__(self):
-  self.ram=RAM.read_bytes();self.cpu=CPU(self.ram);self.ctx=0x1600000;self.rec=0x1700000;self.cpu.r[28]=0x31def0
+ def __init__(self,ram=None):
+  self.ram=RAM.read_bytes() if ram is None else ram;self.cpu=CPU(self.ram);self.ctx=0x1600000;self.rec=0x1700000;self.cpu.r[28]=0x31def0
   # OGG startup initializes gp at this executable-specific address.
   self.save=u32(self.ram,0x31df24);self.master=u32(self.ram,0x31df20);self.diff=u32(self.ram,0x31df2c)
   self.cpu.write(self.ctx+0x2870,0x319d40,4)
