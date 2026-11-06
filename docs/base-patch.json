@@ -1,0 +1,11 @@
+{
+  "repository": "https://github.com/z3oo3z/PS2-SRWOGG-KPatch",
+  "release_tag": "SRWOGG",
+  "release_url": "https://github.com/z3oo3z/PS2-SRWOGG-KPatch/releases/tag/SRWOGG",
+  "asset": "OGGv1.4.3sta.7z",
+  "asset_sha256": "f81f30823be38a2fe3fbc59cfa3d69eec70301f9e589a487cc304901ca90ecd5",
+  "source_japanese_md5": "cb7dc4485f46f220c46095c966a3aad0",
+  "korean_base_md5": "a5254cd5d4deabc57e03a3dcbb6a88d7",
+  "korean_base_sha256": "e819f1e524513bc7e273b004ba02e3977dd4fff365a5887b4eb1c8a9fc9d1e04",
+  "target_windows_verified": 557
+}

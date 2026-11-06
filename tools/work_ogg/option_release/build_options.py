@@ -1,4 +1,4 @@
-"""Build an eight-option patch without ever creating another full ISO."""
+"""Build a seven-option patch without ever creating another full ISO."""
 from pathlib import Path
 import sys,struct,json,hashlib,zlib,base64,bisect,zipfile
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
@@ -8,9 +8,13 @@ from audit_story_layout import TARGET,loadarc
 from story_scripts_25 import records,rebuild_logo,command,NONE
 from campaign_bonus_scripts import insert_commands,EARLY
 import numpy as np
+sys.path.insert(0,str(ROOT/'upstream_base'))
+from source_image import source_image,DATA as BASE_INFO,CHANGES as BASE_CHANGES
 
 HERE=Path(__file__).resolve().parent
-DIST=ROOT/'release_v20261106'
+VERSION='v20261106.1'
+DIST=ROOT/('release_'+VERSION)
+OLD_PACK=ROOT/'release_v20261106/patcher/OGG_options.bin'
 PATCHER=DIST/'patcher'
 OPTIONS=[
  ('25편성 분산 합류·추가 시나리오','3화부터 전이 대화, 4~31화 합류. 추가 기체·파일럿 밸런스 포함'),
@@ -19,8 +23,7 @@ OPTIONS=[
  ('전투 보상: PP 2배·자금 +20%','기존 보너스와 분배 계산 후 적용. 자금 소수점 버림'),
  ('적 강화','전투 능력치 +5, 기체·무장 개조 +2, 기본 HP 2만 미만 +10%'),
  ('공통 무장 밸런스','OGs 공통 무장 조정 이식. 외전 고유의 강화분 유지'),
- ('무장 개조비 할인','최저 비용표를 제외한 무장 개조비 20% 할인'),
- ('정신기 SP 소모 1','정신기 SP 소모를 1로 변경. 해제하면 원래 소모량 복원')]
+ ('무장 개조비 할인','OGs 최종 비용표: 0·1등급 동일, 10단계 88,000 / 105,600 / 176,000')]
 
 def unpack(e,side):
  if side in e:return bytes.fromhex(e[side])
@@ -36,7 +39,7 @@ def plan():
  common=[];features=[[] for _ in OPTIONS];off=[[] for _ in OPTIONS];proof={}
  campaign=json.loads((ROOT/'campaign_tuning_journal.json').read_text(encoding='utf8'))
  story=json.loads((ROOT/'story_25_journal.json').read_text(encoding='utf8'))
- with SOURCE.open('rb') as original,TARGET.open('rb') as current:
+ with source_image() as original,TARGET.open('rb') as current:
   ua,ue=loadarc(current,13);la,le=loadarc(current,14)
   def locate(entries,key):return next(e for e in entries if key in e[0])
   def dp(a,key):return a['directory']+8+next(e['index'] for e in a['entries'] if key in e['keys'])*8
@@ -90,8 +93,11 @@ def plan():
    if label in ['scale final funds before accumulation','preserve PP accumulator load in common minimum-check delay','double each final PP award in temporary','accumulate scaled PP without changing shared per-pilot amount']:bit=3
    elif label in ['hostile pilot combat stat +5','hostile small-unit HP hook']:bit=4
    elif 'common weapon key' in label:bit=5
-   elif label=='weapon upgrade cost tiers 1-4 minus 20 percent':bit=6
-   if bit is not None:switch(bit,e['offset'],unpack(e,'before'),unpack(e,'after'))
+   elif label in ['weapon upgrade cost tiers 1-4 minus 20 percent','weapon upgrade cost OGs final tiers 0-4']:bit=6
+   if bit is not None:
+    before=unpack(e,'before');after=unpack(e,'after')
+    if bit==6:after=struct.pack('<80I',*(step*i for step in (1600,1600,1920,3200,3200) for i in range(16)))
+    switch(bit,e['offset'],before,after)
   # Patch both original and story-specific enemy records. Otherwise changing
   # the story checkbox could silently select an unstrengthened copy.
   seen=set()
@@ -105,7 +111,7 @@ def plan():
      address=bp+pos+0x38
      if address in seen:continue
      seen.add(address);zero=stock[pos+0x38:pos+0x50];values=struct.unpack('<6I',zero);one=struct.pack('<6I',*(min(v+2,15) for v in values));switch(4,address,zero,one)
-  # Restore native costs, including cloned pilots, when SP1 is unchecked.
+  # Native SP costs are mandatory, including the additional cloned pilots.
   _,shared=rawmaster(original,'SHARED.BIN')
   cast={r['new_key']:r for r in json.loads((ROOT/'manifest_selected_27.json').read_text(encoding='utf8'))['cast']}
   for ar in ['SHARED.BIN','IM.BIN']:
@@ -117,7 +123,7 @@ def plan():
     for rel in [*range(0x72,0x78),0x7f]:
      val=normal[rel]
      if rel==0x7f and row[0x7e]==0:val=0
-     switch(7,ce['offset']+pos+rel,bytes([val]),row[rel:rel+1])
+     common.append((ce['offset']+pos+rel,bytes([val])))
   proof.update(native_supply_script_offset=allocation,native_supply_script_size=len(new),native_supply_messages=note['messages'],story_directory_edits=len(features[0]),enemy_record_edits=len([x for x in features[4] if len(x[1])==24]))
  # Deduplicate aliases and require independent options to touch disjoint bytes.
  for lists in [features,off]:
@@ -144,10 +150,28 @@ def fingerprint(ranges,data):
 def deflate(b):
  c=zlib.compressobj(9,zlib.DEFLATED,-15);return c.compress(b)+c.flush()
 
+def load_old_pack():
+ import io
+ f=io.BytesIO(OLD_PACK.read_bytes())
+ def n(fmt):return struct.unpack(fmt,f.read(struct.calcsize(fmt)))
+ def blob():return f.read(n('<I')[0])
+ assert f.read(8)==b'OGGOPT01';assert n('<I')[0]==1
+ n('<Q');f.read(32);count=n('<I')[0];assert count==8
+ for _ in range(count):blob();blob()
+ regions=[]
+ for _ in range(n('<I')[0]):
+  p,size=n('<QI');blob();base=zlib.decompress(blob(),-15);assert len(base)==size;regions.append((p,base))
+ features=[]
+ for _ in range(count):
+  es=[]
+  for _ in range(n('<I')[0]):p,size=n('<QI');es.append((p,f.read(size)))
+  features.append(es)
+ return regions,features
+
 def build():
- PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();spans=[];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
+ PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();old=load_old_pack();spans=[(p,p+len(b)) for p,b in old[0]]+[(p,p+len(b)) for p,b,a in BASE_CHANGES];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
  print('Scanning original and canonical ISO without creating images...',flush=True)
- with SOURCE.open('rb') as a,TARGET.open('rb') as b:
+ with source_image() as a,TARGET.open('rb') as b:
   pos=0
   while x:=a.read(8<<20):
    y=b.read(len(x));assert len(y)==len(x);sh.update(x);ch.update(y)
@@ -155,11 +179,11 @@ def build():
     aa=np.frombuffer(x,dtype=np.uint8);bb=np.frombuffer(y,dtype=np.uint8);flags=np.any((aa!=bb).reshape(-1,4096),axis=1)
     for i in np.flatnonzero(flags):spans.append((pos+int(i)*4096,pos+(int(i)+1)*4096))
    pos+=len(x)
- assert sh.hexdigest()==json.loads((ROOT/'manifest_test.json').read_text())['source_sha256']
+ assert sh.hexdigest()==BASE_INFO['base_sha256']
  assert ch.hexdigest()==json.loads((ROOT/'current_target.json').read_text())['current_sha256']
  for p,b in common+[e for es in off+features for e in es]:spans.append((p//4096*4096,min(size,(p+len(b)+4095)//4096*4096)))
  spans=merge(spans);ranges=[];legacy=[]
- with SOURCE.open('rb') as a,TARGET.open('rb') as b:
+ with source_image() as a,TARGET.open('rb') as b:
   for start,end in spans:ranges.append((start,read(a,start,end-start),bytearray(read(b,start,end-start))));legacy.append(bytes(ranges[-1][2]))
  starts=[r[0] for r in ranges]
  def setbytes(data,p,b):
@@ -167,13 +191,36 @@ def build():
  base=[r[2] for r in ranges]
  for p,b in common+[e for es in off for e in es]:setbytes(base,p,b)
  immutable=[bytes(x) for x in base];profiles=[]
- for mask in range(256):
+ for mask in range(1<<len(OPTIONS)):
   data=[bytearray(x) for x in immutable]
   for bit,es in enumerate(features):
    if mask&(1<<bit):
     for p,b in es:setbytes(data,p,b)
   profiles.append(fingerprint(ranges,data))
- assert len(set(profiles))==256,'Each checkbox must have a distinct reversible profile'
+ assert len(set(profiles))==(1<<len(OPTIONS)),'Each checkbox must have a distinct reversible profile'
+ legacy_inputs={fingerprint(ranges,legacy):127}
+ # Recognize the earlier canonical states before base/SP/price updates.
+ previous=[bytearray(b) for b in legacy]
+ for name in ['upstream_rebase_journal.json','sp_and_prices_revision_journal.json']:
+  journal=json.loads((ROOT/name).read_text(encoding='utf-8'))
+  for e in journal['edits']:setbytes(previous,e['offset'],bytes.fromhex(e['before']))
+  legacy_inputs[fingerprint(ranges,previous)]=127
+ with SOURCE.open('rb') as old_source:old_original=[read(old_source,p,len(b)) for p,b,_ in ranges]
+ legacy_inputs[fingerprint(ranges,old_original)]=0
+
+ # Also recognize the canonical image after only the requested SP/cost changes.
+ canonical_after=[bytearray(b) for b in legacy]
+ for at,b in common:
+  if len(b)==1:setbytes(canonical_after,at,b)
+ for at,b in features[6]:setbytes(canonical_after,at,b)
+ legacy_inputs[fingerprint(ranges,canonical_after)]=127
+ for mask in range(256):
+  data=[bytearray(b) for b in old_original]
+  for at,b in old[0]:setbytes(data,at,b)
+  for bit,es in enumerate(old[1]):
+   if mask&(1<<bit):
+    for at,b in es:setbytes(data,at,b)
+  legacy_inputs[fingerprint(ranges,data)]=mask&127
  pack=PATCHER/'OGG_options.bin'
  with pack.open('wb') as f:
   def w(fmt,*v):f.write(struct.pack(fmt,*v))
@@ -188,9 +235,10 @@ def build():
    for p,b in es:w('<QI',p,len(b));f.write(b)
   w('<I',len(profiles))
   for mask,digest in enumerate(profiles):w('<I',mask);f.write(digest)
-  f.write(fingerprint(ranges,[r[1] for r in ranges]));w('<I',1);f.write(fingerprint(ranges,legacy));w('<I',255)
+  f.write(fingerprint(ranges,[r[1] for r in ranges]));w('<I',len(legacy_inputs))
+  for digest,mask in legacy_inputs.items():f.write(digest);w('<I',mask)
  digest=hashlib.sha256(pack.read_bytes()).hexdigest()
- meta=dict(version='v20261106',original_iso_sha256=sh.hexdigest(),canonical_iso_sha256=ch.hexdigest(),iso_size=size,defaults=0,options=[dict(bit=i,name=n,description=d) for i,(n,d) in enumerate(OPTIONS)],profile_count=256,managed_ranges=len(ranges),managed_bytes=sum(len(r[1]) for r in ranges),pack_sha256=digest,pack_size=pack.stat().st_size,proof=proof,shutdown_requested=True)
+ meta=dict(version=VERSION,original_iso_sha256=sh.hexdigest(),canonical_iso_sha256=ch.hexdigest(),iso_size=size,defaults=0,options=[dict(bit=i,name=n,description=d) for i,(n,d) in enumerate(OPTIONS)],profile_count=len(profiles),managed_ranges=len(ranges),managed_bytes=sum(len(r[1]) for r in ranges),pack_sha256=digest,pack_size=pack.stat().st_size,proof=proof,shutdown_requested=False,legacy_profiles=len(legacy_inputs),sp_cost_policy='native',weapon_cost_steps=[1600,1600,1920,3200,3200],upstream_base={k:v for k,v in BASE_INFO.items() if k not in ['changes']})
  (HERE/'build_metadata.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding='utf8')
  print(json.dumps({k:v for k,v in meta.items() if k not in ['options','proof']},indent=2),flush=True)
  return meta

@@ -24,3 +24,7 @@ tools/work_ogg/test_emulator/
 tools/work_ogg/release_*/
 tools/work_ogs/runtime/
 tools/work_ogs/build/
+
+tools/work_ogg/upstream_base/*.json
+tools/work_ogg/upstream_base/*.vcdiff
+tools/work_ogg/upstream_base/extracted/

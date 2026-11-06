@@ -1,9 +1,9 @@
 """Validate packaged scripts/hooks using the actual game's R5900 routines."""
 from pathlib import Path
-import sys,struct,zlib,io,json,bisect
+import sys,struct,zlib,io,json,bisect,hashlib
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from inspect_iso import SOURCE,OUT,inventory,u32
-from build_options import rawmaster
+from build_options import rawmaster,load_old_pack,source_image
 from audit_story_layout import loadarc
 from story_scripts_25 import records
 from campaign_bonus_scripts import EARLY
@@ -14,7 +14,7 @@ HERE=Path(__file__).resolve().parent
 
 class Profiles:
  def __init__(self):
-  f=io.BytesIO((HERE.parent/'release_v20261106/patcher/OGG_options.bin').read_bytes())
+  f=io.BytesIO((HERE.parent/'release_v20261106.1/patcher/OGG_options.bin').read_bytes())
   def n(fmt):return struct.unpack(fmt,f.read(struct.calcsize(fmt)))
   def blob():return f.read(n('<I')[0])
   assert f.read(8)==b'OGGOPT01';assert n('<I')[0]==1
@@ -30,6 +30,12 @@ class Profiles:
    for _ in range(n('<I')[0]):p,size=n('<QI');es.append((p,f.read(size)))
    self.features.append(es)
   self.starts=[p for p,b in self.regions]
+  profiles=n('<I')[0];self.known={}
+  for _ in range(profiles):
+   mask=n('<I')[0];self.known[f.read(32)]=mask
+  self.known[f.read(32)]=-1
+  for _ in range(n('<I')[0]):
+   digest=f.read(32);mask=n('<I')[0];self.known[digest]=mask
  def data(self,mask):
   data=[bytearray(b) for p,b in self.regions]
   for bit,es in enumerate(self.features):
@@ -94,8 +100,64 @@ def ram(p,mask):
    pc=0x100000+lo-elf['offset']-0x180;out[pc:pc+hi-lo]=data[lo-at:hi-at]
  image.f.close();return bytes(out)
 
+def legacy_checks(p):
+ regions,features=load_old_pack();count=0
+ for mask in range(256):
+  image=Image(p,0);image.f.close()
+  with SOURCE.open('rb') as old_source:
+   for i,(at,b) in enumerate(p.regions):old_source.seek(at);image.data[i]=bytearray(old_source.read(len(b)))
+  for at,b in regions:
+   i=bisect.bisect_right(p.starts,at)-1;rel=at-p.starts[i];image.data[i][rel:rel+len(b)]=b
+  for bit,es in enumerate(features):
+   if mask&(1<<bit):
+    for at,b in es:
+     i=bisect.bisect_right(p.starts,at)-1;rel=at-p.starts[i];image.data[i][rel:rel+len(b)]=b
+  h=hashlib.sha256()
+  for (at,_),b in zip(p.regions,image.data):h.update(struct.pack('<QI',at,len(b)));h.update(hashlib.sha256(b).digest())
+  assert p.known[h.digest()]==mask&127;count+=1
+ return {'previous_8_option_profiles_recognized':count,'removed_SP_bit_not_exposed':True}
+
+def price_and_sp_checks(p):
+ from catalog import u16
+ from r5900_scalar_check import CPU
+ with source_image() as source:
+  _,shared=rawmaster(source,'SHARED.BIN'); originals={name:rawmaster(source,name)[1] for name in ['SHARED.BIN','IM.BIN']}
+ cast={r['new_key']:r for r in json.loads((HERE.parent/'manifest_selected_27.json').read_text(encoding='utf-8'))['cast']}
+ cases=0
+ for mask in [0,127]:
+  image=Image(p,mask)
+  for name in ['SHARED.BIN','IM.BIN']:
+   _,m=rawmaster(image,name);old=originals[name];vm=VM();vm.load_master(m.b);keys={}
+   for key in range(m.tables['PTbl'][2]):
+    index=u16(m.b,m.tables['PTbl'][0]+12+key*2)
+    if index!=65535:keys.setdefault(index,key)
+   for index,at,row in m.rows('Plot'):
+    if index<old.tables['Plot'][2]:expected=old.b[old.tables['Plot'][0]+12+index*148:old.tables['Plot'][0]+12+(index+1)*148]
+    else:
+     item=cast[keys[index]];key=1091 if item['pilot_name']=='이글렛' else item['pilot'];oi=u16(shared.b,shared.tables['PTbl'][0]+12+key*2);expected=shared.b[shared.tables['Plot'][0]+12+oi*148:shared.tables['Plot'][0]+12+(oi+1)*148]
+    for slot in range(6):
+     assert row[0x72+slot]==expected[0x72+slot]
+     if index in keys:assert vm.cpu.run(0x272730,[vm.master,keys[index],slot])==expected[0x72+slot];cases+=1
+    assert row[0x7f]==(expected[0x7f] if row[0x7e] else 0)
+  image.f.close()
+ # Execute the game's invested-weapon-cost loop for every grade and level.
+ price_cases=0
+ for mask in [0,64]:
+  c=CPU(ram(p,mask));steps=[1600,1600,1920,3200,3200] if mask else [2000,3000,5000,6500,7500]
+  for tier,step in enumerate(steps):
+   for level in range(1,16):
+    c.r[2]=tier;c.r[3]=level;c.r[16]=0;c.run(0x26c7e8,stop=0x26c828)
+    assert c.r[16]==step*level*(level+1)//2,(mask,tier,level,c.r[16]);price_cases+=1
+  a=Image(p,mask);_,master=rawmaster(a,'SHARED.BIN')
+  if not mask:baseline=bytes(master.b)
+  else:assert bytes(master.b)==baseline,'Price option changed master/growth data'
+  a.f.close()
+ return {'native_SP_accessor_checks':cases,'native_cost_sum_checks':price_cases,'ten_stage_totals':[88000,88000,105600,176000,176000],'native_SP_in_all_profiles':True,'price_option_preserves_weapon_growth':True}
+
 def main():
  p=Profiles();result={'passed':True,'supply_story_independence':supply_checks(p)}
+ result['sp_costs_and_upgrade_prices']=price_and_sp_checks(p)
+ result['legacy_inputs']=legacy_checks(p)
  # Test each native arithmetic feature while its independent neighbor is off/on.
  r={mask:ram(p,mask) for mask in [0,8,16,24]}
  result['rewards_enemy_off']=reward_checks([r[0],r[8]])

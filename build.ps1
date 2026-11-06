@@ -28,5 +28,5 @@ $reportPath = Join-Path $outputPath 'selftest.json'
 $process = Start-Process -FilePath $executable -ArgumentList @('--selftest', '--report', ('"' + $reportPath + '"')) -WindowStyle Hidden -PassThru -Wait
 if ($process.ExitCode -ne 0) { throw '패처 자체 검증에 실패했습니다.' }
 $report = Get-Content -LiteralPath $reportPath -Raw -Encoding UTF8 | ConvertFrom-Json
-if (-not $report.passed -or $report.profiles -ne 256) { throw '옵션 조합 검증에 실패했습니다.' }
-Write-Output "Build and 256-profile self-test passed: $executable"
+if (-not $report.passed -or $report.profiles -ne $metadata.profiles -or $report.checkboxes -ne $metadata.options) { throw '옵션 조합 검증에 실패했습니다.' }
+Write-Output "Build and $($metadata.profiles)-profile self-test passed: $executable"

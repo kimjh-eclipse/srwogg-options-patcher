@@ -1,0 +1,145 @@
+{
+  "passed": true,
+  "live_playthrough": false,
+  "profile_selftest": {
+    "passed": true,
+    "profiles": 128,
+    "checkboxes": 7
+  },
+  "previous_base_read_only_verification": {
+    "passed": true,
+    "mask": 0,
+    "sha256": "a9f7f03c4cb722f9e0709860a1cf5a16fc52d8bf116a9458403ffc5a67fd7f63"
+  },
+  "real_iso_transitions": {
+    "passed": true,
+    "real_iso_transitions": 128,
+    "official_base_input_verified": true,
+    "backup_restore_verified": true,
+    "canonical_sha256_before": "2a72c67a99901e3885684d536714c20cf9b3c10a1864d60f66b4805c737e25b7",
+    "canonical_sha256_after": "2a72c67a99901e3885684d536714c20cf9b3c10a1864d60f66b4805c737e25b7",
+    "extra_full_ISOs_created": 0
+  },
+  "native_option_behavior": {
+    "passed": true,
+    "supply_story_independence": [
+      {
+        "mask": 0,
+        "story": false,
+        "supplies": false,
+        "first_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 1,
+        "story": true,
+        "supplies": false,
+        "first_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 4,
+        "story": false,
+        "supplies": true,
+        "first_grants": 8,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 5,
+        "story": true,
+        "supplies": true,
+        "first_grants": 8,
+        "repeat_grants": 0
+      }
+    ],
+    "sp_costs_and_upgrade_prices": {
+      "native_SP_accessor_checks": 10260,
+      "native_cost_sum_checks": 150,
+      "ten_stage_totals": [
+        88000,
+        88000,
+        105600,
+        176000,
+        176000
+      ],
+      "native_SP_in_all_profiles": true,
+      "price_option_preserves_weapon_growth": true
+    },
+    "legacy_inputs": {
+      "previous_8_option_profiles_recognized": 256,
+      "removed_SP_bit_not_exposed": true
+    },
+    "rewards_enemy_off": {
+      "cases": 44,
+      "native_reward_arithmetic": true,
+      "property_inputs": "controlled fixtures",
+      "full_battle_property_integration": false,
+      "rounding": "floor",
+      "minimum_PP_doubled": true
+    },
+    "rewards_enemy_on": {
+      "cases": 44,
+      "native_reward_arithmetic": true,
+      "property_inputs": "controlled fixtures",
+      "full_battle_property_integration": false,
+      "rounding": "floor",
+      "minimum_PP_doubled": true
+    },
+    "enemy_rewards_off": {
+      "pilot_stat_cases": 72,
+      "hp_cases": 168,
+      "hp_dispatcher_cases": 8,
+      "missing_map_cases": 6
+    },
+    "enemy_rewards_on": {
+      "pilot_stat_cases": 72,
+      "hp_cases": 168,
+      "hp_dispatcher_cases": 8,
+      "missing_map_cases": 6
+    }
+  },
+  "ui_render_verified": true,
+  "canonical_revision": {
+    "applied": true,
+    "before_sha256": "f627f494cf764053fdffab7ec6ca84db00125f86645ccc5ef03ed658806ff46f",
+    "scope": [
+      "native SP costs",
+      "OGs final weapon price table"
+    ],
+    "extra_full_ISOs_created": 0,
+    "after_sha256": "60b3a921414c7deddb10d47e1e5609057699fa1c94db29d5caa1c93361bb9bdd",
+    "changed_regions": 4187,
+    "changed_region_bytes": 4506
+  },
+  "canonical_verification": {
+    "passed": true,
+    "mask": 127,
+    "sha256": "2a72c67a99901e3885684d536714c20cf9b3c10a1864d60f66b4805c737e25b7"
+  },
+  "official_base": {
+    "passed": true,
+    "official_repository": "https://github.com/z3oo3z/PS2-SRWOGG-KPatch",
+    "release": "SRWOGG",
+    "version": "1.4.3s",
+    "source_md5": "cb7dc4485f46f220c46095c966a3aad0",
+    "base_sha256": "e819f1e524513bc7e273b004ba02e3977dd4fff365a5887b4eb1c8a9fc9d1e04",
+    "base_md5": "a5254cd5d4deabc57e03a3dcbb6a88d7",
+    "bytes": 4666294272,
+    "xdelta_target_checksums_verified": true,
+    "verified_windows": 557,
+    "changed_pages_from_previous_base": 64,
+    "extra_full_ISOs_created": 0
+  },
+  "upstream_rebase": {
+    "applied": true,
+    "before_sha256": "60b3a921414c7deddb10d47e1e5609057699fa1c94db29d5caa1c93361bb9bdd",
+    "official_base_sha256": "e819f1e524513bc7e273b004ba02e3977dd4fff365a5887b4eb1c8a9fc9d1e04",
+    "official_base_md5": "a5254cd5d4deabc57e03a3dcbb6a88d7",
+    "upstream_verified_windows": 557,
+    "custom_unit_pilot_weapon_tables_preserved": true,
+    "extra_full_ISOs_created": 0,
+    "after_sha256": "2a72c67a99901e3885684d536714c20cf9b3c10a1864d60f66b4805c737e25b7",
+    "changed_regions": 101,
+    "semantic_string_count": 60
+  }
+}

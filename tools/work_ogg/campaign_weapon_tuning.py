@@ -41,6 +41,6 @@ def weapon_plan(target):
   values=[s*i for s in [2000,3000,5000,6500,7500] for i in range(16)];old=struct.pack('<80I',*values)
   elf=next(x for x in inventory(f) if x['name'].startswith('SLPS_'));b=read(f,elf['offset'],elf['size']);p=b.find(old)
   assert p>=0 and b.find(old,p+1)<0
-  new=struct.pack('<80I',*(v if i<16 else v*4//5 for i,v in enumerate(values)))
-  edits.append((elf['offset']+p,old,new,'weapon upgrade cost tiers 1-4 minus 20 percent'))
- edits.sort();return edits,dict(weapons=notes,balanced_source=str(SOURCE_BALANCED),power_policy='same delta relative to OGG base; existing Gaiden-only improvements retained',discount_tiers=[1,2,3,4],cheapest_tier_preserved=True,cost_table_virtual=0x100000+p-0x180)
+  new=struct.pack('<80I',*(step*i for step in (1600,1600,1920,3200,3200) for i in range(16)))
+  edits.append((elf['offset']+p,old,new,'weapon upgrade cost OGs final tiers 0-4'))
+ edits.sort();return edits,dict(weapons=notes,balanced_source=str(SOURCE_BALANCED),power_policy='same delta relative to OGG base; existing Gaiden-only improvements retained',discount_tiers=[0,1,2,3,4],cheapest_tier_preserved=False,ten_stage_totals=[88000,88000,105600,176000,176000],cost_table_virtual=0x100000+p-0x180)

@@ -18,3 +18,7 @@ Python 3.11에서 작성했습니다. 외부 라이브러리는 `requirements.tx
 대부분은 `work_ogg/analysis`, ISO, 변경 저널, 이전 단계의 JSON 등 로컬 입력이 필요합니다. 입력에는 게임에서 추출한 데이터·RAM 덤프가 포함될 수 있어 이 저장소에 넣지 않았습니다. 따라서 이 소스만으로 게임 변경 과정을 처음부터 재현할 수는 없습니다. 배포용 패처는 릴리즈의 BIN과 루트 `build.ps1`만으로 빌드할 수 있습니다.
 
 도구의 상대 경로는 당시 `work_ogg`/`work_ogs` 형제를 기준으로 합니다. 일부 실험용·예전 단계용 빌더는 과거 ISO 이름이나 PCSX2 설치 경로를 사용합니다. 사용 전 입력·출력 경로, 원본 해시, 적용 전 상태 가정을 확인하고 현재 작업 경로에 맞게 수정하세요. 일반 사용자는 이 도구를 실행할 필요 없이 릴리즈의 패처를 사용하면 됩니다.
+
+## 공식 베이스 검증
+
+`work_ogg/upstream_base`에는 압축된 일본판 원본과 공식 xdelta를 ISO 복사본 없이 검증하는 도구가 있습니다. `decode_zip_vcdiff.py`는 xdelta의 무압축 recode를 읽어 RFC3284 기본 명령표로 디코딩하고 557개 구간 체크섬과 일본판 MD5를 확인합니다. `source_image.py`는 로컬 `official_base_delta.json`을 이용하는 읽기 전용 sparse overlay이며, `rebase_canonical.py`는 기존 확장 마스터의 문자열을 Strg/Sent ID로 이식합니다. 원본 ISO·공식 패치·게임 바이트를 담은 로컬 저널은 별도 입력입니다.
