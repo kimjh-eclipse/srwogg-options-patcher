@@ -12,7 +12,7 @@ Python 3.11에서 작성했습니다. 외부 라이브러리는 `requirements.tx
 - `story_content_25.py`, `story_*.py`, `apply_story_25.py`: 작성한 대사, 합류 일정, 시나리오와 네이티브 훅.
 - `campaign_*.py`, `apply_campaign_tuning.py`: 보상·적 강화·공통 무장 조정.
 - `validate_*.py`, `story_vm.py`: 구조와 실제 게임 루틴 검사.
-- `option_release/build_options.py`: 검증된 원본·최종 ISO와 변경 기록을 이용한 7옵션 데이터 생성.
+- `option_release/build_options.py`: 검증된 원본·최종 ISO와 변경 기록을 이용한 9옵션 데이터 생성.
 - `option_release/validate_options.py`: 옵션을 합성하여 시나리오/보급 및 보상/적 강화 독립 동작 검사.
 
 대부분은 `work_ogg/analysis`, ISO, 변경 저널, 이전 단계의 JSON 등 로컬 입력이 필요합니다. 입력에는 게임에서 추출한 데이터·RAM 덤프가 포함될 수 있어 이 저장소에 넣지 않았습니다. 따라서 이 소스만으로 게임 변경 과정을 처음부터 재현할 수는 없습니다. 배포용 패처는 릴리즈의 BIN과 루트 `build.ps1`만으로 빌드할 수 있습니다.
@@ -32,3 +32,11 @@ Python 3.11에서 작성했습니다. 외부 라이브러리는 `requirements.tx
 ## 본편 연결 대사
 
 `story_consistency_policy.py`는 첫 구현인 `story_content_25.py`에 적용하는 추가 수정입니다. `story_consistency_logo.py`는 기존 이벤트 내부에서 장면을 이동하면서 분기 목적지와 대사 이력 위치를 보정합니다. `audit_story_consistency.py`는 현재 이미지의 장면 문맥을 읽고, `prepare_story_consistency.py`·`validate_story_consistency.py`·`apply_story_consistency.py`는 3단계 적용 전 이미지와 로컬 중간 자료를 사용하는 준비·검증·적용 도구입니다. 이미 적용된 이미지에 역사적 도구를 다시 실행하지 마세요. 현재 옵션 합성 결과의 선택·해제 검사는 `option_release/validate_options.py`가 담당합니다. [검증 범위와 대사](../docs/story-consistency-v20261106.4.md)를 참고하세요.
+
+## 지원 장비·후반 정비
+
+`support_overhaul_policy.py`는 원래 환장 무장 지급과 여섯 아군의 진행도별 독립 무장 9종을 정의합니다. 기존 진행도 기반 Unit 선택 훅을 재사용하여 새 실행 코드는 추가하지 않습니다. `prepare_support_overhaul.py`·`validate_support_overhaul.py`·`apply_support_overhaul.py`는 로컬 입력과 적용 전 상태를 사용하는 준비·검증·기록 도구입니다. 원래 무장·다른 기체·파일럿의 보존과 단계·개조·지급 상태를 검사합니다. 메뉴용 IM에는 무장 조회를 검사하고, 전투용 생성·저장 기록은 SHARED를 사용합니다.
+
+기존 8옵션의 제거된 SP1 비트와 새 9옵션의 지원 장비 비트는 서로 다른 버전으로 구별합니다. 이전 프로필은 하위 일곱 기능만 옮기고 새 두 기능은 꺼짐으로 인식합니다. 로컬 변경 기록에는 전체 리소스의 미변경 여백도 포함되므로, 빌더는 이 범위를 관리 구간에 포함하여 이전 적용본을 정확히 인식합니다.
+
+공통 무장 옵션은 과거 변경 기록의 절대 위치 대신 현재 WTbl의 무장 ID로 대상을 찾아 적용합니다. Unit·Weap 테이블이 확장되어 위치가 달라져도 다른 무장을 덮어쓰지 않도록 전체 무장표 비교와 실제 게임 조회를 교차 검사합니다.

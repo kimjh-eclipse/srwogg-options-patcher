@@ -3,7 +3,7 @@ from pathlib import Path
 import sys,struct,zlib,io,json,bisect,hashlib
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from inspect_iso import SOURCE,OUT,inventory,u32
-from build_options import rawmaster,load_old_pack,source_image,load_pack,OLD_PACK,PREVIOUS_PACK,OLDER_PACK,SPIRITS_PACK
+from build_options import rawmaster,load_old_pack,source_image,load_pack,OLD_PACK,PREVIOUS_PACK,OLDER_PACK,SPIRITS_PACK,PARTY_PACK
 from audit_story_layout import loadarc
 from story_scripts_25 import records,text_at,encode
 from campaign_bonus_scripts import EARLY
@@ -15,7 +15,7 @@ HERE=Path(__file__).resolve().parent
 
 class Profiles:
  def __init__(self):
-  f=io.BytesIO((HERE.parent/'release_v20261106.4/patcher/OGG_options.bin').read_bytes())
+  f=io.BytesIO((HERE.parent/'release_v20261106.5/patcher/OGG_options.bin').read_bytes())
   def n(fmt):return struct.unpack(fmt,f.read(struct.calcsize(fmt)))
   def blob():return f.read(n('<I')[0])
   assert f.read(8)==b'OGGOPT01';assert n('<I')[0]==1
@@ -119,7 +119,7 @@ def legacy_set_checks(p,path):
  return count
 
 def legacy_checks(p):
- return {'previous_8_option_profiles_recognized':legacy_set_checks(p,OLD_PACK),'v20261106_1_profiles_recognized':legacy_set_checks(p,OLDER_PACK),'v20261106_2_profiles_recognized':legacy_set_checks(p,SPIRITS_PACK),'v20261106_3_profiles_recognized':legacy_set_checks(p,PREVIOUS_PACK),'removed_SP_bit_not_exposed':True}
+ return {'previous_8_option_profiles_recognized':legacy_set_checks(p,OLD_PACK),'v20261106_1_profiles_recognized':legacy_set_checks(p,OLDER_PACK),'v20261106_2_profiles_recognized':legacy_set_checks(p,SPIRITS_PACK),'v20261106_3_profiles_recognized':legacy_set_checks(p,PARTY_PACK),'v20261106_4_profiles_recognized':legacy_set_checks(p,PREVIOUS_PACK),'removed_SP_bit_not_exposed':True}
 
 def price_and_sp_checks(p):
  from catalog import u16
@@ -164,7 +164,7 @@ def party_profile_checks(p):
  from party_policy_25 import edits_for_master,STORY_RECOVERY,NATIVE_RECOVERY
  keys=[r['key'] for ch in json.loads((HERE.parent/'story_25_prepared.json').read_text(encoding='utf-8'))['chapters'] for r in ch['recruits']]
  cases=0
- for mask in range(128):
+ for mask in range(512):
   image=Image(p,mask)
   try:
    entry=next(e for e in inventory(image) if e['name']=='MAP.BIN;1');outer=lice(image,entry['offset'],entry['size']);parent=outer['entries'][14];archive=lice(image,parent['offset'],parent['size'])
@@ -187,7 +187,7 @@ def consistency_profile_checks(p):
   archive,entries=loadarc(source,14);stock={}
   for key,sid in [(2033,366),(2034,169)]:
    _,at,n=next(e for e in entries if key in e[0]);stock[key]=text_at(read(source,at,n),sid)
- for mask in range(128):
+ for mask in range(512):
   image=Image(p,mask)
   try:
    _,entries=loadarc(image,14)
@@ -203,12 +203,73 @@ def consistency_profile_checks(p):
   finally:image.f.close()
  return {'profiles':cases,'revised_dialogue_selected_only_with_story_option':True,'native_dialogue_restored_when_story_off':True,'new_final_response_selected_only_with_story_option':True}
 
+def support_overhaul_profiles(p):
+ from support_overhaul_policy import SUPPORT_FLAG,MAINTENANCE_FLAG
+ from story_consistency_logo import guarded_block
+ from catalog import u16
+ from validate_support_overhaul import block,qty
+ info=json.loads((HERE.parent/'support_overhaul_prepared.json').read_text(encoding='utf-8'));cases=0
+ for mask in range(512):
+  image=Image(p,mask)
+  try:
+   _,entries=loadarc(image,14);_,at,n=next(e for e in entries if 2050 in e[0]);blob=image_read(image,at,n);start,end=guarded_block(blob,SUPPORT_FLAG)
+   assert records(blob)[start+1][4]==(0 if mask&128 else 2)
+   _,at,n=next(e for e in entries if 2027 in e[0]);blob=image_read(image,at,n)
+   if mask&1:
+    start,end=guarded_block(blob,MAINTENANCE_FLAG);assert records(blob)[start+1][4]==(0 if mask&256 else 2)
+   else:assert not any(r[0]==0x93 and r[2:5]==[0x100c1,*MAINTENANCE_FLAG] for r in records(blob))
+   for ar in ['SHARED.BIN','IM.BIN']:
+    _,master=rawmaster(image,ar)
+    for u in info['masters'][ar]['units']:
+     idx=u16(master.b,master.tables['UTbl'][0]+12+u['key']*2);at=master.tables['Unit'][0]+12+idx*100;expected=u['after_unit_hex'] if mask&256 else u['before_unit_hex'];assert master.b[at:at+100]==bytes.fromhex(expected)
+   cases+=1
+  finally:image.f.close()
+ native=[]
+ for mask in [0,1,128,129,256,257,384,385]:
+  image=Image(p,mask);_,master=rawmaster(image,'SHARED.BIN');_,es=loadarc(image,14);_,at,n=next(e for e in es if 2050 in e[0]);blob=image_read(image,at,n);vm=VM(ram(p,mask));vm.load_master(master.b)
+  got=block(vm,blob,SUPPORT_FLAG,True)[0];assert got==(2 if mask&128 else 0);assert [qty(vm,k) for k in [3557,3558]]==[int(bool(mask&128))]*2;assert block(vm,blob,SUPPORT_FLAG,True)[0]==0;native.append({'mask':mask,'grants':got,'repeat_grants':0});image.f.close()
+ return {'profiles':cases,'support_independent_of_story_and_maintenance':True,'maintenance_body_and_dialogue_follow_checkbox':True,'native_support_profiles':native,'unchanged_body_when_maintenance_off':True}
+
+def image_read(image,at,n):image.seek(at);return image.read(n)
+
+def common_weapon_cross_checks(p):
+ from build_options import TARGET,unpack
+ from catalog import u16
+ entries=[e for e in json.loads((HERE.parent/'campaign_tuning_journal.json').read_text(encoding='utf-8'))['edits'] if 'common weapon key' in e['label']];expected={};keys={}
+ with TARGET.open('rb') as current:
+  for ar in ['SHARED.BIN','IM.BIN']:
+   _,master=rawmaster(current,ar);at,size,_=master.tables['Weap'];on=bytes(master.b[at:at+size]);off=bytearray(on);keys[ar]=[]
+   for e in entries:
+    if not e['label'].startswith(ar+' '):continue
+    key=int(e['label'].rsplit(' ',1)[1]);index=u16(master.b,master.tables['WTbl'][0]+12+key*2);pos=12+index*36;assert on[pos:pos+36]==unpack(e,'after');off[pos:pos+36]=unpack(e,'before');keys[ar].append(key)
+   expected[ar]=(bytes(off),on)
+ comparisons=0
+ for mask in range(512):
+  image=Image(p,mask)
+  try:
+   for ar in expected:
+    _,m=rawmaster(image,ar);at,size,_=m.tables['Weap'];assert bytes(m.b[at:at+size])==expected[ar][int(bool(mask&32))],('common/maintenance weapon-table mismatch',mask,ar);comparisons+=1
+  finally:image.f.close()
+ native=0
+ for mask in [0,32,256,288]:
+  image=Image(p,mask)
+  try:
+   for ar in expected:
+    _,m=rawmaster(image,ar);vm=VM(ram(p,mask));vm.load_master(m.b)
+    for key in keys[ar]:
+     index=u16(m.b,m.tables['WTbl'][0]+12+key*2);row=m.b[m.tables['Weap'][0]+12+index*36:m.tables['Weap'][0]+12+(index+1)*36]
+     for fn,want in [(0x274ff0,int.from_bytes(row[8:10],'little')),(0x274cf0,row[0x1a]),(0x274d70,row[0x19])]:assert vm.cpu.run(fn,[vm.master,key])==want;native+=1
+  finally:image.f.close()
+ return {'whole_weapon_table_comparisons':comparisons,'native_accessor_checks':native,'common_weapon_toggle_independent_of_maintenance':True,'unrelated_and_cloned_weapon_rows_preserved':True}
+
 def main():
- p=Profiles();result={'passed':True,'supply_story_independence':supply_checks(p)}
+ p=Profiles();result={'passed':True,'pack_sha256':hashlib.sha256((HERE.parent/'release_v20261106.5/patcher/OGG_options.bin').read_bytes()).hexdigest(),'supply_story_independence':supply_checks(p)}
  result['sp_costs_and_upgrade_prices']=price_and_sp_checks(p)
  result['legacy_inputs']=legacy_checks(p)
  result['party_profiles']=party_profile_checks(p)
  result['story_consistency_profiles']=consistency_profile_checks(p)
+ result['support_overhaul_profiles']=support_overhaul_profiles(p)
+ result['common_weapon_maintenance_cross_checks']=common_weapon_cross_checks(p)
  # Test each native arithmetic feature while its independent neighbor is off/on.
  r={mask:ram(p,mask) for mask in [0,8,16,24]}
  result['rewards_enemy_off']=reward_checks([r[0],r[8]])

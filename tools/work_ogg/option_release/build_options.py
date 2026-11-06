@@ -1,9 +1,10 @@
-"""Build a seven-option patch without ever creating another full ISO."""
+"""Build a nine-option patch without ever creating another full ISO."""
 from pathlib import Path
 import sys,struct,json,hashlib,zlib,base64,bisect,zipfile
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from catalog import Master,u16
 from spirit_policy_25 import POLICY,apply_to_row
+from support_overhaul_policy import SUPPORT_FLAG,MAINTENANCE_FLAG,SUPPORT_NATIVE
 from party_policy_25 import edits_for_master,native_recovery,NATIVE_RECOVERY
 from inspect_iso import ROOT,OUT,SOURCE,read,u32,inventory,lice
 from audit_story_layout import TARGET,loadarc
@@ -14,10 +15,11 @@ sys.path.insert(0,str(ROOT/'upstream_base'))
 from source_image import source_image,DATA as BASE_INFO,CHANGES as BASE_CHANGES
 
 HERE=Path(__file__).resolve().parent
-VERSION='v20261106.4'
+VERSION='v20261106.5'
 DIST=ROOT/('release_'+VERSION)
 OLD_PACK=ROOT/'release_v20261106/patcher/OGG_options.bin'
-PREVIOUS_PACK=ROOT/'release_v20261106.3/patcher/OGG_options.bin'
+PREVIOUS_PACK=ROOT/'release_v20261106.4/patcher/OGG_options.bin'
+PARTY_PACK=ROOT/'release_v20261106.3/patcher/OGG_options.bin'
 SPIRITS_PACK=ROOT/'release_v20261106.2/patcher/OGG_options.bin'
 OLDER_PACK=ROOT/'release_v20261106.1/patcher/OGG_options.bin'
 PATCHER=DIST/'patcher'
@@ -28,7 +30,9 @@ OPTIONS=[
  ('전투 보상: PP 2배·자금 +20%','기존 보너스와 분배 계산 후 적용. 자금 소수점 버림'),
  ('적 강화','전투 능력치 +5, 기체·무장 개조 +2, 기본 HP 2만 미만 +10%'),
  ('공통 무장 밸런스','OGs 공통 무장 조정 이식. 외전 고유의 강화분 유지'),
- ('무장 개조비 할인','OGs 최종 비용표: 0·1등급 동일, 10단계 88,000 / 105,600 / 176,000')]
+ ('무장 개조비 할인','OGs 최종 비용표: 0·1등급 동일, 10단계 88,000 / 105,600 / 176,000'),
+ ('4화 수리·보급장치 추가','수리장치·보급장치 각1개. 시나리오 선택과 별개로 한 번 지급'),
+ ('30화부터 일부 기체 정비','추가 아군6기의 무장9종 EN·탄수 소폭 개선. 기본 화력 유지')]
 
 def unpack(e,side):
  if side in e:return bytes.fromhex(e[side])
@@ -46,6 +50,7 @@ def plan():
  story=json.loads((ROOT/'story_25_journal.json').read_text(encoding='utf8'))
  with source_image() as original,TARGET.open('rb') as current:
   ua,ue=loadarc(current,13);la,le=loadarc(current,14)
+  maintenance=json.loads((ROOT/'support_overhaul_prepared.json').read_text(encoding='utf-8'));support={s['label']:s for s in maintenance['scripts']};native_support=support['support_native'];common.append((SUPPORT_NATIVE,read(current,SUPPORT_NATIVE,native_support['size'])))
   def locate(entries,key):return next(e for e in entries if key in e[0])
   def dp(a,key):return a['directory']+8+next(e['index'] for e in a['entries'] if key in e['keys'])*8
   def switch(bit,at,zero,one):
@@ -70,6 +75,7 @@ def plan():
     at=dp(a,chapter['key']);zero=read(original,at,8);one=read(current,at,8)
     if slot==14 and chapter['key']==2003:zero=newptr
     if slot==14 and chapter['key']==2026:zero=recovery_ptr
+    if slot==14 and chapter['key']==2050:zero=bytes.fromhex(native_support['pointer_hex'])
     switch(0,at,zero,one)
   # Both chapter-three variants contain a guarded supply block. Disabling the
   # option compares a 0/1 flag to 2, so the whole block remains unreachable.
@@ -104,7 +110,15 @@ def plan():
    if bit is not None:
     before=unpack(e,'before');after=unpack(e,'after')
     if bit==6:after=struct.pack('<80I',*(step*i for step in (1600,1600,1920,3200,3200) for i in range(16)))
-    switch(bit,e['offset'],before,after)
+    address=e['offset']
+    if bit==5:
+     # Unit/weapon additions relocate the master tables. Resolve the semantic
+     # weapon ID instead of retaining an address from an older master layout.
+     archive=label.split()[0];key=int(label.rsplit(' ',1)[1]);entry,master=rawmaster(current,archive);index=u16(master.b,master.tables['WTbl'][0]+12+key*2)
+     assert index<master.tables['Weap'][2] and len(after)==36
+     address=entry['offset']+master.tables['Weap'][0]+12+index*36
+     assert read(current,address,36)==after
+    switch(bit,address,before,after)
   # Patch both original and story-specific enemy records. Otherwise changing
   # the story checkbox could silently select an unstrengthened copy.
   seen=set()
@@ -118,6 +132,14 @@ def plan():
      address=bp+pos+0x38
      if address in seen:continue
      seen.add(address);zero=stock[pos+0x38:pos+0x50];values=struct.unpack('<6I',zero);one=struct.pack('<6I',*(min(v+2,15) for v in values));switch(4,address,zero,one)
+  # Independent support flag in both reachable chapter4 variants.
+  for label in ['support_story','support_native']:
+   item=support[label];blob=read(current,item['offset'],item['size']);rs=records(blob);ix=next(i for i,r in enumerate(rs) if r[0]==0x93 and r[2:5]==[0x100c1,*SUPPORT_FLAG]);on=rs[ix+1];disabled=on.copy();disabled[4]=2;record_switch(7,item['offset'],blob,ix+1,disabled,on)
+  item=support['maintenance_story'];blob=read(current,item['offset'],item['size']);rs=records(blob);ix=next(i for i,r in enumerate(rs) if r[0]==0x93 and r[2:5]==[0x100c1,*MAINTENANCE_FLAG]);on=rs[ix+1];disabled=on.copy();disabled[4]=2;record_switch(8,item['offset'],blob,ix+1,disabled,on)
+  for archive in ['SHARED.BIN','IM.BIN']:
+   entry,master=rawmaster(current,archive)
+   for unit in maintenance['masters'][archive]['units']:
+    index=u16(master.b,master.tables['UTbl'][0]+12+unit['key']*2);at=master.tables['Unit'][0]+12+index*100;switch(8,entry['offset']+at,bytes.fromhex(unit['before_unit_hex']),bytes(master.b[at:at+100]))
   # Native SP costs are mandatory, including the additional cloned pilots.
   _,shared=rawmaster(original,'SHARED.BIN')
   cast={r['new_key']:r for r in json.loads((ROOT/'manifest_selected_27.json').read_text(encoding='utf8'))['cast']}
@@ -173,7 +195,7 @@ def load_pack(path):
  def n(fmt):return struct.unpack(fmt,f.read(struct.calcsize(fmt)))
  def blob():return f.read(n('<I')[0])
  assert f.read(8)==b'OGGOPT01';assert n('<I')[0]==1
- n('<Q');source_hash=f.read(32);count=n('<I')[0];assert count in [7,8]
+ n('<Q');source_hash=f.read(32);count=n('<I')[0];assert count in [7,8,9]
  for _ in range(count):blob();blob()
  regions=[]
  for _ in range(n('<I')[0]):
@@ -188,7 +210,11 @@ def load_pack(path):
 def load_old_pack():return load_pack(OLD_PACK)[:2]
 
 def build():
- PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();old=load_old_pack();previous_pack=load_pack(PREVIOUS_PACK);older_pack=load_pack(OLDER_PACK);spirits_pack=load_pack(SPIRITS_PACK);spans=[(p,p+len(b)) for p,b in old[0]]+[(p,p+len(b)) for p,b,a in BASE_CHANGES]+[(p,p+len(b)) for p,b in previous_pack[0]]+[(p,p+len(b)) for p,b in older_pack[0]]+[(p,p+len(b)) for p,b in spirits_pack[0]];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
+ PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();old=load_old_pack();previous_pack=load_pack(PREVIOUS_PACK);older_pack=load_pack(OLDER_PACK);spirits_pack=load_pack(SPIRITS_PACK);party_pack=load_pack(PARTY_PACK);spans=[(p,p+len(b)) for p,b in old[0]]+[(p,p+len(b)) for p,b,a in BASE_CHANGES]+[(p,p+len(b)) for p,b in previous_pack[0]]+[(p,p+len(b)) for p,b in older_pack[0]]+[(p,p+len(b)) for p,b in spirits_pack[0]]+[(p,p+len(b)) for p,b in party_pack[0]];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
+ # Full-resource journals also include unchanged trailing padding. Cover it so
+ # recognizing an older input can safely restore the exact earlier bytes.
+ for e in json.loads((ROOT/'support_overhaul_journal.json').read_text(encoding='utf-8'))['edits']:
+  at=e['offset'];n=len(unpack(e,'before'));spans.append((at//4096*4096,(at+n+4095)//4096*4096))
  print('Scanning original and canonical ISO without creating images...',flush=True)
  with source_image() as a,TARGET.open('rb') as b:
   pos=0
@@ -217,10 +243,10 @@ def build():
     for p,b in es:setbytes(data,p,b)
   profiles.append(fingerprint(ranges,data))
  assert len(set(profiles))==(1<<len(OPTIONS)),'Each checkbox must have a distinct reversible profile'
- legacy_inputs={fingerprint(ranges,legacy):127}
+ legacy_inputs={fingerprint(ranges,legacy):511}
  # Recognize the earlier canonical states before base/SP/price updates.
  previous=[bytearray(b) for b in legacy]
- for name in ['story_consistency_journal.json','party_25_journal.json','spirit_balance_25_journal.json','upstream_rebase_journal.json','sp_and_prices_revision_journal.json']:
+ for name in ['support_overhaul_journal.json','story_consistency_journal.json','party_25_journal.json','spirit_balance_25_journal.json','upstream_rebase_journal.json','sp_and_prices_revision_journal.json']:
   journal=json.loads((ROOT/name).read_text(encoding='utf-8'))
   for e in journal['edits']:setbytes(previous,e['offset'],unpack(e,'before'))
   legacy_inputs[fingerprint(ranges,previous)]=127
@@ -232,8 +258,8 @@ def build():
  for at,b in common:
   if len(b)==1:setbytes(canonical_after,at,b)
  for at,b in features[6]:setbytes(canonical_after,at,b)
- legacy_inputs[fingerprint(ranges,canonical_after)]=127
- for regions,fs,base_hash in [load_pack(OLD_PACK),older_pack,spirits_pack,previous_pack]:
+ legacy_inputs[fingerprint(ranges,canonical_after)]=511
+ for regions,fs,base_hash in [load_pack(OLD_PACK),older_pack,spirits_pack,party_pack,previous_pack]:
   source_data=old_original if base_hash!=sh.digest() else [r[1] for r in ranges]
   for mask in range(1<<len(fs)):
    data=[bytearray(b) for b in source_data]
