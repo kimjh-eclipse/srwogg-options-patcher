@@ -3,12 +3,12 @@ import json,hashlib,zipfile
 
 HERE=Path(__file__).resolve().parent
 WORK=HERE.parent
-DIST=WORK/'release_v20261106.1'
+DIST=WORK/'release_v20261106.2'
 meta=json.loads((HERE/'build_metadata.json').read_text(encoding='utf-8'))
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def report(name):return json.loads((HERE/name).read_text(encoding='utf-8-sig'))
 
-readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.1
+readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.2
 
 사용 방법
 1. ZIP을 압축 해제합니다. patcher 폴더의 EXE와 BIN은 같은 폴더에 두세요.
@@ -62,15 +62,19 @@ readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.1
    공격력 개조 상승량은 유지됩니다. 옵션을 해제하면 외전 원래 비용표입니다.
 
 공통 적용
-- 정신기 SP 1 옵션을 제거했습니다. 모든 파일럿은 원래 정신기 소모량을 사용합니다.
-- 이전 8옵션 적용본의 256가지 조합도 인식하며 새로 적용하면 SP 소모량이 복원됩니다.
+- 정신기 SP 1 옵션을 제거했습니다. 기존 파일럿은 원래 소모량을, 추가 파일럿 13명은 역할별 조정 소모량을 사용합니다.
+- 이전 8옵션 256조합과 v20261106.1의 7옵션 128조합도 인식합니다.
+- 추가 25명 중 13명의 구성·비용·습득 레벨을 조정했습니다. SP 최대치는 유지합니다.
+- 울즈·안사즈의 각성은 SP60·Lv38, 스리사즈는 돌격형 구성입니다.
+- 템페스트의 사랑은 SP65·Lv38이며 비어 있던 트윈 정신기 4개를 보완했습니다.
+- 정찰 SP1은 원작의 정상 비용이므로 유지합니다.
 - 기존 작업의 지형명·도움말·추가 전투 자막 등 한글 표시 수정을 포함합니다.
 - 비활성 추가 기체 데이터와 기능 실행에 공통으로 필요한 자원은 남습니다.
 - 7개 옵션을 모두 해제해도 수정 전 원본과 완전히 같은 파일은 아닙니다.
   패처 최초 사용 전의 정확한 파일로 돌아가려면 [처음 상태 복원]을 사용하세요.
 
 원복과 옵션 변경
-- 첫 적용 때 ISO 옆에 .v20261106.1.oggbak 복원 기록을 만듭니다.
+- 첫 적용 때 ISO 옆에 .v20261106.2.oggbak 복원 기록을 만듭니다.
   이전 버전의 .oggbak과는 별도로 관리합니다. 기존 기록은 덮어쓰지 않습니다.
   전체 ISO 복사본이 아니라 변경 구간만 저장하는 작은 파일입니다.
 - [처음 상태 복원]은 해당 기록을 만든 첫 적용 직전의 파일로 복원합니다.
@@ -96,6 +100,7 @@ readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.1
 - 배포 ZIP에는 게임 ISO·전체 ISO 백업·제작자의 원본 한글 패치 파일이 포함되지 않습니다.
 '''
 (DIST/'읽어주세요.txt').write_text(readme,encoding='utf-8-sig')
+(DIST/'정신기_조정내역.md').write_text((HERE/'spirit_balance_details.md').read_text(encoding='utf-8'),encoding='utf-8')
 validation={
  'passed':True,'live_playthrough':False,
  'profile_selftest':report('selftest.json'),
@@ -103,7 +108,7 @@ validation={
  'real_iso_transitions':report('iso_transition_validation.json'),
  'native_option_behavior':report('native_options_validation.json'),
  'ui_render_verified':True,
- 'canonical_revision':{k:v for k,v in json.loads((WORK/'sp_and_prices_revision_journal.json').read_text(encoding='utf-8')).items() if k!='edits'},
+ 'canonical_revision':{k:v for k,v in json.loads((WORK/'spirit_balance_25_journal.json').read_text(encoding='utf-8')).items() if k!='edits'},
  'canonical_verification':report('canonical_verification.json'),
  'official_base':meta['upstream_base'],
  'upstream_rebase':{k:v for k,v in json.loads((WORK/'upstream_rebase_journal.json').read_text(encoding='utf-8')).items() if k not in ['edits','semantic_strings']}}
@@ -115,15 +120,15 @@ info.update(executable_sha256=sha(DIST/'patcher/OGG_Options_Patcher.exe'),canoni
 (DIST/'PATCH_INFO.json').write_text(json.dumps(info,ensure_ascii=False,indent=2),encoding='utf-8')
 files=sorted(p for p in DIST.rglob('*') if p.is_file() and p.name!='SHA256SUMS.txt')
 (DIST/'SHA256SUMS.txt').write_text(''.join(sha(p)+'  '+p.relative_to(DIST).as_posix()+'\n' for p in files),encoding='utf-8')
-zip_path=WORK/'SRWOGG_Options_kr_v20261106.1.zip'
+zip_path=WORK/'SRWOGG_Options_kr_v20261106.2.zip'
 with zipfile.ZipFile(zip_path,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  for p in sorted(DIST.rglob('*')):
-  if p.is_file():z.write(p,'SRWOGG_Options_kr_v20261106.1/'+p.relative_to(DIST).as_posix())
+  if p.is_file():z.write(p,'SRWOGG_Options_kr_v20261106.2/'+p.relative_to(DIST).as_posix())
 with zipfile.ZipFile(zip_path) as z:
  assert z.testzip() is None
  assert all(not n.lower().endswith(('.iso','.oggbak')) for n in z.namelist())
  for p in sorted(DIST.rglob('*')):
-  if p.is_file():assert hashlib.sha256(z.read('SRWOGG_Options_kr_v20261106.1/'+p.relative_to(DIST).as_posix())).hexdigest()==sha(p)
+  if p.is_file():assert hashlib.sha256(z.read('SRWOGG_Options_kr_v20261106.2/'+p.relative_to(DIST).as_posix())).hexdigest()==sha(p)
 summary={'passed':True,'zip':str(zip_path),'zip_bytes':zip_path.stat().st_size,'zip_sha256':sha(zip_path),'canonical_sha256':meta['canonical_iso_sha256'],'options':7,'verified_profiles':128,'extra_full_ISOs_created':0}
 (HERE/'release_completion.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding='utf-8')
 print(json.dumps(summary,ensure_ascii=False,indent=2))

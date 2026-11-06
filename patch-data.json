@@ -1,9 +1,9 @@
 {
-  "version": "v20261106.1",
+  "version": "v20261106.2",
   "file": "OGG_options.bin",
-  "sha256": "7ba6f0f4c7059c4617acd1275dec0e5570c57e50f734e52e36b1f5b2f711917a",
-  "bytes": 1708995,
+  "sha256": "780bd809c67fc5d323a0493b898379d64a75202a6bbe2c57dd559cb2fb9ed46b",
+  "bytes": 1713736,
   "options": 7,
   "profiles": 128,
-  "release_zip_sha256": "7fdfb5c6932473887246a16836177c067397e05061de5d7cfe91037cd3e877db"
+  "release_zip_sha256": "eabb14a911281209a6b4ed1be1a565c8d0d3729d62cc4ac414b56971d28b0611"
 }

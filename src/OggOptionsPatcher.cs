@@ -11,7 +11,7 @@ using System.Windows.Forms;
 internal static class OggOptionsPatcher
 {
     const string ExpectedPackSha = "__PACK_SHA__";
-    const string Version = "v20261106.1";
+    const string Version = "v20261106.2";
     sealed class Region { public long Offset; public byte[] Original, Zero; }
     sealed class Edit { public long Offset; public byte[] Data; }
     sealed class Pack {
@@ -169,7 +169,7 @@ internal static class OggOptionsPatcher
             Button choose=new Button { Text="ISO 선택",Dock=DockStyle.Fill };choose.Click+=delegate { using(OpenFileDialog d=new OpenFileDialog { Filter="PS2 ISO (*.iso)|*.iso",Title="패치할 OG외전 한글판 ISO를 선택하세요" }) if(d.ShowDialog()==DialogResult.OK) path.Text=d.FileName; };picker.Controls.Add(choose,1,0);main.Controls.Add(picker,0,1);actions.Add(choose);actions.Add(path);
             FlowLayoutPanel options=new FlowLayoutPanel { Dock=DockStyle.Fill,FlowDirection=FlowDirection.TopDown,WrapContents=false,AutoScroll=true,Padding=new Padding(0,4,0,0) };
             for(int i=0;i<checks.Length;i++) { Panel row=new Panel { Width=830,Height=50,Margin=new Padding(0,0,0,2) };CheckBox box=new CheckBox { Left=0,Top=0,Width=820,Height=26,Text=(i+1)+". "+p.Names[i] };checks[i]=box;row.Controls.Add(box);row.Controls.Add(new Label { Left=24,Top=27,Width=800,Height=20,ForeColor=Color.DimGray,Font=new Font("맑은 고딕",9),Text=p.Descriptions[i] });options.Controls.Add(row);actions.Add(box); } main.Controls.Add(options,0,2);
-            messages.Dock=DockStyle.Fill;messages.Multiline=true;messages.ReadOnly=true;messages.ScrollBars=ScrollBars.Vertical;messages.Text="한글 표시 수정과 원래 SP 소모량을 적용합니다. 옵션은 모두 꺼진 상태로 시작합니다.\r\n[검사]를 누르면 현재 ISO의 옵션이 표시됩니다. 선택 후 [패치 적용]을 눌러 주세요.";main.Controls.Add(messages,0,3);
+            messages.Dock=DockStyle.Fill;messages.Multiline=true;messages.ReadOnly=true;messages.ScrollBars=ScrollBars.Vertical;messages.Text="한글 표시 수정과 추가 파일럿 정신기 조정을 적용합니다. 옵션은 모두 꺼진 상태로 시작합니다.\r\n[검사]를 누르면 현재 ISO의 옵션이 표시됩니다. 선택 후 [패치 적용]을 눌러 주세요.";main.Controls.Add(messages,0,3);
             FlowLayoutPanel bar=new FlowLayoutPanel { Dock=DockStyle.Fill,FlowDirection=FlowDirection.LeftToRight,Padding=new Padding(0,8,0,0) };
             Button verify=new Button { Text="검사",Width=100,Height=30 },apply=new Button { Text="패치 적용",Width=130,Height=30 },restore=new Button { Text="처음 상태 복원",Width=150,Height=30 };
             verify.Click+=delegate { Start(0); };apply.Click+=delegate { Start(1); };restore.Click+=delegate { Start(2); };bar.Controls.AddRange(new Control[] {verify,apply,restore});actions.Add(verify);actions.Add(apply);actions.Add(restore);progress.Width=230;progress.Height=26;progress.Margin=new Padding(16,2,0,0);bar.Controls.Add(progress);main.Controls.Add(bar,0,4);
