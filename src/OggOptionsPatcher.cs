@@ -11,7 +11,7 @@ using System.Windows.Forms;
 internal static class OggOptionsPatcher
 {
     const string ExpectedPackSha = "__PACK_SHA__";
-    const string Version = "v20261106.5";
+    const string Version = "v20261107";
     sealed class Region { public long Offset; public byte[] Original, Zero; }
     sealed class Edit { public long Offset; public byte[] Data; }
     sealed class Pack {
@@ -37,7 +37,7 @@ internal static class OggOptionsPatcher
         byte[] raw=File.ReadAllBytes(path); if(Hex(Sha(raw))!=ExpectedPackSha) throw new InvalidDataException("OGG_options.bin의 검증값이 다릅니다. 같은 ZIP의 파일들을 함께 사용해 주세요.");
         Pack p=new Pack(); using(BinaryReader r=new BinaryReader(new MemoryStream(raw),Encoding.UTF8)) {
             if(Encoding.ASCII.GetString(ReadExact(r,8))!="OGGOPT01" || r.ReadInt32()!=1) throw new InvalidDataException("패치 형식 오류");
-            p.Size=r.ReadInt64(); p.SourceHash=ReadExact(r,32); int count=r.ReadInt32(); if(count!=9) throw new InvalidDataException("옵션 수 오류");
+            p.Size=r.ReadInt64(); p.SourceHash=ReadExact(r,32); int count=r.ReadInt32(); if(count!=10) throw new InvalidDataException("옵션 수 오류");
             p.Names=new string[count]; p.Descriptions=new string[count]; p.Features=new List<Edit>[count];
             for(int i=0;i<count;i++) { p.Names[i]=Encoding.UTF8.GetString(Blob(r)); p.Descriptions[i]=Encoding.UTF8.GetString(Blob(r)); }
             int regions=r.ReadInt32(); if(regions<1 || regions>100000) throw new InvalidDataException("구간 수 오류"); long end=0;
@@ -47,7 +47,7 @@ internal static class OggOptionsPatcher
                 for(int j=0;j<n;j++) { long at=r.ReadInt64(); int length=r.ReadInt32(); if(length<1 || length>p.Size || at<0 || at>p.Size-length) throw new InvalidDataException("옵션 범위 오류"); p.Features[i].Add(new Edit { Offset=at, Data=ReadExact(r,length) }); } }
             int profiles=r.ReadInt32(); if(profiles!=(1<<count)) throw new InvalidDataException("조합 수 오류"); p.Profiles=new byte[profiles][];
             for(int i=0;i<profiles;i++) { if(r.ReadInt32()!=i) throw new InvalidDataException("조합 순서 오류"); p.Profiles[i]=ReadExact(r,32); p.Known.Add(Hex(p.Profiles[i]),i); }
-            p.Known[Hex(ReadExact(r,32))]=-1; int legacy=r.ReadInt32(); if(legacy<0 || legacy>1024) throw new InvalidDataException("이전 버전 오류");
+            p.Known[Hex(ReadExact(r,32))]=-1; int legacy=r.ReadInt32(); if(legacy<0 || legacy>4096) throw new InvalidDataException("이전 버전 오류");
             for(int i=0;i<legacy;i++) { string key=Hex(ReadExact(r,32)); int mask=r.ReadInt32(); p.Known[key]=mask; }
             if(r.BaseStream.Position!=r.BaseStream.Length) throw new InvalidDataException("패치 뒤에 잉여 데이터가 있습니다.");
         } return p;
@@ -120,7 +120,7 @@ internal static class OggOptionsPatcher
     }
     static string SelfTest(Pack p) {
         for(int mask=0;mask<p.Profiles.Length;mask++) if(Fingerprint(p,Compose(p,mask))!=Hex(p.Profiles[mask])) throw new InvalidDataException("옵션 조합 검증 실패: "+mask);
-        return "{\"passed\":true,\"profiles\":512,\"checkboxes\":9}";
+        return "{\"passed\":true,\"profiles\":"+p.Profiles.Length+",\"checkboxes\":"+p.Names.Length+"}";
     }
     static string Exercise(Pack p,string path,Action<string> log) {
         string backup=path+"."+Version+".oggbak"; if(File.Exists(backup)) throw new IOException("검사용 경로에 기존 .oggbak이 있습니다. 덮어쓰지 않습니다.");
@@ -159,7 +159,7 @@ internal static class OggOptionsPatcher
             if(args.Length==0) MessageBox.Show(e.Message,"OG외전 옵션 패처",MessageBoxButtons.OK,MessageBoxIcon.Error); else Console.Error.WriteLine(e); return 1; }
     }
     sealed class Window:Form {
-        readonly Pack pack; readonly TextBox path=new TextBox(),messages=new TextBox(); readonly CheckBox[] checks=new CheckBox[9]; readonly ProgressBar progress=new ProgressBar(); readonly List<Control> actions=new List<Control>(); bool busy;
+        readonly Pack pack; readonly TextBox path=new TextBox(),messages=new TextBox(); readonly CheckBox[] checks=new CheckBox[10]; readonly ProgressBar progress=new ProgressBar(); readonly List<Control> actions=new List<Control>(); bool busy;
         public Window(Pack p) {
             pack=p; Text="슈퍼로봇대전 OG외전 옵션 패처 "+Version; Font=new Font("맑은 고딕",10); ClientSize=new Size(900,820); MinimumSize=new Size(800,760); StartPosition=FormStartPosition.CenterScreen;
             TableLayoutPanel main=new TableLayoutPanel { Dock=DockStyle.Fill,Padding=new Padding(16),ColumnCount=1,RowCount=5 };

@@ -1,0 +1,304 @@
+{
+  "passed": true,
+  "live_playthrough": false,
+  "playtesting_owner": "user",
+  "full_iso_profile_exercise_run": false,
+  "profile_selftest": {
+    "passed": true,
+    "profiles": 1024,
+    "checkboxes": 10
+  },
+  "previous_base_read_only_verification": {
+    "passed": true,
+    "mask": 0,
+    "sha256": "a9f7f03c4cb722f9e0709860a1cf5a16fc52d8bf116a9458403ffc5a67fd7f63"
+  },
+  "followup_dialogue": {
+    "passed": true,
+    "scope": "targeted native dialogue/history and persistent event flags; no playthrough",
+    "live_playthrough": false,
+    "scenes": [
+      {
+        "chapter": 25,
+        "boxes": 18,
+        "repeat_and_saved_state_reload_skipped": true
+      },
+      {
+        "chapter": 29,
+        "boxes": 16,
+        "repeat_and_saved_state_reload_skipped": true
+      },
+      {
+        "chapter": 31,
+        "boxes": 11,
+        "repeat_and_saved_state_reload_skipped": true
+      },
+      {
+        "chapter": 32,
+        "boxes": 12,
+        "repeat_and_saved_state_reload_skipped": true
+      },
+      {
+        "chapter": 36,
+        "boxes": 16,
+        "repeat_and_saved_state_reload_skipped": true
+      }
+    ],
+    "scene_count": 5,
+    "new_boxes": 73,
+    "native_string_history_checks": 146,
+    "dialogue_history_entries_checked": 2267,
+    "native_original_records_and_strings_preserved": true,
+    "only_text_and_event_flags_added": true,
+    "chapter29_maintenance_independence": [
+      {
+        "maintenance_enabled": false,
+        "new_followup_boxes": 16,
+        "maintenance_boxes": 0
+      },
+      {
+        "maintenance_enabled": true,
+        "new_followup_boxes": 16,
+        "maintenance_boxes": 3
+      }
+    ],
+    "old_epilogue_state_independence": true,
+    "original_final_lines_still_last": true,
+    "save_reload": "persistent Save/Diff arrays restored into a fresh VM; no memory-card I/O"
+  },
+  "option_composition": {
+    "passed": true,
+    "pack_sha256": "67c10a70e7ebd1d8ecc9db3f4f4601a65ce204f32050cc1a310520d54b26d766",
+    "profiles": 1024,
+    "scene_profile_checks": 5120,
+    "encoded_dialogue_comparisons": 37376,
+    "story_off_uses_original_scripts": true,
+    "other_feature_edits_preserved": true,
+    "new_chapter32_directory_switch_checked": true,
+    "chapter29_native_composed_profiles": [
+      {
+        "mask": 1,
+        "followup_boxes": 16,
+        "maintenance_boxes": 0,
+        "repeat_boxes": 0
+      },
+      {
+        "mask": 257,
+        "followup_boxes": 16,
+        "maintenance_boxes": 3,
+        "repeat_boxes": 0
+      }
+    ],
+    "early_equipment_selection_checks": 1024,
+    "early_equipment_independence": [
+      {
+        "mask": 0,
+        "story": false,
+        "eight_supplies": false,
+        "early_equipment": false,
+        "early_grants": 0,
+        "supply_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 1,
+        "story": true,
+        "eight_supplies": false,
+        "early_equipment": false,
+        "early_grants": 0,
+        "supply_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 4,
+        "story": false,
+        "eight_supplies": true,
+        "early_equipment": false,
+        "early_grants": 0,
+        "supply_grants": 8,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 5,
+        "story": true,
+        "eight_supplies": true,
+        "early_equipment": false,
+        "early_grants": 0,
+        "supply_grants": 8,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 512,
+        "story": false,
+        "eight_supplies": false,
+        "early_equipment": true,
+        "early_grants": 4,
+        "supply_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 513,
+        "story": true,
+        "eight_supplies": false,
+        "early_equipment": true,
+        "early_grants": 4,
+        "supply_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 516,
+        "story": false,
+        "eight_supplies": true,
+        "early_equipment": true,
+        "early_grants": 4,
+        "supply_grants": 8,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 517,
+        "story": true,
+        "eight_supplies": true,
+        "early_equipment": true,
+        "early_grants": 4,
+        "supply_grants": 8,
+        "repeat_grants": 0
+      }
+    ],
+    "legacy_recognition": {
+      "previous_8_option_profiles_recognized": 256,
+      "v20261106_1_profiles_recognized": 128,
+      "v20261106_2_profiles_recognized": 128,
+      "v20261106_3_profiles_recognized": 128,
+      "v20261106_4_profiles_recognized": 128,
+      "v20261106_5_profiles_recognized": 512,
+      "removed_SP_bit_not_exposed": true
+    },
+    "live_playthrough": false,
+    "ISO_writes_performed": false
+  },
+  "early_equipment": {
+    "passed": true,
+    "chapter": 3,
+    "flag": [
+      59,
+      7
+    ],
+    "units": [
+      [
+        1222,
+        "빌트팔켄 타입 L"
+      ],
+      [
+        1052,
+        "아슈세이버"
+      ]
+    ],
+    "weapons": [
+      [
+        3510,
+        "그라비톤 런처"
+      ],
+      [
+        3500,
+        "G 임팩트 스테이크"
+      ]
+    ],
+    "native_text_history_checks": 4,
+    "cases": [
+      {
+        "enabled": false,
+        "already_owned_units": false,
+        "grant_commands": 0,
+        "pilots_unchanged": true,
+        "existing_unit_records_preserved": true,
+        "repeat_and_saved_state_reload_grants": 0
+      },
+      {
+        "enabled": true,
+        "already_owned_units": false,
+        "grant_commands": 4,
+        "pilots_unchanged": true,
+        "existing_unit_records_preserved": true,
+        "repeat_and_saved_state_reload_grants": 0
+      },
+      {
+        "enabled": true,
+        "already_owned_units": true,
+        "grant_commands": 4,
+        "pilots_unchanged": true,
+        "existing_unit_records_preserved": true,
+        "repeat_and_saved_state_reload_grants": 0
+      }
+    ],
+    "unit_pilot_weapon_master_data_changed": false,
+    "new_pilots": 0,
+    "live_playthrough": false,
+    "save_reload": "Save/Diff arrays restored into a fresh VM; no memory-card I/O"
+  },
+  "early_equipment_revision": {
+    "applied": true,
+    "before_sha256": "80a28a4fcf0d9713e5bc40285271d07728bbe6b6d618d6fabfbd68aa65b21513",
+    "chapter": 3,
+    "units": [
+      [
+        1222,
+        "빌트팔켄 타입 L"
+      ],
+      [
+        1052,
+        "아슈세이버"
+      ]
+    ],
+    "weapons": [
+      [
+        3510,
+        "그라비톤 런처"
+      ],
+      [
+        3500,
+        "G 임팩트 스테이크"
+      ]
+    ],
+    "new_pilots": 0,
+    "gameplay_master_UNTD_and_balances_preserved": true,
+    "extra_full_ISOs_created": 0,
+    "after_sha256": "70036f186e13810eef0794ff852bd476a2b76ef89e1af51d4ff7e9189abb702b",
+    "all_other_image_bytes_preserved": true
+  },
+  "canonical_revision": {
+    "applied": true,
+    "before_sha256": "9c3a85d5395fb9ba202fe1158992d70d9a32fb6509cd5a2dfdfc50481d4c7d0b",
+    "scene_count": 5,
+    "new_boxes": 73,
+    "chapters": [
+      25,
+      29,
+      31,
+      32,
+      36
+    ],
+    "gameplay_master_UNTD_and_balances_preserved": true,
+    "extra_full_ISOs_created": 0,
+    "after_sha256": "80a28a4fcf0d9713e5bc40285271d07728bbe6b6d618d6fabfbd68aa65b21513",
+    "all_other_image_bytes_preserved": true
+  },
+  "canonical_verification": {
+    "passed": true,
+    "mask": 1023,
+    "sha256": "70036f186e13810eef0794ff852bd476a2b76ef89e1af51d4ff7e9189abb702b"
+  },
+  "official_base": {
+    "passed": true,
+    "official_repository": "https://github.com/z3oo3z/PS2-SRWOGG-KPatch",
+    "release": "SRWOGG",
+    "version": "1.4.3s",
+    "source_md5": "cb7dc4485f46f220c46095c966a3aad0",
+    "base_sha256": "e819f1e524513bc7e273b004ba02e3977dd4fff365a5887b4eb1c8a9fc9d1e04",
+    "base_md5": "a5254cd5d4deabc57e03a3dcbb6a88d7",
+    "bytes": 4666294272,
+    "xdelta_target_checksums_verified": true,
+    "verified_windows": 557,
+    "changed_pages_from_previous_base": 64,
+    "extra_full_ISOs_created": 0
+  }
+}

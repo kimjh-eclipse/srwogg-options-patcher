@@ -3,12 +3,12 @@ import json,hashlib,zipfile
 
 HERE=Path(__file__).resolve().parent
 WORK=HERE.parent
-DIST=WORK/'release_v20261106.5'
+DIST=WORK/'release_v20261107'
 meta=json.loads((HERE/'build_metadata.json').read_text(encoding='utf-8'))
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def report(name):return json.loads((HERE/name).read_text(encoding='utf-8-sig'))
 
-readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.5 — 수리·보급과 후반 정비
+readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261107 — 합류 이후 관계 시나리오
 
 사용 방법
 1. ZIP을 압축 해제합니다. patcher 폴더의 EXE와 BIN은 같은 폴더에 두세요.
@@ -28,11 +28,11 @@ readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.5 — �
 - 파일 크기: 4,666,294,272바이트.
 - 기준 원본 SHA-256:
   e819f1e524513bc7e273b004ba02e3977dd4fff365a5887b4eb1c8a9fc9d1e04
-- 현재 SRWOGS_EX_K_TEST.ISO도 인식하며 [검사] 시 9개 옵션이 선택됩니다.
+- 현재 SRWOGS_EX_K_TEST.ISO도 인식하며 [검사] 시 10개 옵션이 선택됩니다.
 - 다른 개조판이나 지원되지 않는 변경이 있는 ISO는 쓰기 전에 거부합니다.
 - Python이나 xdelta 설치 없이 Windows의 .NET Framework로 실행됩니다.
 
-선택 옵션 (9개, 실행 직후 기본값은 모두 해제)
+선택 옵션 (10개, 실행 직후 기본값은 모두 해제)
 1. 25편성 분산 합류·추가 시나리오
    3화부터 전이 관련 대화, 4~31화에 25편성이 분산 합류합니다.
    죽기 직전 차원이동 설정과 레몬·액셀렌의 자매 인연을 포함합니다.
@@ -73,7 +73,22 @@ readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.5 — �
    기존 육성과 무장 개조를 유지합니다. 이미 소비한 탄약을 즉시 채워 주지는 않습니다.
    중간 세이브에서도 진행도 조건을 만족하면 적용하며 안내 이벤트만 소급 재생하지 않습니다.
 
-시나리오 대사 수정 (1번 옵션 선택 시)
+10. 3화 기체·무장 조기 입수
+   빌트팔켄 타입 L·아슈세이버 각 1기, 그라비톤 런처·G 임팩트 스테이크 각 1개.
+   기체만 추가하며 파일럿 추가·강제 탑승은 없습니다. 원래 성능과 기본 무장을 사용합니다.
+   1번 추가 시나리오·3번 8종 보급과 독립 동작하고 중복 지급하지 않습니다.
+   이미 보유한 동일 기체는 복제하거나 육성·개조를 초기화하지 않습니다.
+   3화 해당 이벤트 이후에는 소급 지급하지 않으므로 이벤트 이전 세이브부터 진행하세요.
+
+후속 시나리오 보강 (1번 옵션 선택 시)
+- 25·29·31·32·36화에 새 장면 5개, 대사 73개를 추가했습니다.
+- 잉그램과 SRX팀의 신뢰 회복, 오우카와 아이들의 상호 돌봄, 비안과 류네의 다른 시간을 다룹니다.
+- 레몬·액셀렌은 대신할 수 없는 두 사람으로서 자매의 인연을 이어 갑니다.
+- 빈델·웬드로는 조건부 공투와 책임을 유지하며, 원작의 죽음과 마지막 대사를 보존합니다.
+- 합류 화수·편성·능력치·무장·보상은 이번 대사 보강으로 바뀌지 않습니다.
+- 자세한 장면과 작성 대사는 후속시나리오_대사.md에 있습니다.
+
+이전 본편 연결 수정 (1번 옵션 선택 시)
 - 13개 화의 대사 31개를 다듬고 최종전 반응 대사 3개를 추가했습니다.
 - 28화의 빈델 장면은 피오나 귀환과 라미아 구출 작전 설명 뒤로 옮겼습니다.
 - 35화의 추가 인물 반응은 라울·미즈호의 데스피니스 구조 뒤로 옮겼습니다.
@@ -90,6 +105,7 @@ readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.5 — �
   이 복구는 추가 시나리오 옵션을 꺼도 적용됩니다. 이미 지난 28화 이벤트는 재실행되지 않습니다.
 - 시나리오 해제 시 사용하는 보급·복구 스크립트가 상위 파일 범위에 포함되도록 수정했습니다.
 - 정신기 SP 1 옵션을 제거했습니다. 기존 파일럿은 원래 소모량을, 추가 파일럿 13명은 역할별 조정 소모량을 사용합니다.
+- v20261106.5의 9옵션 512조합을 인식하고 지원 장비·정비 선택을 유지합니다.
 - 이전 8옵션 256조합과 v20261106.1·v20261106.2·v20261106.3·v20261106.4의 7옵션 각 128조합도 인식합니다.
 - 추가 25명 중 13명의 구성·비용·습득 레벨을 조정했습니다. SP 최대치는 유지합니다.
 - 울즈·안사즈의 각성은 SP60·Lv38, 스리사즈는 돌격형 구성입니다.
@@ -97,11 +113,11 @@ readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.5 — �
 - 정찰 SP1은 원작의 정상 비용이므로 유지합니다.
 - 기존 작업의 지형명·도움말·추가 전투 자막 등 한글 표시 수정을 포함합니다.
 - 비활성 추가 기체 데이터와 기능 실행에 공통으로 필요한 자원은 남습니다.
-- 9개 옵션을 모두 해제해도 수정 전 원본과 완전히 같은 파일은 아닙니다.
+- 10개 옵션을 모두 해제해도 수정 전 원본과 완전히 같은 파일은 아닙니다.
   패처 최초 사용 전의 정확한 파일로 돌아가려면 [처음 상태 복원]을 사용하세요.
 
 원복과 옵션 변경
-- 첫 적용 때 ISO 옆에 .v20261106.5.oggbak 복원 기록을 만듭니다.
+- 첫 적용 때 ISO 옆에 .v20261107.oggbak 복원 기록을 만듭니다.
   이전 버전의 .oggbak과는 별도로 관리합니다. 기존 기록은 덮어쓰지 않습니다.
   전체 ISO 복사본이 아니라 변경 구간만 저장하는 작은 파일입니다.
 - [처음 상태 복원]은 해당 기록을 만든 첫 적용 직전의 파일로 복원합니다.
@@ -119,13 +135,11 @@ readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.5 — �
   배치 때 저장되는 적 개조 단계는 해당 맵 진입 전부터 진행해 주세요.
 
 검증 범위
-- 512가지 조합을 생성하고 실제 시험 ISO에 전환·읽기 검증했습니다.
-- 복원 기록을 이용해 시험 ISO를 원래 SHA-256으로 복원했습니다.
-- 실제 게임의 R5900 루틴으로 보급 중복 방지, 대화 문자열·로그,
-  보상 계산 및 적 능력치·HP를 검사했습니다.
-- 패처 화면도 렌더링 확인했습니다. 편성 보존은 실제 게임 루틴과 통제된 입력으로 검사했습니다.
-  맵 유닛 조회는 부재 조건으로 대체했으며, 재로드는 영구 저장 데이터의 VM 복원입니다.
-  실제 메모리카드 저장·로드나 PCSX2 전편 실기 플레이는 미검증입니다.
+- 새 73개 대사의 실제 게임 문자열·이력 조회 146건과 전체 대사 이력 2,267항목을 확인했습니다.
+- 새 장면의 1회 실행, 반복 건너뛰기 및 영구 저장 데이터를 새 VM에 복원했을 때의 중복 방지를 확인했습니다.
+- 1,024개 옵션 조합을 메모리에서 합성하여 장면의 선택·해제와 29화 정비 옵션 독립 동작을 확인했습니다.
+- 이전 적용본 인식과 패처 자체 검사를 진행했습니다. 이번 버전에서 1,024개 조합을 ISO에 반복 쓰지는 않았습니다.
+- PCSX2 플레이 테스트는 사용자가 진행합니다. 실제 메모리카드 I/O·전편 플레이를 검증했다고 주장하지 않습니다.
 - 배포 ZIP에는 게임 ISO·전체 ISO 백업·제작자의 원본 한글 패치 파일이 포함되지 않습니다.
 '''
 (DIST/'읽어주세요.txt').write_text(readme,encoding='utf-8-sig')
@@ -134,39 +148,37 @@ readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.5 — �
 (DIST/'편성보존_수정내역.md').write_text((HERE/'party_preservation_details.md').read_text(encoding='utf-8'),encoding='utf-8')
 (DIST/'정신기_조정내역.md').write_text((HERE/'spirit_balance_details.md').read_text(encoding='utf-8'),encoding='utf-8')
 validation={
- 'passed':True,'live_playthrough':False,
+ 'passed':True,'live_playthrough':False,'playtesting_owner':'user',
+ 'full_iso_profile_exercise_run':False,
  'profile_selftest':report('selftest.json'),
  'previous_base_read_only_verification':report('source_verification.json'),
- 'real_iso_transitions':report('iso_transition_validation.json'),
- 'native_option_behavior':report('native_options_validation.json'),
- 'ui_render_verified':True,
- 'party_preservation':json.loads((WORK/'party_25_validation.json').read_text(encoding='utf-8')),
- 'story_consistency':json.loads((WORK/'story_consistency_validation.json').read_text(encoding='utf-8')),
- 'current_recruitment_and_reload':report('recruitment_validation.json'),
- 'support_overhaul':json.loads((WORK/'support_overhaul_validation.json').read_text(encoding='utf-8')),
- 'canonical_revision':{k:v for k,v in json.loads((WORK/'support_overhaul_journal.json').read_text(encoding='utf-8')).items() if k!='edits'},
+ 'followup_dialogue':json.loads((WORK/'followup_story_validation.json').read_text(encoding='utf-8')),
+ 'option_composition':report('followup_options_validation.json'),
+ 'early_equipment':json.loads((WORK/'early_equipment_validation.json').read_text(encoding='utf-8')),
+ 'early_equipment_revision':{k:v for k,v in json.loads((WORK/'early_equipment_journal.json').read_text(encoding='utf-8')).items() if k!='edits'},
+ 'canonical_revision':{k:v for k,v in json.loads((WORK/'followup_story_journal.json').read_text(encoding='utf-8')).items() if k!='edits'},
  'canonical_verification':report('canonical_verification.json'),
- 'official_base':meta['upstream_base'],
- 'upstream_rebase':{k:v for k,v in json.loads((WORK/'upstream_rebase_journal.json').read_text(encoding='utf-8')).items() if k not in ['edits','semantic_strings']}}
-assert all(validation[k]['passed'] for k in ['profile_selftest','previous_base_read_only_verification','real_iso_transitions','native_option_behavior'])
-assert validation['party_preservation']['passed'] and validation['story_consistency']['passed'] and validation['support_overhaul']['passed']
-assert validation['native_option_behavior']['pack_sha256']==meta['pack_sha256']
-assert validation['real_iso_transitions']['canonical_sha256_after']==meta['canonical_iso_sha256']
+ 'official_base':meta['upstream_base']}
+assert all(validation[k]['passed'] for k in ['profile_selftest','previous_base_read_only_verification','followup_dialogue','option_composition','early_equipment','canonical_verification'])
+assert validation['profile_selftest']['profiles']==meta['profile_count'] and validation['profile_selftest']['checkboxes']==len(meta['options'])
+assert validation['option_composition']['pack_sha256']==meta['pack_sha256']
+assert validation['canonical_verification']['sha256']==meta['canonical_iso_sha256']
+(DIST/'후속시나리오_대사.md').write_text((HERE/'followup_story_details.md').read_text(encoding='utf-8'),encoding='utf-8')
 (DIST/'검증결과.json').write_text(json.dumps(validation,ensure_ascii=False,indent=2),encoding='utf-8')
 info={k:v for k,v in meta.items() if k not in ['proof','shutdown_requested']}
 info.update(executable_sha256=sha(DIST/'patcher/OGG_Options_Patcher.exe'),canonical_iso_preserved_during_option_tests=True,canonical_revision_applied=True,source_iso_preserved=True,live_playthrough=False)
 (DIST/'PATCH_INFO.json').write_text(json.dumps(info,ensure_ascii=False,indent=2),encoding='utf-8')
 files=sorted(p for p in DIST.rglob('*') if p.is_file() and p.name!='SHA256SUMS.txt')
 (DIST/'SHA256SUMS.txt').write_text(''.join(sha(p)+'  '+p.relative_to(DIST).as_posix()+'\n' for p in files),encoding='utf-8')
-zip_path=WORK/'SRWOGG_Options_kr_v20261106.5.zip'
+zip_path=WORK/'SRWOGG_Options_kr_v20261107.zip'
 with zipfile.ZipFile(zip_path,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  for p in sorted(DIST.rglob('*')):
-  if p.is_file():z.write(p,'SRWOGG_Options_kr_v20261106.5/'+p.relative_to(DIST).as_posix())
+  if p.is_file():z.write(p,'SRWOGG_Options_kr_v20261107/'+p.relative_to(DIST).as_posix())
 with zipfile.ZipFile(zip_path) as z:
  assert z.testzip() is None
  assert all(not n.lower().endswith(('.iso','.oggbak')) for n in z.namelist())
  for p in sorted(DIST.rglob('*')):
-  if p.is_file():assert hashlib.sha256(z.read('SRWOGG_Options_kr_v20261106.5/'+p.relative_to(DIST).as_posix())).hexdigest()==sha(p)
-summary={'passed':True,'zip':str(zip_path),'zip_bytes':zip_path.stat().st_size,'zip_sha256':sha(zip_path),'canonical_sha256':meta['canonical_iso_sha256'],'options':9,'verified_profiles':512,'extra_full_ISOs_created':0}
+  if p.is_file():assert hashlib.sha256(z.read('SRWOGG_Options_kr_v20261107/'+p.relative_to(DIST).as_posix())).hexdigest()==sha(p)
+summary={'passed':True,'zip':str(zip_path),'zip_bytes':zip_path.stat().st_size,'zip_sha256':sha(zip_path),'canonical_sha256':meta['canonical_iso_sha256'],'options':10,'verified_profiles':1024,'extra_full_ISOs_created':0}
 (HERE/'release_completion.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding='utf-8')
 print(json.dumps(summary,ensure_ascii=False,indent=2))

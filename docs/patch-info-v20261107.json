@@ -1,0 +1,92 @@
+{
+  "version": "v20261107",
+  "original_iso_sha256": "e819f1e524513bc7e273b004ba02e3977dd4fff365a5887b4eb1c8a9fc9d1e04",
+  "canonical_iso_sha256": "70036f186e13810eef0794ff852bd476a2b76ef89e1af51d4ff7e9189abb702b",
+  "iso_size": 4666294272,
+  "defaults": 0,
+  "options": [
+    {
+      "bit": 0,
+      "name": "25편성 분산 합류·추가 시나리오",
+      "description": "3화 전이 대화, 4~31화 합류. 기체 밸런스·본편 연결·관계 후속 장면 포함"
+    },
+    {
+      "bit": 1,
+      "name": "숨겨진 요소 자동 습득",
+      "description": "6·13·25·30화 보상 조건 해제. 미롱가는 양쪽 루트에서 입수"
+    },
+    {
+      "bit": 2,
+      "name": "3화 추가 보급 8종",
+      "description": "시시오 블레이드·부스트 해머와 강화파츠 6종을 각 1개 지급"
+    },
+    {
+      "bit": 3,
+      "name": "전투 보상: PP 2배·자금 +20%",
+      "description": "기존 보너스와 분배 계산 후 적용. 자금 소수점 버림"
+    },
+    {
+      "bit": 4,
+      "name": "적 강화",
+      "description": "전투 능력치 +5, 기체·무장 개조 +2, 기본 HP 2만 미만 +10%"
+    },
+    {
+      "bit": 5,
+      "name": "공통 무장 밸런스",
+      "description": "OGs 공통 무장 조정 이식. 외전 고유의 강화분 유지"
+    },
+    {
+      "bit": 6,
+      "name": "무장 개조비 할인",
+      "description": "OGs 최종 비용표: 0·1등급 동일, 10단계 88,000 / 105,600 / 176,000"
+    },
+    {
+      "bit": 7,
+      "name": "4화 수리·보급장치 추가",
+      "description": "수리장치·보급장치 각1개. 시나리오 선택과 별개로 한 번 지급"
+    },
+    {
+      "bit": 8,
+      "name": "30화부터 일부 기체 정비",
+      "description": "추가 아군6기의 무장9종 EN·탄수 소폭 개선. 기본 화력 유지"
+    },
+    {
+      "bit": 9,
+      "name": "3화 기체·무장 조기 입수",
+      "description": "빌트팔켄 L·아슈세이버 각1기, 그라비톤 런처·G 임팩트 스테이크 각1개. 파일럿 추가 없음"
+    }
+  ],
+  "profile_count": 1024,
+  "managed_ranges": 66,
+  "managed_bytes": 7966720,
+  "pack_sha256": "67c10a70e7ebd1d8ecc9db3f4f4601a65ce204f32050cc1a310520d54b26d766",
+  "pack_size": 2074760,
+  "legacy_profiles": 1291,
+  "sp_cost_policy": "native with 13 allied-clone role corrections",
+  "weapon_cost_steps": [
+    1600,
+    1600,
+    1920,
+    3200,
+    3200
+  ],
+  "upstream_base": {
+    "passed": true,
+    "official_repository": "https://github.com/z3oo3z/PS2-SRWOGG-KPatch",
+    "release": "SRWOGG",
+    "version": "1.4.3s",
+    "source_md5": "cb7dc4485f46f220c46095c966a3aad0",
+    "base_sha256": "e819f1e524513bc7e273b004ba02e3977dd4fff365a5887b4eb1c8a9fc9d1e04",
+    "base_md5": "a5254cd5d4deabc57e03a3dcbb6a88d7",
+    "bytes": 4666294272,
+    "xdelta_target_checksums_verified": true,
+    "verified_windows": 557,
+    "changed_pages_from_previous_base": 64,
+    "extra_full_ISOs_created": 0
+  },
+  "executable_sha256": "e393149399b5431f19d7676c730de8c7ccef51dfd7044cbb09ac56e0cee5df52",
+  "canonical_iso_preserved_during_option_tests": true,
+  "canonical_revision_applied": true,
+  "source_iso_preserved": true,
+  "live_playthrough": false
+}

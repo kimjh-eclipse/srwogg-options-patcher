@@ -1,4 +1,4 @@
-"""Build a nine-option patch without ever creating another full ISO."""
+"""Build a ten-option patch without ever creating another full ISO."""
 from pathlib import Path
 import sys,struct,json,hashlib,zlib,base64,bisect,zipfile
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
@@ -10,21 +10,23 @@ from inspect_iso import ROOT,OUT,SOURCE,read,u32,inventory,lice
 from audit_story_layout import TARGET,loadarc
 from story_scripts_25 import records,rebuild_logo,command,NONE
 from campaign_bonus_scripts import insert_commands,EARLY
+from early_equipment_policy import FLAG as EARLY_FLAG,script as early_script
 import numpy as np
 sys.path.insert(0,str(ROOT/'upstream_base'))
 from source_image import source_image,DATA as BASE_INFO,CHANGES as BASE_CHANGES
 
 HERE=Path(__file__).resolve().parent
-VERSION='v20261106.5'
+VERSION='v20261107'
 DIST=ROOT/('release_'+VERSION)
 OLD_PACK=ROOT/'release_v20261106/patcher/OGG_options.bin'
-PREVIOUS_PACK=ROOT/'release_v20261106.4/patcher/OGG_options.bin'
+PREVIOUS_PACK=ROOT/'release_v20261106.5/patcher/OGG_options.bin'
+CONSISTENCY_PACK=ROOT/'release_v20261106.4/patcher/OGG_options.bin'
 PARTY_PACK=ROOT/'release_v20261106.3/patcher/OGG_options.bin'
 SPIRITS_PACK=ROOT/'release_v20261106.2/patcher/OGG_options.bin'
 OLDER_PACK=ROOT/'release_v20261106.1/patcher/OGG_options.bin'
 PATCHER=DIST/'patcher'
 OPTIONS=[
- ('25편성 분산 합류·추가 시나리오','3화 전이 대화, 4~31화 합류. 기체 밸런스·본편 연결 대사 포함'),
+ ('25편성 분산 합류·추가 시나리오','3화 전이 대화, 4~31화 합류. 기체 밸런스·본편 연결·관계 후속 장면 포함'),
  ('숨겨진 요소 자동 습득','6·13·25·30화 보상 조건 해제. 미롱가는 양쪽 루트에서 입수'),
  ('3화 추가 보급 8종','시시오 블레이드·부스트 해머와 강화파츠 6종을 각 1개 지급'),
  ('전투 보상: PP 2배·자금 +20%','기존 보너스와 분배 계산 후 적용. 자금 소수점 버림'),
@@ -32,7 +34,8 @@ OPTIONS=[
  ('공통 무장 밸런스','OGs 공통 무장 조정 이식. 외전 고유의 강화분 유지'),
  ('무장 개조비 할인','OGs 최종 비용표: 0·1등급 동일, 10단계 88,000 / 105,600 / 176,000'),
  ('4화 수리·보급장치 추가','수리장치·보급장치 각1개. 시나리오 선택과 별개로 한 번 지급'),
- ('30화부터 일부 기체 정비','추가 아군6기의 무장9종 EN·탄수 소폭 개선. 기본 화력 유지')]
+ ('30화부터 일부 기체 정비','추가 아군6기의 무장9종 EN·탄수 소폭 개선. 기본 화력 유지'),
+ ('3화 기체·무장 조기 입수','빌트팔켄 L·아슈세이버 각1기, 그라비톤 런처·G 임팩트 스테이크 각1개. 파일럿 추가 없음')]
 
 def unpack(e,side):
  if side in e:return bytes.fromhex(e[side])
@@ -66,6 +69,7 @@ def plan():
   new,note=rebuild_logo(vanilla,point,line,{'카이':1090},(63,7))
   ix=next(i for i,r in enumerate(records(new)) if r[0]==0xba and r[2:5]==[0x100c1,63,7])
   new=insert_commands(new,ix,[command(op,key,0) for op,key,name in EARLY])
+  new,early_note=early_script(new)
   allocation=0x1b480000;assert not any(read(current,allocation,len(new))) and allocation+len(new)<0x1b594000
   recovery,recovery_ptr=native_recovery(original,la);common.append((NATIVE_RECOVERY,recovery))
   common.append((allocation,new));newptr=struct.pack('<II',allocation-la['directory'],len(new))
@@ -77,12 +81,16 @@ def plan():
     if slot==14 and chapter['key']==2026:zero=recovery_ptr
     if slot==14 and chapter['key']==2050:zero=bytes.fromhex(native_support['pointer_hex'])
     switch(0,at,zero,one)
+  # Chapter32 gains dialogue only; its UNTD stays native.
+  at=dp(la,2030);switch(0,at,read(original,at,8),read(current,at,8))
   # Both chapter-three variants contain a guarded supply block. Disabling the
   # option compares a 0/1 flag to 2, so the whole block remains unreachable.
   _,p,n=locate(le,2003)
   for base,blob in [(p,read(current,p,n)),(allocation,new)]:
    rows=records(blob);ix=next(i for i,r in enumerate(rows) if r[0]==0x93 and r[2:5]==[0x100c1,63,7]);cond=rows[ix+1].copy();assert cond[0]==0x91 and cond[4]==0
    disabled=cond.copy();disabled[4]=2;record_switch(2,base,blob,ix+1,disabled,cond)
+  for base,blob in [(p,read(current,p,n)),(allocation,new)]:
+   rows=records(blob);ix=next(i for i,r in enumerate(rows) if r[0]==0x93 and r[2:5]==[0x100c1,*EARLY_FLAG]);cond=rows[ix+1];disabled=cond.copy();disabled[4]=2;record_switch(9,base,blob,ix+1,disabled,cond)
   # Hidden conditions in original and additional-story payloads are independent
   # of which script directory entry the story checkbox selects.
   for key,grants in [(2005,[(0x60,31,[-1])]),(2023,[(0x64,3513,[-1]),(0x60,32,[-1])]),(2028,[(0x64,3530,[-1]),(0x60,33,[-5,-1])])]:
@@ -134,8 +142,8 @@ def plan():
      seen.add(address);zero=stock[pos+0x38:pos+0x50];values=struct.unpack('<6I',zero);one=struct.pack('<6I',*(min(v+2,15) for v in values));switch(4,address,zero,one)
   # Independent support flag in both reachable chapter4 variants.
   for label in ['support_story','support_native']:
-   item=support[label];blob=read(current,item['offset'],item['size']);rs=records(blob);ix=next(i for i,r in enumerate(rs) if r[0]==0x93 and r[2:5]==[0x100c1,*SUPPORT_FLAG]);on=rs[ix+1];disabled=on.copy();disabled[4]=2;record_switch(7,item['offset'],blob,ix+1,disabled,on)
-  item=support['maintenance_story'];blob=read(current,item['offset'],item['size']);rs=records(blob);ix=next(i for i,r in enumerate(rs) if r[0]==0x93 and r[2:5]==[0x100c1,*MAINTENANCE_FLAG]);on=rs[ix+1];disabled=on.copy();disabled[4]=2;record_switch(8,item['offset'],blob,ix+1,disabled,on)
+   item=support[label];_,base,size=locate(le,2050) if label=='support_story' else (None,item['offset'],item['size']);blob=read(current,base,size);rs=records(blob);ix=next(i for i,r in enumerate(rs) if r[0]==0x93 and r[2:5]==[0x100c1,*SUPPORT_FLAG]);on=rs[ix+1];disabled=on.copy();disabled[4]=2;record_switch(7,base,blob,ix+1,disabled,on)
+  _,base,size=locate(le,2027);blob=read(current,base,size);rs=records(blob);ix=next(i for i,r in enumerate(rs) if r[0]==0x93 and r[2:5]==[0x100c1,*MAINTENANCE_FLAG]);on=rs[ix+1];disabled=on.copy();disabled[4]=2;record_switch(8,base,blob,ix+1,disabled,on)
   for archive in ['SHARED.BIN','IM.BIN']:
    entry,master=rawmaster(current,archive)
    for unit in maintenance['masters'][archive]['units']:
@@ -163,7 +171,7 @@ def plan():
   for archive in ['SHARED.BIN','IM.BIN']:
    entry,master=rawmaster(current,archive)
    for at,old,replacement,key in edits_for_master(master.b,[r['key'] for ch in json.loads((ROOT/'story_25_prepared.json').read_text(encoding='utf-8'))['chapters'] for r in ch['recruits']]):common.append((entry['offset']+at,replacement))
-  proof.update(party_preservation=True,native_recovery_script_offset=NATIVE_RECOVERY,native_recovery_script_size=len(recovery),spirit_balanced_pilots=len(POLICY),native_supply_script_offset=allocation,native_supply_script_size=len(new),native_supply_messages=note['messages'],story_directory_edits=len(features[0]),enemy_record_edits=len([x for x in features[4] if len(x[1])==24]))
+  proof.update(party_preservation=True,native_recovery_script_offset=NATIVE_RECOVERY,native_recovery_script_size=len(recovery),spirit_balanced_pilots=len(POLICY),native_supply_script_offset=allocation,native_supply_script_size=len(new),native_supply_messages=note['messages'],early_equipment_native_messages=early_note['messages'],story_directory_edits=len(features[0]),enemy_record_edits=len([x for x in features[4] if len(x[1])==24]))
  # Deduplicate aliases and require independent options to touch disjoint bytes.
  for lists in [features,off]:
   for i,es in enumerate(lists):
@@ -195,7 +203,7 @@ def load_pack(path):
  def n(fmt):return struct.unpack(fmt,f.read(struct.calcsize(fmt)))
  def blob():return f.read(n('<I')[0])
  assert f.read(8)==b'OGGOPT01';assert n('<I')[0]==1
- n('<Q');source_hash=f.read(32);count=n('<I')[0];assert count in [7,8,9]
+ n('<Q');source_hash=f.read(32);count=n('<I')[0];assert count in [7,8,9,10]
  for _ in range(count):blob();blob()
  regions=[]
  for _ in range(n('<I')[0]):
@@ -210,7 +218,7 @@ def load_pack(path):
 def load_old_pack():return load_pack(OLD_PACK)[:2]
 
 def build():
- PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();old=load_old_pack();previous_pack=load_pack(PREVIOUS_PACK);older_pack=load_pack(OLDER_PACK);spirits_pack=load_pack(SPIRITS_PACK);party_pack=load_pack(PARTY_PACK);spans=[(p,p+len(b)) for p,b in old[0]]+[(p,p+len(b)) for p,b,a in BASE_CHANGES]+[(p,p+len(b)) for p,b in previous_pack[0]]+[(p,p+len(b)) for p,b in older_pack[0]]+[(p,p+len(b)) for p,b in spirits_pack[0]]+[(p,p+len(b)) for p,b in party_pack[0]];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
+ PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();old=load_old_pack();previous_pack=load_pack(PREVIOUS_PACK);older_pack=load_pack(OLDER_PACK);spirits_pack=load_pack(SPIRITS_PACK);party_pack=load_pack(PARTY_PACK);consistency_pack=load_pack(CONSISTENCY_PACK);spans=[(p,p+len(b)) for p,b in old[0]]+[(p,p+len(b)) for p,b,a in BASE_CHANGES]+[(p,p+len(b)) for p,b in previous_pack[0]]+[(p,p+len(b)) for p,b in older_pack[0]]+[(p,p+len(b)) for p,b in spirits_pack[0]]+[(p,p+len(b)) for p,b in party_pack[0]]+[(p,p+len(b)) for p,b in consistency_pack[0]];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
  # Full-resource journals also include unchanged trailing padding. Cover it so
  # recognizing an older input can safely restore the exact earlier bytes.
  for e in json.loads((ROOT/'support_overhaul_journal.json').read_text(encoding='utf-8'))['edits']:
@@ -243,13 +251,13 @@ def build():
     for p,b in es:setbytes(data,p,b)
   profiles.append(fingerprint(ranges,data))
  assert len(set(profiles))==(1<<len(OPTIONS)),'Each checkbox must have a distinct reversible profile'
- legacy_inputs={fingerprint(ranges,legacy):511}
+ legacy_inputs={fingerprint(ranges,legacy):1023}
  # Recognize the earlier canonical states before base/SP/price updates.
  previous=[bytearray(b) for b in legacy]
- for name in ['support_overhaul_journal.json','story_consistency_journal.json','party_25_journal.json','spirit_balance_25_journal.json','upstream_rebase_journal.json','sp_and_prices_revision_journal.json']:
+ for name in ['early_equipment_journal.json','followup_story_journal.json','support_overhaul_journal.json','story_consistency_journal.json','party_25_journal.json','spirit_balance_25_journal.json','upstream_rebase_journal.json','sp_and_prices_revision_journal.json']:
   journal=json.loads((ROOT/name).read_text(encoding='utf-8'))
   for e in journal['edits']:setbytes(previous,e['offset'],unpack(e,'before'))
-  legacy_inputs[fingerprint(ranges,previous)]=127
+  legacy_inputs[fingerprint(ranges,previous)]=511 if name in ['early_equipment_journal.json','followup_story_journal.json'] else 127
  with SOURCE.open('rb') as old_source:old_original=[read(old_source,p,len(b)) for p,b,_ in ranges]
  legacy_inputs[fingerprint(ranges,old_original)]=0
 
@@ -258,8 +266,8 @@ def build():
  for at,b in common:
   if len(b)==1:setbytes(canonical_after,at,b)
  for at,b in features[6]:setbytes(canonical_after,at,b)
- legacy_inputs[fingerprint(ranges,canonical_after)]=511
- for regions,fs,base_hash in [load_pack(OLD_PACK),older_pack,spirits_pack,party_pack,previous_pack]:
+ legacy_inputs[fingerprint(ranges,canonical_after)]=1023
+ for regions,fs,base_hash in [load_pack(OLD_PACK),older_pack,spirits_pack,party_pack,consistency_pack,previous_pack]:
   source_data=old_original if base_hash!=sh.digest() else [r[1] for r in ranges]
   for mask in range(1<<len(fs)):
    data=[bytearray(b) for b in source_data]
@@ -267,7 +275,7 @@ def build():
    for bit,es in enumerate(fs):
     if mask&(1<<bit):
      for at,b in es:setbytes(data,at,b)
-   legacy_inputs[fingerprint(ranges,data)]=mask&127
+   legacy_inputs[fingerprint(ranges,data)]=mask if len(fs)==9 else mask&127
  pack=PATCHER/'OGG_options.bin'
  with pack.open('wb') as f:
   def w(fmt,*v):f.write(struct.pack(fmt,*v))
