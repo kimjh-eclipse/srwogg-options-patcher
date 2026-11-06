@@ -1,0 +1,670 @@
+{
+  "passed": true,
+  "live_playthrough": false,
+  "playtesting_owner": "user",
+  "full_iso_profile_exercise_run": false,
+  "profile_selftest": {
+    "passed": true,
+    "profiles": 2048,
+    "checkboxes": 11
+  },
+  "previous_base_read_only_verification": {
+    "passed": true,
+    "mask": 0,
+    "sha256": "a9f7f03c4cb722f9e0709860a1cf5a16fc52d8bf116a9458403ffc5a67fd7f63"
+  },
+  "followup_dialogue": {
+    "passed": true,
+    "scope": "targeted native dialogue/history and persistent event flags; no playthrough",
+    "live_playthrough": false,
+    "scenes": [
+      {
+        "chapter": 25,
+        "boxes": 18,
+        "repeat_and_saved_state_reload_skipped": true
+      },
+      {
+        "chapter": 29,
+        "boxes": 16,
+        "repeat_and_saved_state_reload_skipped": true
+      },
+      {
+        "chapter": 31,
+        "boxes": 11,
+        "repeat_and_saved_state_reload_skipped": true
+      },
+      {
+        "chapter": 32,
+        "boxes": 12,
+        "repeat_and_saved_state_reload_skipped": true
+      },
+      {
+        "chapter": 36,
+        "boxes": 16,
+        "repeat_and_saved_state_reload_skipped": true
+      }
+    ],
+    "scene_count": 5,
+    "new_boxes": 73,
+    "native_string_history_checks": 146,
+    "dialogue_history_entries_checked": 2267,
+    "native_original_records_and_strings_preserved": true,
+    "only_text_and_event_flags_added": true,
+    "chapter29_maintenance_independence": [
+      {
+        "maintenance_enabled": false,
+        "new_followup_boxes": 16,
+        "maintenance_boxes": 0
+      },
+      {
+        "maintenance_enabled": true,
+        "new_followup_boxes": 16,
+        "maintenance_boxes": 3
+      }
+    ],
+    "old_epilogue_state_independence": true,
+    "original_final_lines_still_last": true,
+    "save_reload": "persistent Save/Diff arrays restored into a fresh VM; no memory-card I/O"
+  },
+  "option_composition": {
+    "passed": true,
+    "pack_sha256": "acec0dcc83760b25cdcc7373f37bcb38c6ce6ccacf2a96bbc32031874346087d",
+    "profiles": 2048,
+    "scene_profile_checks": 10240,
+    "encoded_dialogue_comparisons": 74752,
+    "story_off_uses_original_scripts": true,
+    "other_feature_edits_preserved": true,
+    "new_chapter32_directory_switch_checked": true,
+    "chapter29_native_composed_profiles": [
+      {
+        "mask": 1,
+        "followup_boxes": 16,
+        "maintenance_boxes": 0,
+        "repeat_boxes": 0
+      },
+      {
+        "mask": 257,
+        "followup_boxes": 16,
+        "maintenance_boxes": 3,
+        "repeat_boxes": 0
+      }
+    ],
+    "early_equipment_selection_checks": 2048,
+    "early_equipment_independence": [
+      {
+        "mask": 0,
+        "story": false,
+        "eight_supplies": false,
+        "early_equipment": false,
+        "early_grants": 0,
+        "supply_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 1,
+        "story": true,
+        "eight_supplies": false,
+        "early_equipment": false,
+        "early_grants": 0,
+        "supply_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 4,
+        "story": false,
+        "eight_supplies": true,
+        "early_equipment": false,
+        "early_grants": 0,
+        "supply_grants": 8,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 5,
+        "story": true,
+        "eight_supplies": true,
+        "early_equipment": false,
+        "early_grants": 0,
+        "supply_grants": 8,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 512,
+        "story": false,
+        "eight_supplies": false,
+        "early_equipment": true,
+        "early_grants": 5,
+        "supply_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 513,
+        "story": true,
+        "eight_supplies": false,
+        "early_equipment": true,
+        "early_grants": 5,
+        "supply_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 516,
+        "story": false,
+        "eight_supplies": true,
+        "early_equipment": true,
+        "early_grants": 5,
+        "supply_grants": 8,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 517,
+        "story": true,
+        "eight_supplies": true,
+        "early_equipment": true,
+        "early_grants": 5,
+        "supply_grants": 8,
+        "repeat_grants": 0
+      }
+    ],
+    "legacy_recognition": {
+      "previous_8_option_profiles_recognized": 256,
+      "v20261106_1_profiles_recognized": 128,
+      "v20261106_2_profiles_recognized": 128,
+      "v20261106_3_profiles_recognized": 128,
+      "v20261106_4_profiles_recognized": 128,
+      "v20261106_5_profiles_recognized": 512,
+      "v20261107_profiles_recognized": 1024,
+      "removed_SP_bit_not_exposed": true
+    },
+    "huckebein_R_body_profile_checks": 4096,
+    "refined_boxes": 17,
+    "live_playthrough": false,
+    "ISO_writes_performed": false,
+    "native_R_unit_weapon_accessors": [
+      {
+        "mask": 0,
+        "archive": "SHARED.BIN",
+        "slot": 0,
+        "power": 1200
+      },
+      {
+        "mask": 0,
+        "archive": "SHARED.BIN",
+        "slot": 1,
+        "power": 2800
+      },
+      {
+        "mask": 0,
+        "archive": "SHARED.BIN",
+        "slot": 2,
+        "power": 3700
+      },
+      {
+        "mask": 0,
+        "archive": "SHARED.BIN",
+        "slot": 3,
+        "power": 4300
+      },
+      {
+        "mask": 0,
+        "archive": "SHARED.BIN",
+        "slot": 8,
+        "power": 3000
+      },
+      {
+        "mask": 0,
+        "archive": "IM.BIN",
+        "slot": 0,
+        "power": 1200
+      },
+      {
+        "mask": 0,
+        "archive": "IM.BIN",
+        "slot": 1,
+        "power": 2800
+      },
+      {
+        "mask": 0,
+        "archive": "IM.BIN",
+        "slot": 2,
+        "power": 3500
+      },
+      {
+        "mask": 0,
+        "archive": "IM.BIN",
+        "slot": 3,
+        "power": 3800
+      },
+      {
+        "mask": 0,
+        "archive": "IM.BIN",
+        "slot": 8,
+        "power": 3000
+      },
+      {
+        "mask": 32,
+        "archive": "SHARED.BIN",
+        "slot": 0,
+        "power": 1200
+      },
+      {
+        "mask": 32,
+        "archive": "SHARED.BIN",
+        "slot": 1,
+        "power": 2800
+      },
+      {
+        "mask": 32,
+        "archive": "SHARED.BIN",
+        "slot": 2,
+        "power": 3700
+      },
+      {
+        "mask": 32,
+        "archive": "SHARED.BIN",
+        "slot": 3,
+        "power": 4300
+      },
+      {
+        "mask": 32,
+        "archive": "SHARED.BIN",
+        "slot": 8,
+        "power": 3000
+      },
+      {
+        "mask": 32,
+        "archive": "IM.BIN",
+        "slot": 0,
+        "power": 1200
+      },
+      {
+        "mask": 32,
+        "archive": "IM.BIN",
+        "slot": 1,
+        "power": 2800
+      },
+      {
+        "mask": 32,
+        "archive": "IM.BIN",
+        "slot": 2,
+        "power": 3500
+      },
+      {
+        "mask": 32,
+        "archive": "IM.BIN",
+        "slot": 3,
+        "power": 3800
+      },
+      {
+        "mask": 32,
+        "archive": "IM.BIN",
+        "slot": 8,
+        "power": 3000
+      },
+      {
+        "mask": 1024,
+        "archive": "SHARED.BIN",
+        "slot": 0,
+        "power": 1400
+      },
+      {
+        "mask": 1024,
+        "archive": "SHARED.BIN",
+        "slot": 1,
+        "power": 3000
+      },
+      {
+        "mask": 1024,
+        "archive": "SHARED.BIN",
+        "slot": 2,
+        "power": 3900
+      },
+      {
+        "mask": 1024,
+        "archive": "SHARED.BIN",
+        "slot": 3,
+        "power": 4500
+      },
+      {
+        "mask": 1024,
+        "archive": "SHARED.BIN",
+        "slot": 8,
+        "power": 3200
+      },
+      {
+        "mask": 1024,
+        "archive": "IM.BIN",
+        "slot": 0,
+        "power": 1400
+      },
+      {
+        "mask": 1024,
+        "archive": "IM.BIN",
+        "slot": 1,
+        "power": 3000
+      },
+      {
+        "mask": 1024,
+        "archive": "IM.BIN",
+        "slot": 2,
+        "power": 3700
+      },
+      {
+        "mask": 1024,
+        "archive": "IM.BIN",
+        "slot": 3,
+        "power": 4000
+      },
+      {
+        "mask": 1024,
+        "archive": "IM.BIN",
+        "slot": 8,
+        "power": 3200
+      },
+      {
+        "mask": 1056,
+        "archive": "SHARED.BIN",
+        "slot": 0,
+        "power": 1400
+      },
+      {
+        "mask": 1056,
+        "archive": "SHARED.BIN",
+        "slot": 1,
+        "power": 3000
+      },
+      {
+        "mask": 1056,
+        "archive": "SHARED.BIN",
+        "slot": 2,
+        "power": 3900
+      },
+      {
+        "mask": 1056,
+        "archive": "SHARED.BIN",
+        "slot": 3,
+        "power": 4500
+      },
+      {
+        "mask": 1056,
+        "archive": "SHARED.BIN",
+        "slot": 8,
+        "power": 3200
+      },
+      {
+        "mask": 1056,
+        "archive": "IM.BIN",
+        "slot": 0,
+        "power": 1400
+      },
+      {
+        "mask": 1056,
+        "archive": "IM.BIN",
+        "slot": 1,
+        "power": 3000
+      },
+      {
+        "mask": 1056,
+        "archive": "IM.BIN",
+        "slot": 2,
+        "power": 3700
+      },
+      {
+        "mask": 1056,
+        "archive": "IM.BIN",
+        "slot": 3,
+        "power": 4000
+      },
+      {
+        "mask": 1056,
+        "archive": "IM.BIN",
+        "slot": 8,
+        "power": 3200
+      }
+    ]
+  },
+  "huckebein_R_early": {
+    "passed": true,
+    "added_unit_key": 1209,
+    "added_unit_name": "휴케바인Ｍｋ－Ⅲ・타입Ｒ",
+    "chapter": 3,
+    "new_pilots": 0,
+    "master_UNTD_and_other_units_unchanged": true,
+    "native_text_history_checks": 2,
+    "cases": [
+      {
+        "enabled": false,
+        "already_owned": false,
+        "grants": 0,
+        "no_pilot_changes": true,
+        "repeat_and_saved_state_reload_grants": 0
+      },
+      {
+        "enabled": true,
+        "already_owned": false,
+        "grants": 5,
+        "no_pilot_changes": true,
+        "repeat_and_saved_state_reload_grants": 0
+      },
+      {
+        "enabled": true,
+        "already_owned": true,
+        "grants": 5,
+        "no_pilot_changes": true,
+        "repeat_and_saved_state_reload_grants": 0
+      }
+    ],
+    "live_playthrough": false,
+    "save_reload": "Save/Diff arrays restored into a new VM; no memory-card I/O"
+  },
+  "huckebein_R_weapons": {
+    "passed": true,
+    "unit_key": 1209,
+    "power_delta": 200,
+    "default_weapons": 5,
+    "native_power_accessor_checks": 20,
+    "original_weapons_other_units_pilots_and_strings_preserved": true,
+    "range_EN_ammo_motion_upgrade_cost_and_growth_preserved": true,
+    "live_playthrough": false
+  },
+  "dialogue_refinement": {
+    "passed": true,
+    "chapters": [
+      25,
+      29,
+      31,
+      32,
+      36
+    ],
+    "changed_boxes": 17,
+    "native_text_history_checks": 34,
+    "record_order_flags_dialogue_history_and_other_strings_preserved": true,
+    "gameplay_changes": false,
+    "live_playthrough": false
+  },
+  "R_weapon_revision": {
+    "applied": true,
+    "unit_key": 1209,
+    "power_delta": 200,
+    "before_sha256": "ca3452531f2042519b84d3477e635eacf7e8a921594db09bc67adaf85a8363eb",
+    "unit_count": 1,
+    "weapon_count": 5,
+    "extra_full_ISOs_created": 0,
+    "after_sha256": "09a69ac37b61281d19dea0df43b29f7cd02727eaced8a2622f6bd518de28b022",
+    "all_other_image_bytes_preserved": true
+  },
+  "R_early_revision": {
+    "applied": true,
+    "before_sha256": "70036f186e13810eef0794ff852bd476a2b76ef89e1af51d4ff7e9189abb702b",
+    "chapter": 3,
+    "units": [
+      [
+        1222,
+        "빌트팔켄 타입 L"
+      ],
+      [
+        1052,
+        "아슈세이버"
+      ],
+      [
+        1209,
+        "휴케바인 Mk-3 타입 R"
+      ]
+    ],
+    "weapons": [
+      [
+        3510,
+        "그라비톤 런처"
+      ],
+      [
+        3500,
+        "G 임팩트 스테이크"
+      ]
+    ],
+    "new_pilots": 0,
+    "gameplay_master_UNTD_and_balances_preserved": true,
+    "extra_full_ISOs_created": 0,
+    "after_sha256": "ca3452531f2042519b84d3477e635eacf7e8a921594db09bc67adaf85a8363eb",
+    "all_other_image_bytes_preserved": true
+  },
+  "refinement_revision": {
+    "applied": true,
+    "before_sha256": "09a69ac37b61281d19dea0df43b29f7cd02727eaced8a2622f6bd518de28b022",
+    "scene_count": 5,
+    "changed_boxes": 17,
+    "chapters": [
+      25,
+      29,
+      31,
+      32,
+      36
+    ],
+    "gameplay_master_UNTD_and_balances_preserved": true,
+    "extra_full_ISOs_created": 0,
+    "after_sha256": "a2d1645742fc9ecb592522a83026a6f12f2b6e055e42193284f8db76906dd832",
+    "all_other_image_bytes_preserved": true
+  },
+  "early_equipment": {
+    "passed": true,
+    "chapter": 3,
+    "flag": [
+      59,
+      7
+    ],
+    "units": [
+      [
+        1222,
+        "빌트팔켄 타입 L"
+      ],
+      [
+        1052,
+        "아슈세이버"
+      ]
+    ],
+    "weapons": [
+      [
+        3510,
+        "그라비톤 런처"
+      ],
+      [
+        3500,
+        "G 임팩트 스테이크"
+      ]
+    ],
+    "native_text_history_checks": 4,
+    "cases": [
+      {
+        "enabled": false,
+        "already_owned_units": false,
+        "grant_commands": 0,
+        "pilots_unchanged": true,
+        "existing_unit_records_preserved": true,
+        "repeat_and_saved_state_reload_grants": 0
+      },
+      {
+        "enabled": true,
+        "already_owned_units": false,
+        "grant_commands": 4,
+        "pilots_unchanged": true,
+        "existing_unit_records_preserved": true,
+        "repeat_and_saved_state_reload_grants": 0
+      },
+      {
+        "enabled": true,
+        "already_owned_units": true,
+        "grant_commands": 4,
+        "pilots_unchanged": true,
+        "existing_unit_records_preserved": true,
+        "repeat_and_saved_state_reload_grants": 0
+      }
+    ],
+    "unit_pilot_weapon_master_data_changed": false,
+    "new_pilots": 0,
+    "live_playthrough": false,
+    "save_reload": "Save/Diff arrays restored into a fresh VM; no memory-card I/O"
+  },
+  "early_equipment_revision": {
+    "applied": true,
+    "before_sha256": "80a28a4fcf0d9713e5bc40285271d07728bbe6b6d618d6fabfbd68aa65b21513",
+    "chapter": 3,
+    "units": [
+      [
+        1222,
+        "빌트팔켄 타입 L"
+      ],
+      [
+        1052,
+        "아슈세이버"
+      ]
+    ],
+    "weapons": [
+      [
+        3510,
+        "그라비톤 런처"
+      ],
+      [
+        3500,
+        "G 임팩트 스테이크"
+      ]
+    ],
+    "new_pilots": 0,
+    "gameplay_master_UNTD_and_balances_preserved": true,
+    "extra_full_ISOs_created": 0,
+    "after_sha256": "70036f186e13810eef0794ff852bd476a2b76ef89e1af51d4ff7e9189abb702b",
+    "all_other_image_bytes_preserved": true
+  },
+  "canonical_revision": {
+    "applied": true,
+    "before_sha256": "9c3a85d5395fb9ba202fe1158992d70d9a32fb6509cd5a2dfdfc50481d4c7d0b",
+    "scene_count": 5,
+    "new_boxes": 73,
+    "chapters": [
+      25,
+      29,
+      31,
+      32,
+      36
+    ],
+    "gameplay_master_UNTD_and_balances_preserved": true,
+    "extra_full_ISOs_created": 0,
+    "after_sha256": "80a28a4fcf0d9713e5bc40285271d07728bbe6b6d618d6fabfbd68aa65b21513",
+    "all_other_image_bytes_preserved": true
+  },
+  "canonical_verification": {
+    "passed": true,
+    "mask": 2047,
+    "sha256": "a2d1645742fc9ecb592522a83026a6f12f2b6e055e42193284f8db76906dd832"
+  },
+  "official_base": {
+    "passed": true,
+    "official_repository": "https://github.com/z3oo3z/PS2-SRWOGG-KPatch",
+    "release": "SRWOGG",
+    "version": "1.4.3s",
+    "source_md5": "cb7dc4485f46f220c46095c966a3aad0",
+    "base_sha256": "e819f1e524513bc7e273b004ba02e3977dd4fff365a5887b4eb1c8a9fc9d1e04",
+    "base_md5": "a5254cd5d4deabc57e03a3dcbb6a88d7",
+    "bytes": 4666294272,
+    "xdelta_target_checksums_verified": true,
+    "verified_windows": 557,
+    "changed_pages_from_previous_base": 64,
+    "extra_full_ISOs_created": 0
+  }
+}

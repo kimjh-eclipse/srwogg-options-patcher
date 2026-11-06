@@ -27,7 +27,9 @@ def main():
  prep=json.loads((ROOT/'followup_story_prepared.json').read_text(encoding='utf-8'))
  old_native=json.loads((ROOT/'followup_story_validation.json').read_text(encoding='utf-8'))
  assert old_native['passed'];count=messages=0
- for mask in range(1024):
+ refinement=json.loads((ROOT/'followup_refinement_prepared.json').read_text(encoding='utf-8'));overrides={(scene['chapter'],m['string_id']):__import__('story_scripts_25').encode(m['text']) for scene in refinement['scenes'] for m in scene['messages']}
+ r_weapons=json.loads((ROOT/'huckebein_r_weapons_prepared.json').read_text(encoding='utf-8'));unit_profiles=0
+ for mask in range(2048):
   image=Image(p,mask)
   try:
    _,es=loadarc(image,14)
@@ -38,7 +40,7 @@ def main():
      start,end=guarded_block(blob,scene['flag'])
      assert len([r for r in records(blob)[start:end] if r[0]==0x30])==len(scene['messages'])
      for msg in scene['messages']:
-      assert text_at(blob,msg['string_id'])==bytes.fromhex(msg['encoded']);messages+=1
+      assert text_at(blob,msg['string_id'])==overrides.get((scene['chapter'],msg['string_id']),bytes.fromhex(msg['encoded']));messages+=1
      if scene['chapter']==29:
       ms,me=guarded_block(blob,[63,1]);assert end==ms
       assert records(blob)[ms+1][4]==(0 if mask&256 else 2)
@@ -52,6 +54,10 @@ def main():
    assert [(r[0],r[2]) for r in rs[start:end] if r[0] in [0x5f,0x64]]==[(0x5f,k) for k,n in UNITS]+[(0x64,k) for k,n in WEAPONS]
    assert all(r[3:6]==[0xdeaddeed]*3 for r in rs[start:end] if r[0]==0x5f)
    assert end==guarded_block(blob,[63,7])[0]
+   for ar,item in r_weapons['masters'].items():
+    _,m=__import__('build_options').rawmaster(image,ar);idx=__import__('catalog').u16(m.b,m.tables['UTbl'][0]+12+1209*2);at=m.tables['Unit'][0]+12+idx*100;assert bytes(m.b[at:at+100])==bytes.fromhex(item['after_unit_hex'] if mask&1024 else item['before_unit_hex']);unit_profiles+=1
+    for w in item['weapons']:
+     wi=__import__('catalog').u16(m.b,m.tables['WTbl'][0]+12+w['private_key']*2);assert __import__('catalog').u16(m.b,m.tables['Weap'][0]+12+wi*36+8)==(w['after_power'] if mask&1024 else w['before_power'])
   finally:image.f.close()
  native=[];base=ram(p,511)
  for mask in [1,257]:
@@ -81,7 +87,7 @@ def main():
  equipment=[]
  for mask in [0,1,4,5,512,513,516,517]:
   image=Image(p,mask);_,master=__import__('build_options').rawmaster(image,'SHARED.BIN');_,es=loadarc(image,14);_,at,size=next(e for e in es if 2003 in e[0]);image.seek(at);blob=image.read(size);image.f.close();vm=VM(base);vm.load_master(master.b)
-  assert early_execute(vm,blob,bool(mask&512))==(4 if mask&512 else 0)
+  assert early_execute(vm,blob,bool(mask&512))==(len(UNITS)+len(WEAPONS) if mask&512 else 0)
   for key,name in UNITS:assert (vm.cpu.run(0x244c20,[vm.save,key,0,0])>=0)==bool(mask&512)
   assert [qty(vm,k) for k,n in WEAPONS]==[int(bool(mask&512))]*2
   # The independent eight-supply block must still execute or skip correctly.
@@ -93,8 +99,17 @@ def main():
   assert grants==(8 if mask&4 else 0)
   assert early_execute(vm,blob,bool(mask&512))==0
   for key,name in WEAPONS:assert qty(vm,key)==int(bool(mask&512))
-  equipment.append({'mask':mask,'story':bool(mask&1),'eight_supplies':bool(mask&4),'early_equipment':bool(mask&512),'early_grants':4 if mask&512 else 0,'supply_grants':grants,'repeat_grants':0})
- result={'passed':True,'pack_sha256':meta['pack_sha256'],'profiles':1024,'scene_profile_checks':count,'encoded_dialogue_comparisons':messages,'story_off_uses_original_scripts':True,'other_feature_edits_preserved':True,'new_chapter32_directory_switch_checked':True,'chapter29_native_composed_profiles':native,'early_equipment_selection_checks':1024,'early_equipment_independence':equipment,'legacy_recognition':legacy_checks(p),'live_playthrough':False,'ISO_writes_performed':False}
+  equipment.append({'mask':mask,'story':bool(mask&1),'eight_supplies':bool(mask&4),'early_equipment':bool(mask&512),'early_grants':len(UNITS)+len(WEAPONS) if mask&512 else 0,'supply_grants':grants,'repeat_grants':0})
+ result={'passed':True,'pack_sha256':meta['pack_sha256'],'profiles':2048,'scene_profile_checks':count,'encoded_dialogue_comparisons':messages,'story_off_uses_original_scripts':True,'other_feature_edits_preserved':True,'new_chapter32_directory_switch_checked':True,'chapter29_native_composed_profiles':native,'early_equipment_selection_checks':2048,'early_equipment_independence':equipment,'legacy_recognition':legacy_checks(p),'huckebein_R_body_profile_checks':unit_profiles,'refined_boxes':17,'live_playthrough':False,'ISO_writes_performed':False}
+ native_weapons=[]
+ for mask in [0,32,1024,1056]:
+  image=Image(p,mask)
+  for ar,item in r_weapons['masters'].items():
+   _,m=__import__('build_options').rawmaster(image,ar);vm=VM(base);vm.load_master(m.b);idx=__import__('catalog').u16(m.b,m.tables['UTbl'][0]+12+1209*2);body=vm.cpu.run(0x278880,[vm.master+0x40,idx])
+   for w in item['weapons']:
+    key=vm.cpu.read(body+0x24+w['slot']*2,2);assert key==(w['private_key'] if mask&1024 else w['source_key']);assert vm.cpu.run(0x274ff0,[vm.master,key])==(w['after_power'] if mask&1024 else w['before_power']);assert vm.cpu.run(0x274ff0,[vm.master,w['private_key']])==(w['after_power'] if mask&1024 else w['before_power']);native_weapons.append({'mask':mask,'archive':ar,'slot':w['slot'],'power':w['after_power'] if mask&1024 else w['before_power']})
+  image.f.close()
+ result['native_R_unit_weapon_accessors']=native_weapons
  (HERE/'followup_options_validation.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8');print(json.dumps(result,ensure_ascii=False,indent=2),flush=True)
 
 if __name__=='__main__':main()

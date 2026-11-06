@@ -12,7 +12,7 @@ Python 3.11에서 작성했습니다. 외부 라이브러리는 `requirements.tx
 - `story_content_25.py`, `story_*.py`, `apply_story_25.py`: 작성한 대사, 합류 일정, 시나리오와 네이티브 훅.
 - `campaign_*.py`, `apply_campaign_tuning.py`: 보상·적 강화·공통 무장 조정.
 - `validate_*.py`, `story_vm.py`: 구조와 실제 게임 루틴 검사.
-- `option_release/build_options.py`: 검증된 원본·최종 ISO와 변경 기록을 이용한 10옵션 데이터 생성.
+- `option_release/build_options.py`: 검증된 원본·최종 ISO와 변경 기록을 이용한 11옵션 데이터 생성.
 - `option_release/validate_options.py`: 옵션을 합성하여 시나리오/보급 및 보상/적 강화 독립 동작 검사.
 
 대부분은 `work_ogg/analysis`, ISO, 변경 저널, 이전 단계의 JSON 등 로컬 입력이 필요합니다. 입력에는 게임에서 추출한 데이터·RAM 덤프가 포함될 수 있어 이 저장소에 넣지 않았습니다. 따라서 이 소스만으로 게임 변경 과정을 처음부터 재현할 수는 없습니다. 배포용 패처는 릴리즈의 BIN과 루트 `build.ps1`만으로 빌드할 수 있습니다.
@@ -50,3 +50,11 @@ Python 3.11에서 작성했습니다. 외부 라이브러리는 `requirements.tx
 이번 변경은 대사와 이벤트 플래그뿐입니다. 전체 ISO 1,024회 반복 쓰기는 수행하지 않았으며, PCSX2 플레이 테스트는 사용자가 진행합니다. [작성 대사와 확인 범위](../docs/followup-story-v20261107.md)를 참고하세요.
 
 `early_equipment_policy.py`·`prepare_early_equipment.py`·`apply_early_equipment.py`는 별도 조기 입수 기능입니다. 원래 Unit1222·1052와 환장 Weap3510·3500을 사용하고, 플래그59,7을 새로 예약했습니다. 원본·현재 MAP의 모든 LOGO에서 이 비트가 미사용인 것을 확인했습니다. 기존 60~63 플래그는 재사용하지 않습니다. 3화 시나리오 및 시나리오 해제용 보급 스크립트 양쪽에 동일 이벤트를 넣고 10번 옵션으로 제어합니다. 파일럿 생성·강제 탑승 명령은 추가하지 않으며 마스터·UNTD는 변경하지 않습니다.
+
+## 휴케바인 R와 대사 다듬기
+
+`prepare_huckebein_r_early.py`·`apply_huckebein_r_early.py`는 기존 3화 가드59,7 내부에 원래 기체1209의 파일럿 없는 지급만 추가합니다. 이미 지난 이벤트는 소급하지 않습니다. `huckebein_r_weapon_policy.py`·`prepare_huckebein_r_weapons.py`·`apply_huckebein_r_weapons.py`는 SHARED/IM에서 R형 기본 장착 5종을 전용 ID3678~3682로 복제하고 공격력만 200 올립니다. 다른 기체와 원래 무장 행·파일럿·문자열은 보존합니다.
+
+11번 옵션은 Unit1209의 무장 참조와 전용 무장 5종의 공격력 필드를 함께 전환합니다. 이미 지급되어 저장된 전용 환장 무장도 옵션 해제 시 원래 공격력이 되어야 하므로 참조만 바꾸면 안 됩니다. 이전 9·10옵션은 모든 선택 비트를 유지하여 인식하고, 제거된 SP1이 있는 7·8옵션만 하위7비트로 이관합니다.
+
+`followup_refinement_policy.py`·`prepare_followup_refinement.py`·`apply_followup_refinement.py`는 추가 대사 17개의 증분 수정입니다. 크기·대사ID·명령·플래그·이력은 유지하고 다른 문자열도 보존합니다. 최초 `followup_story_content.py`와 준비된 페이로드는 역사적 입력이므로 재적용하면 이 수정이 되돌아갑니다. 현재 대사는 `docs/followup-story-v20261107.1.md`에서 확인하세요. 현재 조합 검사는 `option_release/validate_followup_options.py`가 담당합니다.

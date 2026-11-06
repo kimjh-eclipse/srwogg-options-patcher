@@ -48,7 +48,7 @@ def main():
   for key,name in WEAPONS:assert vm.op(command(0x64,key,0))==10
   original_slot=c.run(0x244c20,[vm.save,1218,0,0]);original=bytes(c.mem[vm.save+0x6efc+216*original_slot:vm.save+0x6efc+216*(original_slot+1)])
   pilots=bytes(c.mem[vm.save+0x25cfc:vm.save+0x3b2fc]);existing={key:bytes(c.mem[vm.save+0x6efc+216*c.run(0x244c20,[vm.save,key,0,0]):vm.save+0x6efc+216*(c.run(0x244c20,[vm.save,key,0,0])+1)]) for key,name in UNITS} if owned else {}
-  assert execute(vm,blob,enabled)==(4 if enabled else 0)
+  assert execute(vm,blob,enabled)==(len(UNITS)+len(WEAPONS) if enabled else 0)
   for key,name in UNITS:
    slot=c.run(0x244c20,[vm.save,key,0,0]);assert (slot>=0)==(enabled or owned)
    if owned:assert bytes(c.mem[vm.save+0x6efc+216*slot:vm.save+0x6efc+216*(slot+1)])==existing[key]
@@ -58,7 +58,7 @@ def main():
   save=bytes(c.mem[vm.save:vm.save+0x40000]);diff=bytes(c.mem[vm.diff:vm.diff+0x1300]);assert execute(vm,blob,enabled)==0
   assert bytes(c.mem[vm.save:vm.save+len(save)])==save and bytes(c.mem[vm.diff:vm.diff+len(diff)])==diff
   vm=VM(base);vm.load_master(master.b);vm.cpu.mem[vm.save:vm.save+len(save)]=save;vm.cpu.mem[vm.diff:vm.diff+len(diff)]=diff;assert execute(vm,blob,enabled)==0
-  cases.append({'enabled':enabled,'already_owned_units':owned,'grant_commands':4 if enabled else 0,'pilots_unchanged':True,'existing_unit_records_preserved':True,'repeat_and_saved_state_reload_grants':0})
+  cases.append({'enabled':enabled,'already_owned_units':owned,'grant_commands':len(UNITS)+len(WEAPONS) if enabled else 0,'pilots_unchanged':True,'existing_unit_records_preserved':True,'repeat_and_saved_state_reload_grants':0})
  prepared={'prepared':True,'before_sha256':state['current_sha256'],'offset':STORY_ALLOCATION,'size':len(blob),'pointer_offset':dp,'pointer_hex':struct.pack('<II',STORY_ALLOCATION-archive['directory'],len(blob)).hex(),'flag':list(FLAG),'units':UNITS,'weapons':WEAPONS,'note':note}
  (ROOT/'early_equipment_prepared.json').write_text(json.dumps(prepared,ensure_ascii=False,indent=2),encoding='utf-8')
  result={'passed':True,'chapter':3,'flag':list(FLAG),'units':UNITS,'weapons':WEAPONS,'native_text_history_checks':text_checks,'cases':cases,'unit_pilot_weapon_master_data_changed':False,'new_pilots':0,'live_playthrough':False,'save_reload':'Save/Diff arrays restored into a fresh VM; no memory-card I/O'}

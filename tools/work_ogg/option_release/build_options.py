@@ -1,4 +1,4 @@
-"""Build a ten-option patch without ever creating another full ISO."""
+"""Build an eleven-option patch without ever creating another full ISO."""
 from pathlib import Path
 import sys,struct,json,hashlib,zlib,base64,bisect,zipfile
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
@@ -16,10 +16,11 @@ sys.path.insert(0,str(ROOT/'upstream_base'))
 from source_image import source_image,DATA as BASE_INFO,CHANGES as BASE_CHANGES
 
 HERE=Path(__file__).resolve().parent
-VERSION='v20261107'
+VERSION='v20261107.1'
 DIST=ROOT/('release_'+VERSION)
 OLD_PACK=ROOT/'release_v20261106/patcher/OGG_options.bin'
 PREVIOUS_PACK=ROOT/'release_v20261106.5/patcher/OGG_options.bin'
+PREVIOUS_TEN_PACK=ROOT/'release_v20261107/patcher/OGG_options.bin'
 CONSISTENCY_PACK=ROOT/'release_v20261106.4/patcher/OGG_options.bin'
 PARTY_PACK=ROOT/'release_v20261106.3/patcher/OGG_options.bin'
 SPIRITS_PACK=ROOT/'release_v20261106.2/patcher/OGG_options.bin'
@@ -35,7 +36,8 @@ OPTIONS=[
  ('무장 개조비 할인','OGs 최종 비용표: 0·1등급 동일, 10단계 88,000 / 105,600 / 176,000'),
  ('4화 수리·보급장치 추가','수리장치·보급장치 각1개. 시나리오 선택과 별개로 한 번 지급'),
  ('30화부터 일부 기체 정비','추가 아군6기의 무장9종 EN·탄수 소폭 개선. 기본 화력 유지'),
- ('3화 기체·무장 조기 입수','빌트팔켄 L·아슈세이버 각1기, 그라비톤 런처·G 임팩트 스테이크 각1개. 파일럿 추가 없음')]
+ ('3화 기체·무장 조기 입수','빌트팔켄 L·아슈세이버·휴케바인 Mk-3 R 각1기와 무장2종. 파일럿 추가 없음'),
+ ('휴케바인 Mk-3 R 무장 +200','기본 장착 무장5종 공격력 +200. 조기 입수와 독립 선택, 다른 기체의 원래 무장 유지')]
 
 def unpack(e,side):
  if side in e:return bytes.fromhex(e[side])
@@ -148,6 +150,11 @@ def plan():
    entry,master=rawmaster(current,archive)
    for unit in maintenance['masters'][archive]['units']:
     index=u16(master.b,master.tables['UTbl'][0]+12+unit['key']*2);at=master.tables['Unit'][0]+12+index*100;switch(8,entry['offset']+at,bytes.fromhex(unit['before_unit_hex']),bytes(master.b[at:at+100]))
+  r_weapons=json.loads((ROOT/'huckebein_r_weapons_prepared.json').read_text(encoding='utf-8'))
+  for ar,item in r_weapons['masters'].items():
+   entry,master=rawmaster(current,ar);index=u16(master.b,master.tables['UTbl'][0]+12+1209*2);at=entry['offset']+master.tables['Unit'][0]+12+index*100;switch(10,at,bytes.fromhex(item['before_unit_hex']),bytes.fromhex(item['after_unit_hex']))
+   for w in item['weapons']:
+    wi=u16(master.b,master.tables['WTbl'][0]+12+w['private_key']*2);at=entry['offset']+master.tables['Weap'][0]+12+wi*36+8;switch(10,at,struct.pack('<H',w['before_power']),struct.pack('<H',w['after_power']))
   # Native SP costs are mandatory, including the additional cloned pilots.
   _,shared=rawmaster(original,'SHARED.BIN')
   cast={r['new_key']:r for r in json.loads((ROOT/'manifest_selected_27.json').read_text(encoding='utf8'))['cast']}
@@ -203,7 +210,7 @@ def load_pack(path):
  def n(fmt):return struct.unpack(fmt,f.read(struct.calcsize(fmt)))
  def blob():return f.read(n('<I')[0])
  assert f.read(8)==b'OGGOPT01';assert n('<I')[0]==1
- n('<Q');source_hash=f.read(32);count=n('<I')[0];assert count in [7,8,9,10]
+ n('<Q');source_hash=f.read(32);count=n('<I')[0];assert count in [7,8,9,10,11]
  for _ in range(count):blob();blob()
  regions=[]
  for _ in range(n('<I')[0]):
@@ -218,7 +225,7 @@ def load_pack(path):
 def load_old_pack():return load_pack(OLD_PACK)[:2]
 
 def build():
- PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();old=load_old_pack();previous_pack=load_pack(PREVIOUS_PACK);older_pack=load_pack(OLDER_PACK);spirits_pack=load_pack(SPIRITS_PACK);party_pack=load_pack(PARTY_PACK);consistency_pack=load_pack(CONSISTENCY_PACK);spans=[(p,p+len(b)) for p,b in old[0]]+[(p,p+len(b)) for p,b,a in BASE_CHANGES]+[(p,p+len(b)) for p,b in previous_pack[0]]+[(p,p+len(b)) for p,b in older_pack[0]]+[(p,p+len(b)) for p,b in spirits_pack[0]]+[(p,p+len(b)) for p,b in party_pack[0]]+[(p,p+len(b)) for p,b in consistency_pack[0]];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
+ PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();old=load_old_pack();previous_pack=load_pack(PREVIOUS_PACK);older_pack=load_pack(OLDER_PACK);spirits_pack=load_pack(SPIRITS_PACK);party_pack=load_pack(PARTY_PACK);consistency_pack=load_pack(CONSISTENCY_PACK);previous_ten_pack=load_pack(PREVIOUS_TEN_PACK);spans=[(p,p+len(b)) for p,b in old[0]]+[(p,p+len(b)) for p,b,a in BASE_CHANGES]+[(p,p+len(b)) for p,b in previous_pack[0]]+[(p,p+len(b)) for p,b in older_pack[0]]+[(p,p+len(b)) for p,b in spirits_pack[0]]+[(p,p+len(b)) for p,b in party_pack[0]]+[(p,p+len(b)) for p,b in consistency_pack[0]]+[(p,p+len(b)) for p,b in previous_ten_pack[0]];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
  # Full-resource journals also include unchanged trailing padding. Cover it so
  # recognizing an older input can safely restore the exact earlier bytes.
  for e in json.loads((ROOT/'support_overhaul_journal.json').read_text(encoding='utf-8'))['edits']:
@@ -251,13 +258,13 @@ def build():
     for p,b in es:setbytes(data,p,b)
   profiles.append(fingerprint(ranges,data))
  assert len(set(profiles))==(1<<len(OPTIONS)),'Each checkbox must have a distinct reversible profile'
- legacy_inputs={fingerprint(ranges,legacy):1023}
+ legacy_inputs={fingerprint(ranges,legacy):2047}
  # Recognize the earlier canonical states before base/SP/price updates.
  previous=[bytearray(b) for b in legacy]
- for name in ['early_equipment_journal.json','followup_story_journal.json','support_overhaul_journal.json','story_consistency_journal.json','party_25_journal.json','spirit_balance_25_journal.json','upstream_rebase_journal.json','sp_and_prices_revision_journal.json']:
+ for name in ['followup_refinement_journal.json','huckebein_r_weapons_journal.json','huckebein_r_early_journal.json','early_equipment_journal.json','followup_story_journal.json','support_overhaul_journal.json','story_consistency_journal.json','party_25_journal.json','spirit_balance_25_journal.json','upstream_rebase_journal.json','sp_and_prices_revision_journal.json']:
   journal=json.loads((ROOT/name).read_text(encoding='utf-8'))
   for e in journal['edits']:setbytes(previous,e['offset'],unpack(e,'before'))
-  legacy_inputs[fingerprint(ranges,previous)]=511 if name in ['early_equipment_journal.json','followup_story_journal.json'] else 127
+  legacy_inputs[fingerprint(ranges,previous)]=2047 if name=='followup_refinement_journal.json' else 1023 if name in ['huckebein_r_weapons_journal.json','huckebein_r_early_journal.json'] else 511 if name in ['early_equipment_journal.json','followup_story_journal.json'] else 127
  with SOURCE.open('rb') as old_source:old_original=[read(old_source,p,len(b)) for p,b,_ in ranges]
  legacy_inputs[fingerprint(ranges,old_original)]=0
 
@@ -266,8 +273,8 @@ def build():
  for at,b in common:
   if len(b)==1:setbytes(canonical_after,at,b)
  for at,b in features[6]:setbytes(canonical_after,at,b)
- legacy_inputs[fingerprint(ranges,canonical_after)]=1023
- for regions,fs,base_hash in [load_pack(OLD_PACK),older_pack,spirits_pack,party_pack,consistency_pack,previous_pack]:
+ legacy_inputs[fingerprint(ranges,canonical_after)]=2047
+ for regions,fs,base_hash in [load_pack(OLD_PACK),older_pack,spirits_pack,party_pack,consistency_pack,previous_pack,previous_ten_pack]:
   source_data=old_original if base_hash!=sh.digest() else [r[1] for r in ranges]
   for mask in range(1<<len(fs)):
    data=[bytearray(b) for b in source_data]
@@ -275,7 +282,7 @@ def build():
    for bit,es in enumerate(fs):
     if mask&(1<<bit):
      for at,b in es:setbytes(data,at,b)
-   legacy_inputs[fingerprint(ranges,data)]=mask if len(fs)==9 else mask&127
+   legacy_inputs[fingerprint(ranges,data)]=mask if len(fs)>=9 else mask&127
  pack=PATCHER/'OGG_options.bin'
  with pack.open('wb') as f:
   def w(fmt,*v):f.write(struct.pack(fmt,*v))
