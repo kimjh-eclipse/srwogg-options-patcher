@@ -146,12 +146,12 @@ def command_checks(base,master,commands,templates,pilot_templates):
   if sum(by_op.values())%150==0:print('Native roster handlers tested:',sum(by_op.values()),flush=True)
  return {'cases':sum(by_op.values()),'by_opcode':dict(by_op),'native_unit_target_types':native_counts[0],'native_pilot_targets':native_counts[1],'errors':errors,'map_actor_lookups':'absent-actor fixtures; all save mutations executed natively'}
 
-def guard_reload_checks(base,master):
+def guard_reload_checks(base,master,script_blobs=None):
  vm=machine(base,master);events=0;repeats=0;reloads=0;guarded=[]
  with (ROOT.parent/'SRWOGS_EX_K_TEST.ISO').open('rb') as f:
   _,scripts=loadarc(f,14)
   for ch in STORY['chapters']:
-   _,at,n=next(e for e in scripts if ch['key'] in e[0]);rows=records(read(f,at,n));group,bit=ch['flag']
+   _,at,n=next(e for e in scripts if ch['key'] in e[0]);rows=records(script_blobs[ch['key']] if script_blobs and ch['key'] in script_blobs else read(f,at,n));group,bit=ch['flag']
    start=next(i for i,r in enumerate(rows) if r[0]==0x93 and r[2:5]==[0x100c1,group,bit])
    end=next(i for i in range(start+1,len(rows)) if rows[i][0]==0xba and rows[i][2:5]==[0x100c1,group,bit])+1
    def block():

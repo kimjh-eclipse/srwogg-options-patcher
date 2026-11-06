@@ -3,12 +3,12 @@ import json,hashlib,zipfile
 
 HERE=Path(__file__).resolve().parent
 WORK=HERE.parent
-DIST=WORK/'release_v20261106.3'
+DIST=WORK/'release_v20261106.4'
 meta=json.loads((HERE/'build_metadata.json').read_text(encoding='utf-8'))
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def report(name):return json.loads((HERE/name).read_text(encoding='utf-8-sig'))
 
-readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.3 — 편성 보존 수정
+readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.4 — 본편 연결 대사 수정
 
 사용 방법
 1. ZIP을 압축 해제합니다. patcher 폴더의 EXE와 BIN은 같은 폴더에 두세요.
@@ -61,6 +61,14 @@ readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.3 — �
    10단계 누적: 0/1등급 88,000, 2등급 105,600, 3/4등급 176,000.
    공격력 개조 상승량은 유지됩니다. 옵션을 해제하면 외전 원래 비용표입니다.
 
+시나리오 대사 수정 (1번 옵션 선택 시)
+- 13개 화의 대사 31개를 다듬고 최종전 반응 대사 3개를 추가했습니다.
+- 28화의 빈델 장면은 피오나 귀환과 라미아 구출 작전 설명 뒤로 옮겼습니다.
+- 35화의 추가 인물 반응은 라울·미즈호의 데스피니스 구조 뒤로 옮겼습니다.
+- 36화는 비안·잉그램·레몬의 최종전 반응을 추가하고 원작 마지막 대사로 마칩니다.
+- 레몬과 액셀렌의 선택한 자매 관계, 합류 화수, 기체·파일럿 밸런스를 유지합니다.
+- 이번 변경은 기존 추가 시나리오 옵션에 포함되며 별도 체크 항목은 없습니다.
+
 공통 적용
 - 추가한 린의 휴케바인을 원래 휴케바인과 별도 그룹으로 분리했습니다.
   본편의 원래 기체 이탈 처리가 추가 기체와 탑승 파일럿까지 비활성화하던 문제를 수정합니다.
@@ -70,7 +78,7 @@ readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.3 — �
   이 복구는 추가 시나리오 옵션을 꺼도 적용됩니다. 이미 지난 28화 이벤트는 재실행되지 않습니다.
 - 시나리오 해제 시 사용하는 보급·복구 스크립트가 상위 파일 범위에 포함되도록 수정했습니다.
 - 정신기 SP 1 옵션을 제거했습니다. 기존 파일럿은 원래 소모량을, 추가 파일럿 13명은 역할별 조정 소모량을 사용합니다.
-- 이전 8옵션 256조합과 v20261106.1·v20261106.2의 7옵션 각 128조합도 인식합니다.
+- 이전 8옵션 256조합과 v20261106.1·v20261106.2·v20261106.3의 7옵션 각 128조합도 인식합니다.
 - 추가 25명 중 13명의 구성·비용·습득 레벨을 조정했습니다. SP 최대치는 유지합니다.
 - 울즈·안사즈의 각성은 SP60·Lv38, 스리사즈는 돌격형 구성입니다.
 - 템페스트의 사랑은 SP65·Lv38이며 비어 있던 트윈 정신기 4개를 보완했습니다.
@@ -81,7 +89,7 @@ readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.3 — �
   패처 최초 사용 전의 정확한 파일로 돌아가려면 [처음 상태 복원]을 사용하세요.
 
 원복과 옵션 변경
-- 첫 적용 때 ISO 옆에 .v20261106.3.oggbak 복원 기록을 만듭니다.
+- 첫 적용 때 ISO 옆에 .v20261106.4.oggbak 복원 기록을 만듭니다.
   이전 버전의 .oggbak과는 별도로 관리합니다. 기존 기록은 덮어쓰지 않습니다.
   전체 ISO 복사본이 아니라 변경 구간만 저장하는 작은 파일입니다.
 - [처음 상태 복원]은 해당 기록을 만든 첫 적용 직전의 파일로 복원합니다.
@@ -109,6 +117,7 @@ readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261106.3 — �
 - 배포 ZIP에는 게임 ISO·전체 ISO 백업·제작자의 원본 한글 패치 파일이 포함되지 않습니다.
 '''
 (DIST/'읽어주세요.txt').write_text(readme,encoding='utf-8-sig')
+(DIST/'본편연결_수정내역.md').write_text((HERE/'story_consistency_details.md').read_text(encoding='utf-8'),encoding='utf-8')
 (DIST/'편성보존_수정내역.md').write_text((HERE/'party_preservation_details.md').read_text(encoding='utf-8'),encoding='utf-8')
 (DIST/'정신기_조정내역.md').write_text((HERE/'spirit_balance_details.md').read_text(encoding='utf-8'),encoding='utf-8')
 validation={
@@ -119,12 +128,13 @@ validation={
  'native_option_behavior':report('native_options_validation.json'),
  'ui_render_verified':True,
  'party_preservation':json.loads((WORK/'party_25_validation.json').read_text(encoding='utf-8')),
- 'canonical_revision':{k:v for k,v in json.loads((WORK/'party_25_journal.json').read_text(encoding='utf-8')).items() if k!='edits'},
+ 'story_consistency':json.loads((WORK/'story_consistency_validation.json').read_text(encoding='utf-8')),
+ 'canonical_revision':{k:v for k,v in json.loads((WORK/'story_consistency_journal.json').read_text(encoding='utf-8')).items() if k!='edits'},
  'canonical_verification':report('canonical_verification.json'),
  'official_base':meta['upstream_base'],
  'upstream_rebase':{k:v for k,v in json.loads((WORK/'upstream_rebase_journal.json').read_text(encoding='utf-8')).items() if k not in ['edits','semantic_strings']}}
 assert all(validation[k]['passed'] for k in ['profile_selftest','previous_base_read_only_verification','real_iso_transitions','native_option_behavior'])
-assert validation['party_preservation']['passed']
+assert validation['party_preservation']['passed'] and validation['story_consistency']['passed']
 assert validation['real_iso_transitions']['canonical_sha256_after']==meta['canonical_iso_sha256']
 (DIST/'검증결과.json').write_text(json.dumps(validation,ensure_ascii=False,indent=2),encoding='utf-8')
 info={k:v for k,v in meta.items() if k not in ['proof','shutdown_requested']}
@@ -132,15 +142,15 @@ info.update(executable_sha256=sha(DIST/'patcher/OGG_Options_Patcher.exe'),canoni
 (DIST/'PATCH_INFO.json').write_text(json.dumps(info,ensure_ascii=False,indent=2),encoding='utf-8')
 files=sorted(p for p in DIST.rglob('*') if p.is_file() and p.name!='SHA256SUMS.txt')
 (DIST/'SHA256SUMS.txt').write_text(''.join(sha(p)+'  '+p.relative_to(DIST).as_posix()+'\n' for p in files),encoding='utf-8')
-zip_path=WORK/'SRWOGG_Options_kr_v20261106.3.zip'
+zip_path=WORK/'SRWOGG_Options_kr_v20261106.4.zip'
 with zipfile.ZipFile(zip_path,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  for p in sorted(DIST.rglob('*')):
-  if p.is_file():z.write(p,'SRWOGG_Options_kr_v20261106.3/'+p.relative_to(DIST).as_posix())
+  if p.is_file():z.write(p,'SRWOGG_Options_kr_v20261106.4/'+p.relative_to(DIST).as_posix())
 with zipfile.ZipFile(zip_path) as z:
  assert z.testzip() is None
  assert all(not n.lower().endswith(('.iso','.oggbak')) for n in z.namelist())
  for p in sorted(DIST.rglob('*')):
-  if p.is_file():assert hashlib.sha256(z.read('SRWOGG_Options_kr_v20261106.3/'+p.relative_to(DIST).as_posix())).hexdigest()==sha(p)
+  if p.is_file():assert hashlib.sha256(z.read('SRWOGG_Options_kr_v20261106.4/'+p.relative_to(DIST).as_posix())).hexdigest()==sha(p)
 summary={'passed':True,'zip':str(zip_path),'zip_bytes':zip_path.stat().st_size,'zip_sha256':sha(zip_path),'canonical_sha256':meta['canonical_iso_sha256'],'options':7,'verified_profiles':128,'extra_full_ISOs_created':0}
 (HERE/'release_completion.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding='utf-8')
 print(json.dumps(summary,ensure_ascii=False,indent=2))

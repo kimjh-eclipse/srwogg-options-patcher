@@ -3,9 +3,9 @@ from pathlib import Path
 import sys,struct,zlib,io,json,bisect,hashlib
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from inspect_iso import SOURCE,OUT,inventory,u32
-from build_options import rawmaster,load_old_pack,source_image,load_pack,OLD_PACK,PREVIOUS_PACK,OLDER_PACK
+from build_options import rawmaster,load_old_pack,source_image,load_pack,OLD_PACK,PREVIOUS_PACK,OLDER_PACK,SPIRITS_PACK
 from audit_story_layout import loadarc
-from story_scripts_25 import records
+from story_scripts_25 import records,text_at,encode
 from campaign_bonus_scripts import EARLY
 from story_vm import VM
 from spirit_policy_25 import POLICY,apply_to_row
@@ -15,7 +15,7 @@ HERE=Path(__file__).resolve().parent
 
 class Profiles:
  def __init__(self):
-  f=io.BytesIO((HERE.parent/'release_v20261106.3/patcher/OGG_options.bin').read_bytes())
+  f=io.BytesIO((HERE.parent/'release_v20261106.4/patcher/OGG_options.bin').read_bytes())
   def n(fmt):return struct.unpack(fmt,f.read(struct.calcsize(fmt)))
   def blob():return f.read(n('<I')[0])
   assert f.read(8)==b'OGGOPT01';assert n('<I')[0]==1
@@ -119,7 +119,7 @@ def legacy_set_checks(p,path):
  return count
 
 def legacy_checks(p):
- return {'previous_8_option_profiles_recognized':legacy_set_checks(p,OLD_PACK),'v20261106_1_profiles_recognized':legacy_set_checks(p,OLDER_PACK),'v20261106_2_profiles_recognized':legacy_set_checks(p,PREVIOUS_PACK),'removed_SP_bit_not_exposed':True}
+ return {'previous_8_option_profiles_recognized':legacy_set_checks(p,OLD_PACK),'v20261106_1_profiles_recognized':legacy_set_checks(p,OLDER_PACK),'v20261106_2_profiles_recognized':legacy_set_checks(p,SPIRITS_PACK),'v20261106_3_profiles_recognized':legacy_set_checks(p,PREVIOUS_PACK),'removed_SP_bit_not_exposed':True}
 
 def price_and_sp_checks(p):
  from catalog import u16
@@ -178,11 +178,37 @@ def party_profile_checks(p):
   finally:image.f.close()
  return {'profiles':cases,'all_MAP14_pointers_within_declared_span':True,'private_family_identity_in_both_archives':True,'chapter28_existing_clone_recovery_story_on_and_off':True}
 
+def consistency_profile_checks(p):
+ from story_consistency_policy import FINAL_RESPONSE_FLAG
+ from inspect_iso import read
+ plan=json.loads((HERE.parent/'story_consistency_prepared.json').read_text(encoding='utf-8'))
+ cases=0
+ with source_image() as source:
+  archive,entries=loadarc(source,14);stock={}
+  for key,sid in [(2033,366),(2034,169)]:
+   _,at,n=next(e for e in entries if key in e[0]);stock[key]=text_at(read(source,at,n),sid)
+ for mask in range(128):
+  image=Image(p,mask)
+  try:
+   _,entries=loadarc(image,14)
+   for chapter in plan['chapters']:
+    _,at,n=next(e for e in entries if chapter['key'] in e[0]);blob=read(image,at,n)
+    if mask&1:
+     for change in chapter['replacements']:assert text_at(blob,change['string_id'])==encode(change['text'])
+    elif chapter['key'] in stock:
+     sid=366 if chapter['key']==2033 else 169;assert text_at(blob,sid)==stock[chapter['key']]
+   _,at,n=next(e for e in entries if 2034 in e[0]);blob=read(image,at,n)
+   assert sum(r[0]==0x93 and r[2:5]==[0x100c1,*FINAL_RESPONSE_FLAG] for r in records(blob))==int(bool(mask&1))
+   cases+=1
+  finally:image.f.close()
+ return {'profiles':cases,'revised_dialogue_selected_only_with_story_option':True,'native_dialogue_restored_when_story_off':True,'new_final_response_selected_only_with_story_option':True}
+
 def main():
  p=Profiles();result={'passed':True,'supply_story_independence':supply_checks(p)}
  result['sp_costs_and_upgrade_prices']=price_and_sp_checks(p)
  result['legacy_inputs']=legacy_checks(p)
  result['party_profiles']=party_profile_checks(p)
+ result['story_consistency_profiles']=consistency_profile_checks(p)
  # Test each native arithmetic feature while its independent neighbor is off/on.
  r={mask:ram(p,mask) for mask in [0,8,16,24]}
  result['rewards_enemy_off']=reward_checks([r[0],r[8]])

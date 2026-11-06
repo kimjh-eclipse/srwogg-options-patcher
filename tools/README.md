@@ -28,3 +28,7 @@ Python 3.11에서 작성했습니다. 외부 라이브러리는 `requirements.tx
 `party_policy_25.py`는 독립 기체 그룹과 28화 기존 편성 복구 스크립트를 정의합니다. `apply_party_25.py`는 검증 결과·원본 해시를 확인하고 배타적으로 연 시험 ISO에 작은 변경 기록을 남겨 적용합니다. `validate_party_25.py`는 실제 저장 데이터 처리 루틴을 실행합니다. 수정 전의 린 그룹 참조는 메모리에서만 재구성하므로 적용 후에도 회귀 검사를 반복할 수 있습니다.
 
 이 검사 역시 로컬의 ISO·합류 일정 JSON·실행 RAM·옵션 BIN·기존 변경 기록을 입력으로 사용합니다. 맵 유닛 조회를 부재 조건으로 대체하고 영구 저장 데이터의 VM 복원을 검사하므로 전편 플레이나 실제 메모리카드 검사를 대신하지 않습니다. 자세한 조건은 `docs/party-preservation-v20261106.3.md`에 있습니다.
+
+## 본편 연결 대사
+
+`story_consistency_policy.py`는 첫 구현인 `story_content_25.py`에 적용하는 추가 수정입니다. `story_consistency_logo.py`는 기존 이벤트 내부에서 장면을 이동하면서 분기 목적지와 대사 이력 위치를 보정합니다. `audit_story_consistency.py`는 현재 이미지의 장면 문맥을 읽고, `prepare_story_consistency.py`·`validate_story_consistency.py`·`apply_story_consistency.py`는 3단계 적용 전 이미지와 로컬 중간 자료를 사용하는 준비·검증·적용 도구입니다. 이미 적용된 이미지에 역사적 도구를 다시 실행하지 마세요. 현재 옵션 합성 결과의 선택·해제 검사는 `option_release/validate_options.py`가 담당합니다. [검증 범위와 대사](../docs/story-consistency-v20261106.4.md)를 참고하세요.

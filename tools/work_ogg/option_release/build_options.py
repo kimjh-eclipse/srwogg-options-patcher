@@ -14,14 +14,15 @@ sys.path.insert(0,str(ROOT/'upstream_base'))
 from source_image import source_image,DATA as BASE_INFO,CHANGES as BASE_CHANGES
 
 HERE=Path(__file__).resolve().parent
-VERSION='v20261106.3'
+VERSION='v20261106.4'
 DIST=ROOT/('release_'+VERSION)
 OLD_PACK=ROOT/'release_v20261106/patcher/OGG_options.bin'
-PREVIOUS_PACK=ROOT/'release_v20261106.2/patcher/OGG_options.bin'
+PREVIOUS_PACK=ROOT/'release_v20261106.3/patcher/OGG_options.bin'
+SPIRITS_PACK=ROOT/'release_v20261106.2/patcher/OGG_options.bin'
 OLDER_PACK=ROOT/'release_v20261106.1/patcher/OGG_options.bin'
 PATCHER=DIST/'patcher'
 OPTIONS=[
- ('25편성 분산 합류·추가 시나리오','3화부터 전이 대화, 4~31화 합류. 추가 기체·파일럿 밸런스 포함'),
+ ('25편성 분산 합류·추가 시나리오','3화 전이 대화, 4~31화 합류. 기체 밸런스·본편 연결 대사 포함'),
  ('숨겨진 요소 자동 습득','6·13·25·30화 보상 조건 해제. 미롱가는 양쪽 루트에서 입수'),
  ('3화 추가 보급 8종','시시오 블레이드·부스트 해머와 강화파츠 6종을 각 1개 지급'),
  ('전투 보상: PP 2배·자금 +20%','기존 보너스와 분배 계산 후 적용. 자금 소수점 버림'),
@@ -187,7 +188,7 @@ def load_pack(path):
 def load_old_pack():return load_pack(OLD_PACK)[:2]
 
 def build():
- PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();old=load_old_pack();previous_pack=load_pack(PREVIOUS_PACK);older_pack=load_pack(OLDER_PACK);spans=[(p,p+len(b)) for p,b in old[0]]+[(p,p+len(b)) for p,b,a in BASE_CHANGES]+[(p,p+len(b)) for p,b in previous_pack[0]]+[(p,p+len(b)) for p,b in older_pack[0]];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
+ PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();old=load_old_pack();previous_pack=load_pack(PREVIOUS_PACK);older_pack=load_pack(OLDER_PACK);spirits_pack=load_pack(SPIRITS_PACK);spans=[(p,p+len(b)) for p,b in old[0]]+[(p,p+len(b)) for p,b,a in BASE_CHANGES]+[(p,p+len(b)) for p,b in previous_pack[0]]+[(p,p+len(b)) for p,b in older_pack[0]]+[(p,p+len(b)) for p,b in spirits_pack[0]];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
  print('Scanning original and canonical ISO without creating images...',flush=True)
  with source_image() as a,TARGET.open('rb') as b:
   pos=0
@@ -219,7 +220,7 @@ def build():
  legacy_inputs={fingerprint(ranges,legacy):127}
  # Recognize the earlier canonical states before base/SP/price updates.
  previous=[bytearray(b) for b in legacy]
- for name in ['party_25_journal.json','spirit_balance_25_journal.json','upstream_rebase_journal.json','sp_and_prices_revision_journal.json']:
+ for name in ['story_consistency_journal.json','party_25_journal.json','spirit_balance_25_journal.json','upstream_rebase_journal.json','sp_and_prices_revision_journal.json']:
   journal=json.loads((ROOT/name).read_text(encoding='utf-8'))
   for e in journal['edits']:setbytes(previous,e['offset'],unpack(e,'before'))
   legacy_inputs[fingerprint(ranges,previous)]=127
@@ -232,7 +233,7 @@ def build():
   if len(b)==1:setbytes(canonical_after,at,b)
  for at,b in features[6]:setbytes(canonical_after,at,b)
  legacy_inputs[fingerprint(ranges,canonical_after)]=127
- for regions,fs,base_hash in [load_pack(OLD_PACK),older_pack,previous_pack]:
+ for regions,fs,base_hash in [load_pack(OLD_PACK),older_pack,spirits_pack,previous_pack]:
   source_data=old_original if base_hash!=sh.digest() else [r[1] for r in ranges]
   for mask in range(1<<len(fs)):
    data=[bytearray(b) for b in source_data]
