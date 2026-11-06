@@ -1,0 +1,198 @@
+"""Build an eight-option patch without ever creating another full ISO."""
+from pathlib import Path
+import sys,struct,json,hashlib,zlib,base64,bisect,zipfile
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from catalog import Master,u16
+from inspect_iso import ROOT,OUT,SOURCE,read,u32,inventory,lice
+from audit_story_layout import TARGET,loadarc
+from story_scripts_25 import records,rebuild_logo,command,NONE
+from campaign_bonus_scripts import insert_commands,EARLY
+import numpy as np
+
+HERE=Path(__file__).resolve().parent
+DIST=ROOT/'release_v20261106'
+PATCHER=DIST/'patcher'
+OPTIONS=[
+ ('25편성 분산 합류·추가 시나리오','3화부터 전이 대화, 4~31화 합류. 추가 기체·파일럿 밸런스 포함'),
+ ('숨겨진 요소 자동 습득','6·13·25·30화 보상 조건 해제. 미롱가는 양쪽 루트에서 입수'),
+ ('3화 추가 보급 8종','시시오 블레이드·부스트 해머와 강화파츠 6종을 각 1개 지급'),
+ ('전투 보상: PP 2배·자금 +20%','기존 보너스와 분배 계산 후 적용. 자금 소수점 버림'),
+ ('적 강화','전투 능력치 +5, 기체·무장 개조 +2, 기본 HP 2만 미만 +10%'),
+ ('공통 무장 밸런스','OGs 공통 무장 조정 이식. 외전 고유의 강화분 유지'),
+ ('무장 개조비 할인','최저 비용표를 제외한 무장 개조비 20% 할인'),
+ ('정신기 SP 소모 1','정신기 SP 소모를 1로 변경. 해제하면 원래 소모량 복원')]
+
+def unpack(e,side):
+ if side in e:return bytes.fromhex(e[side])
+ return zlib.decompress(base64.b64decode(e[side+'_zlib_base64']))
+
+def rawmaster(f,name):
+ e=next(e for e in inventory(f) if e['name']==name+';1');a=lice(f,e['offset'],e['size']);e=a['entries'][3];a=lice(f,e['offset'],e['size']);e=a['entries'][0]
+ return e,Master(read(f,e['offset'],e['size']))
+
+def plan():
+ # Common includes translations, unused clone resources and verified equivalent
+ # initializer helpers. Only reachable feature entry points are optional.
+ common=[];features=[[] for _ in OPTIONS];off=[[] for _ in OPTIONS];proof={}
+ campaign=json.loads((ROOT/'campaign_tuning_journal.json').read_text(encoding='utf8'))
+ story=json.loads((ROOT/'story_25_journal.json').read_text(encoding='utf8'))
+ with SOURCE.open('rb') as original,TARGET.open('rb') as current:
+  ua,ue=loadarc(current,13);la,le=loadarc(current,14)
+  def locate(entries,key):return next(e for e in entries if key in e[0])
+  def dp(a,key):return a['directory']+8+next(e['index'] for e in a['entries'] if key in e['keys'])*8
+  def switch(bit,at,zero,one):
+   assert len(zero)==len(one)
+   if zero!=one:off[bit].append((at,bytes(zero)));features[bit].append((at,bytes(one)))
+  def record_switch(bit,bp,base,i,zero,one):switch(bit,bp+u32(base,44)+i*96,struct.pack('<24I',*zero),struct.pack('<24I',*one))
+  # Build the independent no-story chapter-three supply script in unused MAP space.
+  p3=dp(la,2003);origptr=read(original,p3,8);rel,n=struct.unpack('<II',origptr);vanilla=read(original,la['directory']+rel,n)
+  wave=next(i for i,r in enumerate(records(vanilla)) if r[0]==0xca and r[2]==5)
+  end=next(i for i in range(wave+1,len(records(vanilla))) if records(vanilla)[i][0]==0x25)
+  point=max(i for i in range(wave+1,end) if records(vanilla)[i][0]==0x30)+1
+  line=[('카이','보급품을 인계한다. 시시오 블레이드, 부스트 해머와 강화파츠 여섯 종류를 각각 하나씩 지급한다.')]
+  new,note=rebuild_logo(vanilla,point,line,{'카이':1090},(63,7))
+  ix=next(i for i,r in enumerate(records(new)) if r[0]==0xba and r[2:5]==[0x100c1,63,7])
+  new=insert_commands(new,ix,[command(op,key,0) for op,key,name in EARLY])
+  allocation=0x1b480000;assert not any(read(current,allocation,len(new))) and allocation+len(new)<0x1b594000
+  common.append((allocation,new));newptr=struct.pack('<II',allocation-la['directory'],len(new))
+  for slot,a in [(13,ua),(14,la)]:
+   for chapter in story['chapters']:
+    if slot==13 and not chapter['recruits']:continue
+    at=dp(a,chapter['key']);zero=read(original,at,8);one=read(current,at,8)
+    if slot==14 and chapter['key']==2003:zero=newptr
+    switch(0,at,zero,one)
+  # Both chapter-three variants contain a guarded supply block. Disabling the
+  # option compares a 0/1 flag to 2, so the whole block remains unreachable.
+  _,p,n=locate(le,2003)
+  for base,blob in [(p,read(current,p,n)),(allocation,new)]:
+   rows=records(blob);ix=next(i for i,r in enumerate(rows) if r[0]==0x93 and r[2:5]==[0x100c1,63,7]);cond=rows[ix+1].copy();assert cond[0]==0x91 and cond[4]==0
+   disabled=cond.copy();disabled[4]=2;record_switch(2,base,blob,ix+1,disabled,cond)
+  # Hidden conditions in original and additional-story payloads are independent
+  # of which script directory entry the story checkbox selects.
+  for key,grants in [(2005,[(0x60,31,[-1])]),(2023,[(0x64,3513,[-1]),(0x60,32,[-1])]),(2028,[(0x64,3530,[-1]),(0x60,33,[-5,-1])])]:
+   at=dp(la,key);rel,n=struct.unpack('<II',read(original,at,8));oldp=la['directory']+rel;old=read(original,oldp,n);rows=records(old)
+   for op,item,deltas in grants:
+    gi=next(i for i,r in enumerate(rows) if r[0]==op and r[2]==item)
+    for delta in deltas:
+     zero=rows[gi+delta];assert zero[0] in [0x91,0x2b]
+     _,p,n=locate(le,key);cur=read(current,p,n);ri=next(i for i,r in enumerate(records(cur)) if r[0]==op and r[2]==item)
+     for bp,blob,index in [(oldp,old,gi+delta),(p,cur,ri+delta)]:record_switch(1,bp,blob,index,zero,command(0x8a))
+  # Chapter 13's common scripts retain the stock recovery scene and metadata.
+  # Only the successful-result override and idempotent extra grant are optional.
+  _,p,n=locate(le,2012);cur=read(current,p,n);r=records(cur)
+  rel,size=struct.unpack('<II',read(original,dp(la,2012),8));stock=read(original,la['directory']+rel,size);sr=records(stock)
+  record_switch(1,p,cur,872,sr[872],r[872]);record_switch(1,p,cur,898,sr[898],r[898])
+  ix=next(i for i,row in enumerate(r) if row[0]==0x5f and row[2]==1410);record_switch(1,p,cur,ix,command(0x8a),r[ix])
+  _,p,n=locate(le,2054);cur=read(current,p,n);r=records(cur);ix=next(i for i,row in enumerate(r) if row[0]==0x93 and row[2:5]==[0x100c1,63,6]);disabled=r[ix+1].copy();disabled[4]=2;record_switch(1,p,cur,ix+1,disabled,r[ix+1])
+  # Optional hooks share verified-equivalent helpers, which stay common.
+  for e in campaign['edits']:
+   label=e['label'];bit=None
+   if label in ['scale final funds before accumulation','preserve PP accumulator load in common minimum-check delay','double each final PP award in temporary','accumulate scaled PP without changing shared per-pilot amount']:bit=3
+   elif label in ['hostile pilot combat stat +5','hostile small-unit HP hook']:bit=4
+   elif 'common weapon key' in label:bit=5
+   elif label=='weapon upgrade cost tiers 1-4 minus 20 percent':bit=6
+   if bit is not None:switch(bit,e['offset'],unpack(e,'before'),unpack(e,'after'))
+  # Patch both original and story-specific enemy records. Otherwise changing
+  # the story checkbox could silently select an unstrengthened copy.
+  seen=set()
+  for keys,p,n in ue:
+   if not any(2001<=k<=2070 for k in keys):continue
+   key=next(k for k in keys if 2001<=k<=2070);at=dp(ua,key);rel,size=struct.unpack('<II',read(original,at,8));stock=read(original,ua['directory']+rel,size)
+   for bp,blob in [(ua['directory']+rel,stock),(p,read(current,p,n))]:
+    for i in range(u32(stock,40)):
+     pos=44+i*336
+     if u32(stock,pos+8) not in [2,3,4]:continue
+     address=bp+pos+0x38
+     if address in seen:continue
+     seen.add(address);zero=stock[pos+0x38:pos+0x50];values=struct.unpack('<6I',zero);one=struct.pack('<6I',*(min(v+2,15) for v in values));switch(4,address,zero,one)
+  # Restore native costs, including cloned pilots, when SP1 is unchecked.
+  _,shared=rawmaster(original,'SHARED.BIN')
+  cast={r['new_key']:r for r in json.loads((ROOT/'manifest_selected_27.json').read_text(encoding='utf8'))['cast']}
+  for ar in ['SHARED.BIN','IM.BIN']:
+   ce,cm=rawmaster(current,ar);_,om=rawmaster(original,ar);clones={u16(cm.b,cm.tables['PTbl'][0]+12+k*2):r for k,r in cast.items()}
+   for i,pos,row in cm.rows('Plot'):
+    if i<om.tables['Plot'][2]:normal=om.b[om.tables['Plot'][0]+12+i*148:om.tables['Plot'][0]+12+(i+1)*148]
+    else:
+     item=clones[i];key=1091 if item['pilot_name']=='이글렛' else item['pilot'];j=u16(shared.b,shared.tables['PTbl'][0]+12+key*2);normal=shared.b[shared.tables['Plot'][0]+12+j*148:shared.tables['Plot'][0]+12+(j+1)*148]
+    for rel in [*range(0x72,0x78),0x7f]:
+     val=normal[rel]
+     if rel==0x7f and row[0x7e]==0:val=0
+     switch(7,ce['offset']+pos+rel,bytes([val]),row[rel:rel+1])
+  proof.update(native_supply_script_offset=allocation,native_supply_script_size=len(new),native_supply_messages=note['messages'],story_directory_edits=len(features[0]),enemy_record_edits=len([x for x in features[4] if len(x[1])==24]))
+ # Deduplicate aliases and require independent options to touch disjoint bytes.
+ for lists in [features,off]:
+  for i,es in enumerate(lists):
+   d={}
+   for p,b in es:assert p not in d or d[p]==b;d[p]=b
+   lists[i]=sorted(d.items())
+ flat=sorted((p,p+len(b),i) for i,es in enumerate(features) for p,b in es)
+ for a,b in zip(flat,flat[1:]):assert a[1]<=b[0],('option overlap',a,b)
+ return common,off,features,proof
+
+def merge(spans):
+ out=[]
+ for start,end in sorted(spans):
+  if out and start<=out[-1][1]+4096:out[-1]=(out[-1][0],max(end,out[-1][1]))
+  else:out.append((start,end))
+ return out
+
+def fingerprint(ranges,data):
+ h=hashlib.sha256()
+ for (p,original,base),b in zip(ranges,data):h.update(struct.pack('<QI',p,len(b)));h.update(hashlib.sha256(b).digest())
+ return h.digest()
+
+def deflate(b):
+ c=zlib.compressobj(9,zlib.DEFLATED,-15);return c.compress(b)+c.flush()
+
+def build():
+ PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();spans=[];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
+ print('Scanning original and canonical ISO without creating images...',flush=True)
+ with SOURCE.open('rb') as a,TARGET.open('rb') as b:
+  pos=0
+  while x:=a.read(8<<20):
+   y=b.read(len(x));assert len(y)==len(x);sh.update(x);ch.update(y)
+   if x!=y:
+    aa=np.frombuffer(x,dtype=np.uint8);bb=np.frombuffer(y,dtype=np.uint8);flags=np.any((aa!=bb).reshape(-1,4096),axis=1)
+    for i in np.flatnonzero(flags):spans.append((pos+int(i)*4096,pos+(int(i)+1)*4096))
+   pos+=len(x)
+ assert sh.hexdigest()==json.loads((ROOT/'manifest_test.json').read_text())['source_sha256']
+ assert ch.hexdigest()==json.loads((ROOT/'current_target.json').read_text())['current_sha256']
+ for p,b in common+[e for es in off+features for e in es]:spans.append((p//4096*4096,min(size,(p+len(b)+4095)//4096*4096)))
+ spans=merge(spans);ranges=[];legacy=[]
+ with SOURCE.open('rb') as a,TARGET.open('rb') as b:
+  for start,end in spans:ranges.append((start,read(a,start,end-start),bytearray(read(b,start,end-start))));legacy.append(bytes(ranges[-1][2]))
+ starts=[r[0] for r in ranges]
+ def setbytes(data,p,b):
+  i=bisect.bisect_right(starts,p)-1;offset=p-starts[i];assert i>=0 and offset+len(b)<=len(data[i]);data[i][offset:offset+len(b)]=b
+ base=[r[2] for r in ranges]
+ for p,b in common+[e for es in off for e in es]:setbytes(base,p,b)
+ immutable=[bytes(x) for x in base];profiles=[]
+ for mask in range(256):
+  data=[bytearray(x) for x in immutable]
+  for bit,es in enumerate(features):
+   if mask&(1<<bit):
+    for p,b in es:setbytes(data,p,b)
+  profiles.append(fingerprint(ranges,data))
+ assert len(set(profiles))==256,'Each checkbox must have a distinct reversible profile'
+ pack=PATCHER/'OGG_options.bin'
+ with pack.open('wb') as f:
+  def w(fmt,*v):f.write(struct.pack(fmt,*v))
+  def blob(b):w('<I',len(b));f.write(b)
+  f.write(b'OGGOPT01');w('<IQ',1,size);f.write(sh.digest());w('<I',len(OPTIONS))
+  for name,desc in OPTIONS:
+   for s in [name,desc]:blob(s.encode('utf8'))
+  w('<I',len(ranges))
+  for (p,original,_),zero in zip(ranges,immutable):w('<QI',p,len(original));blob(deflate(original));blob(deflate(zero))
+  for es in features:
+   w('<I',len(es))
+   for p,b in es:w('<QI',p,len(b));f.write(b)
+  w('<I',len(profiles))
+  for mask,digest in enumerate(profiles):w('<I',mask);f.write(digest)
+  f.write(fingerprint(ranges,[r[1] for r in ranges]));w('<I',1);f.write(fingerprint(ranges,legacy));w('<I',255)
+ digest=hashlib.sha256(pack.read_bytes()).hexdigest()
+ meta=dict(version='v20261106',original_iso_sha256=sh.hexdigest(),canonical_iso_sha256=ch.hexdigest(),iso_size=size,defaults=0,options=[dict(bit=i,name=n,description=d) for i,(n,d) in enumerate(OPTIONS)],profile_count=256,managed_ranges=len(ranges),managed_bytes=sum(len(r[1]) for r in ranges),pack_sha256=digest,pack_size=pack.stat().st_size,proof=proof,shutdown_requested=True)
+ (HERE/'build_metadata.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding='utf8')
+ print(json.dumps({k:v for k,v in meta.items() if k not in ['options','proof']},indent=2),flush=True)
+ return meta
+
+if __name__=='__main__':build()

@@ -1,0 +1,58 @@
+{
+  "version": "v20261106",
+  "original_iso_sha256": "a9f7f03c4cb722f9e0709860a1cf5a16fc52d8bf116a9458403ffc5a67fd7f63",
+  "canonical_iso_sha256": "f627f494cf764053fdffab7ec6ca84db00125f86645ccc5ef03ed658806ff46f",
+  "iso_size": 4666294272,
+  "defaults": 0,
+  "options": [
+    {
+      "bit": 0,
+      "name": "25편성 분산 합류·추가 시나리오",
+      "description": "3화부터 전이 대화, 4~31화 합류. 추가 기체·파일럿 밸런스 포함"
+    },
+    {
+      "bit": 1,
+      "name": "숨겨진 요소 자동 습득",
+      "description": "6·13·25·30화 보상 조건 해제. 미롱가는 양쪽 루트에서 입수"
+    },
+    {
+      "bit": 2,
+      "name": "3화 추가 보급 8종",
+      "description": "시시오 블레이드·부스트 해머와 강화파츠 6종을 각 1개 지급"
+    },
+    {
+      "bit": 3,
+      "name": "전투 보상: PP 2배·자금 +20%",
+      "description": "기존 보너스와 분배 계산 후 적용. 자금 소수점 버림"
+    },
+    {
+      "bit": 4,
+      "name": "적 강화",
+      "description": "전투 능력치 +5, 기체·무장 개조 +2, 기본 HP 2만 미만 +10%"
+    },
+    {
+      "bit": 5,
+      "name": "공통 무장 밸런스",
+      "description": "OGs 공통 무장 조정 이식. 외전 고유의 강화분 유지"
+    },
+    {
+      "bit": 6,
+      "name": "무장 개조비 할인",
+      "description": "최저 비용표를 제외한 무장 개조비 20% 할인"
+    },
+    {
+      "bit": 7,
+      "name": "정신기 SP 소모 1",
+      "description": "정신기 SP 소모를 1로 변경. 해제하면 원래 소모량 복원"
+    }
+  ],
+  "profile_count": 256,
+  "managed_ranges": 35,
+  "managed_bytes": 6168576,
+  "pack_sha256": "0ffa4bdeebbd1e421530e7e9abd7d13a7871eec8f7c718aabc99ce3c34098e1a",
+  "pack_size": 1642675,
+  "executable_sha256": "8f0b198bce7da25adca1421e4cb0e9717bcd516b1d32f4b4128a5db120506f18",
+  "canonical_iso_preserved": true,
+  "source_iso_preserved": true,
+  "live_playthrough": false
+}
