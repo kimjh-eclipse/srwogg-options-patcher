@@ -15,7 +15,7 @@ HERE=Path(__file__).resolve().parent
 
 class Profiles:
  def __init__(self):
-  f=io.BytesIO((HERE.parent/'release_v20261107.7/patcher/OGG_options.bin').read_bytes())
+  f=io.BytesIO((HERE.parent/'release_v20261107.8/patcher/OGG_options.bin').read_bytes())
   def n(fmt):return struct.unpack(fmt,f.read(struct.calcsize(fmt)))
   def blob():return f.read(n('<I')[0])
   assert f.read(8)==b'OGGOPT01';assert n('<I')[0]==1
@@ -126,8 +126,9 @@ def _legacy_checks_through_bosses(p):
  return {'previous_8_option_profiles_recognized':legacy_set_checks(p,OLD_PACK),'v20261106_1_profiles_recognized':legacy_set_checks(p,OLDER_PACK),'v20261106_2_profiles_recognized':legacy_set_checks(p,SPIRITS_PACK),'v20261106_3_profiles_recognized':legacy_set_checks(p,PARTY_PACK),'v20261106_4_profiles_recognized':legacy_set_checks(p,CONSISTENCY_PACK),'v20261106_5_profiles_recognized':legacy_set_checks(p,PREVIOUS_PACK),'v20261107_profiles_recognized':legacy_set_checks(p,PREVIOUS_TEN_PACK),'v20261107_1_profiles_recognized':legacy_set_checks(p,PREVIOUS_ELEVEN_PACK),'v20261107_2_profiles_recognized':legacy_set_checks(p,PREVIOUS_REGIONAL_PACK),'v20261107_3_profiles_recognized':legacy_set_checks(p,PREVIOUS_BOSSES_PACK),'removed_SP_bit_not_exposed':True}
 
 def legacy_checks(p):
- from build_options import PREVIOUS_INTERMISSION_PACK
+ from build_options import PREVIOUS_INTERMISSION_PACK,PREVIOUS_CIVIL_WAR_PACK
  result=_legacy_checks_through_bosses(p)
+ result['v20261107_7_profiles_recognized']=legacy_set_checks(p,PREVIOUS_CIVIL_WAR_PACK)
  result['v20261107_6_profiles_recognized']=legacy_set_checks(p,PREVIOUS_INTERMISSION_PACK)
  result['v20261107_5_profiles_recognized']=legacy_set_checks(p,PREVIOUS_BEOWULF_PACK)
  result['v20261107_4_profiles_recognized']=legacy_set_checks(p,PREVIOUS_DENSITY_PACK)
@@ -280,7 +281,7 @@ def common_weapon_cross_checks(p):
  return {'whole_weapon_table_comparisons':comparisons,'native_accessor_checks':native,'common_weapon_toggle_independent_of_maintenance':True,'unrelated_and_cloned_weapon_rows_preserved':True}
 
 def main():
- p=Profiles();result={'passed':True,'pack_sha256':hashlib.sha256((HERE.parent/'release_v20261107.7/patcher/OGG_options.bin').read_bytes()).hexdigest(),'supply_story_independence':supply_checks(p)}
+ p=Profiles();result={'passed':True,'pack_sha256':hashlib.sha256((HERE.parent/'release_v20261107.8/patcher/OGG_options.bin').read_bytes()).hexdigest(),'supply_story_independence':supply_checks(p)}
  result['sp_costs_and_upgrade_prices']=price_and_sp_checks(p)
  result['legacy_inputs']=legacy_checks(p)
  result['party_profiles']=party_profile_checks(p)

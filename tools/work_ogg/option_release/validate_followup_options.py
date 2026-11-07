@@ -31,7 +31,7 @@ def main():
  regional=json.loads((ROOT/'regional_five_prepared.json').read_text(encoding='utf8'));regional_checks=0
  beowulf=json.loads((ROOT/'beowulf_stage_prepared.json').read_text(encoding='utf8'));beowulf_checks=0
  intermission=json.loads((ROOT/'intermission_six_prepared.json').read_text(encoding='utf8'));iscenes={x['key']:x for x in intermission['scenes']}
- civil=json.loads((ROOT/'civil_war_prepared.json').read_text(encoding='utf8'));civil_checks=0
+ civil=json.loads((ROOT/'civil_guard_prepared.json').read_text(encoding='utf8'))['effective_civil'];civil_checks=0
  bridges={x['key']:x for x in civil['bridges']}
  for key,item in bridges.items():
   original=iscenes[key];original['logo']=item['logo'];original['old_story_gates']=item['old_story_gates'];original['new_story_gates']=item['new_story_gates']
@@ -91,7 +91,7 @@ def main():
     _,at,size=next(e for e in es if scene['key'] in e[0]);assert (at,size)==(scene['logo']['offset'],scene['logo']['size']);image.seek(at);cb=image.read(size);cr=records(cb)
     assert all(cr[ix][4]==(0 if mask&1 else 2) for ix in scene['story_gates'])
     assert any(r[0]==0xa1 and r[2]==scene['next_index'] for r in cr)
-    _,at,size=next(e for e in units if scene['key'] in e[0]);image.seek(at);ub=image.read(size);assert __import__('inspect_iso').u32(ub,40)==45
+    _,at,size=next(e for e in units if scene['key'] in e[0]);image.seek(at);ub=image.read(size);assert __import__('inspect_iso').u32(ub,40)==63
     for item in scene['spawn']:
      assert __import__('struct').unpack_from('<6I',ub,44+item['row']*336+0x38)==tuple([item['base_grade']+(2 if mask&16 else 0)]*6)
     if mask in [0,1,16,17,2048,2049,2064,2065]:
@@ -113,8 +113,8 @@ def main():
    for ar,item in r_weapons['masters'].items():
     _,m=__import__('build_options').rawmaster(image,ar)
     if ar=='SHARED.BIN':
-     sb=__import__('regional_five_policy').stage_base(m);assert [m.b[sb+i*12+6] for i in [33,34]]==([40,47] if mask&2048 else [35,36]);regional_checks+=1
-     assert all((__import__('catalog').u16(m.b,sb+i*12)==65535)==(not bool(mask&2048)) for i in range(35,46));regional_checks+=1
+     sb=__import__('regional_five_policy').stage_base(m);assert [m.b[sb+i*12+6] for i in [33,34]]==([40,49] if mask&2048 else [35,36]);regional_checks+=1
+     assert all((__import__('catalog').u16(m.b,sb+i*12)==65535)==(not bool(mask&2048)) for i in range(35,48));regional_checks+=1
     idx=__import__('catalog').u16(m.b,m.tables['UTbl'][0]+12+1209*2);at=m.tables['Unit'][0]+12+idx*100;assert bytes(m.b[at:at+100])==bytes.fromhex(item['after_unit_hex'] if mask&1024 else item['before_unit_hex']);unit_profiles+=1
     for w in item['weapons']:
      wi=__import__('catalog').u16(m.b,m.tables['WTbl'][0]+12+w['private_key']*2);assert __import__('catalog').u16(m.b,m.tables['Weap'][0]+12+wi*36+8)==(w['after_power'] if mask&1024 else w['before_power'])
@@ -142,7 +142,7 @@ def main():
  assert [b for at,b in p.features[2]]==[b for at,b in old[2]]
  for bit in [3,6,7]:assert p.features[bit]==old[bit],bit
  assert [b for at,b in p.features[5]]==[b for at,b in old[5]]
- assert set(old[4])<=set(p.features[4]) and len(p.features[4])==len(old[4])+352
+ assert set(old[4])<=set(p.features[4]) and len(p.features[4])==len(old[4])+542
  assert p.features[8][:-1]==old[8][:-1]
  assert p.features[8][-1][1]==old[8][-1][1]
  assert len(p.features[8][-1][1])==96
@@ -172,7 +172,7 @@ def main():
     key=vm.cpu.read(body+0x24+w['slot']*2,2);assert key==(w['private_key'] if mask&1024 else w['source_key']);assert vm.cpu.run(0x274ff0,[vm.master,key])==(w['after_power'] if mask&1024 else w['before_power']);assert vm.cpu.run(0x274ff0,[vm.master,w['private_key']])==(w['after_power'] if mask&1024 else w['before_power']);native_weapons.append({'mask':mask,'archive':ar,'slot':w['slot'],'power':w['after_power'] if mask&1024 else w['before_power']})
   image.f.close()
  result['native_R_unit_weapon_accessors']=native_weapons
- result.update(intermission_profiles=len(masks),intermission_scenes=12,intermission_new_lines=225,tactical_expansions=6,beowulf_profile_checks=beowulf_checks,beowulf_profiles=len(masks),civil_war_profile_checks=civil_checks,civil_war_battles=5,additional_battles=11,semantic_masks=masks,byte_profile_selftest_count=4096,shared_option_bit=11,no_thirteenth_option=True)
+ result.update(intermission_profiles=len(masks),intermission_scenes=12,intermission_new_lines=225,tactical_expansions=6,beowulf_profile_checks=beowulf_checks,beowulf_profiles=len(masks),civil_war_profile_checks=civil_checks,civil_war_battles=7,additional_battles=13,semantic_masks=masks,byte_profile_selftest_count=4096,shared_option_bit=11,no_thirteenth_option=True)
  (HERE/'followup_options_validation.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8');print(json.dumps(result,ensure_ascii=False,indent=2),flush=True)
 
 if __name__=='__main__':main()

@@ -33,19 +33,20 @@ def started(a,name):
 def mission(template,scene,members,speakers,private,mapkey,targets,nextindex):
  a=Logo(template,speakers);key=scene['key'];pairs=[]
  a.function('defeat',28);started(a,'defeat');a.emit(0x7a,0x100ad,0,0);a.emit(0xa1,0xffffffff,0);a.end('defeat')
- a.function('hostage_loss',28);started(a,'hostage_loss');a.emit(0x7a,0x100bd,HOSTAGE_KEY,0);a.say([('테츠야','수송편과의 연결이 끊겼다. 이번 작전은 실패다. 철수한다.')]);a.emit(0xa1,0xffffffff,0);a.end('hostage_loss')
+ a.function('hostage_loss',28);started(a,'hostage_loss');a.emit(0x7a,0x100bd,HOSTAGE_KEY,0);a.say([(scene.get('commander','테츠야'),'수송편과의 연결이 끊겼다. 이번 작전은 실패다. 철수한다.')]);a.emit(0xa1,0xffffffff,0);a.end('hostage_loss')
  a.function('map',2);a.emit(0xb0,60,0x10014);a.emit(0xbd,mapkey);a.emit(0x79,0x10049,NONE,NONE);a.emit(0xba,0x10071,4,7);a.end('map')
  a.function('opening',27,0,0);a.emit(0xb0,1,0x10012);a.emit(0xaf,1,0x10014);a.emit(0xaf,60,0x10012)
  if key==2044:availability(a,members,INFIL,1)
  say(a,scene['pre'],members);a.emit(0x7b,0x100ef,0x10086,0x10041);a.emit(0xb0,1,0x10012)
  a.emit(0xca,0,250);a.emit(0xca,1,250);a.emit(0xc3,12);a.emit(0x6c,30,0);a.emit(0x68,53);a.emit(0xbc,53);a.emit(0xaf,60,0x10012)
  say(a,scene['opening'],members);a.emit(0x7b,0x100ef,0x10086,0x10041)
- for sel,text in [(0x100ed,'반란 지휘부 제압' if key==2045 else '제어 중계기 제압'),(0x10072,'아군 전멸 또는 인질 수송기 격파'),(0x100b7,'없음')]:a.emit(0x5a,sel,a.string(text))
+ for sel,text in [(0x100ed,scene.get('objective_name','반란 지휘부 제압' if key==2045 else '제어 중계기 제압')),(0x10072,'아군 전멸 또는 인질 수송기 격파'),(0x100b7,'없음')]:a.emit(0x5a,sel,a.string(text))
  a.emit(0x5b,0x1ff);a.emit(0xd1,0);a.end('opening',0)
  a.function('ending',27,1,2);started(a,'ending')
  a.emit(0x96,0x100bd,HOSTAGE_KEY,0x800e);i=a.emit(0x91,0x800e,0x8000,1,DEAD,DEAD,0);a.fix.append((i,'ending_exit'))
  for target in targets:a.emit(0x7a,0x100bd,target,0)
  a.emit(0x6d);a.emit(0x67);say(a,scene['post'],members);a.emit(0x7b,0x100ef,0x10086,0x10041)
+ for row in scene.get('post_commands',[]):a.rows.append(row.copy())
  if key==2041:availability(a,members,INFIL,0)
  if key==2044:
   availability(a,members,GUARD,1);availability(a,members,INFIL,1)
@@ -57,17 +58,17 @@ def mission(template,scene,members,speakers,private,mapkey,targets,nextindex):
  a.function('encounters',27,2);started(a,'encounters')
  dispatch=[]
  for index in scene['pairs']:
-  left,right=PAIRS[index]
+  left,right=scene.get('pair_definitions',PAIRS)[index]
   def actor(who):
    item=members[who]
-   enemy=(item['team']==GUARD and key<2045) or (item['team']==REBELS) or (item['team']==INFIL and key in [2042,2043])
+   enemy=(item['team']==GUARD and scene.get('guard_enemy',key<2045)) or (item['team']==REBELS) or (item['team']==INFIL and key in [2042,2043])
    return private[who] if enemy else item['pilot']
   dispatch.append((a.emit(0x2a,0x8000,0x100a8,actor(left),0x100a8,actor(right),0x10018,0),index,left,right,actor(left),actor(right)))
  a.end('encounters')
  for row,index,left,right,lp,rp in dispatch:
   name='pair_'+str(index);a.label(name);a.funcs.append(name);a.rows[row][8]=len(a.funcs)
   a.flagguard(1,index,name+'_exit') if index<8 else a.flagguard(2,index-8,name+'_exit')
-  say(a,pair_lines(key,index),members);a.emit(0x7b,0x100ef,0x10086,0x10041);a.emit(0xba,0x10071,1 if index<8 else 2,index if index<8 else index-8)
+  say(a,scene.get('pair_dialogue',{}).get(index,pair_lines(key,index)),members);a.emit(0x7b,0x100ef,0x10086,0x10041);a.emit(0xba,0x10071,1 if index<8 else 2,index if index<8 else index-8)
   a.label(name+'_exit');a.emit(0x3e)
   pairs.append(dict(index=index,left=left,right=right,left_key=lp,right_key=rp,function=name,dispatcher_row=row,flag=[1 if index<8 else 2,index if index<8 else index-8]))
  blob,note=a.finish();note.update(pairs=pairs,targets=targets,hostage=HOSTAGE_KEY,next_index=nextindex,auto_encounter=True)
