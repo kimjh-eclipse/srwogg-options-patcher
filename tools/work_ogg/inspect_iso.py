@@ -34,10 +34,13 @@ def lice(f,base,limit):
     mapping=struct.unpack('<%dH'%slots,read(f,base+16,slots*2))
     d=read(f,base+di,8+count*8);assert d[:4]==b'Wpbb' and u32(d,4)==count
     entries=[]
+    keys_by_index=[[] for _ in range(count)]
+    for key,index in enumerate(mapping):
+        if index<count:keys_by_index[index].append(key)
     for i in range(count):
         off,size=struct.unpack_from('<II',d,8+8*i);assert di+off+size<=limit
         at=base+di+off;magic=read(f,at,min(32,size))
-        entries.append(dict(index=i,keys=[k for k,v in enumerate(mapping) if v==i],offset=at,size=size,head=magic.hex()))
+        entries.append(dict(index=i,keys=keys_by_index[i],offset=at,size=size,head=magic.hex()))
     return dict(offset=base,directory=base+di,count=count,slots=slots,entries=entries)
 def main():
     OUT.mkdir(parents=True,exist_ok=True)

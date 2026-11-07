@@ -3,7 +3,7 @@ from pathlib import Path
 import sys,struct,zlib,io,json,bisect,hashlib
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from inspect_iso import SOURCE,OUT,inventory,u32
-from build_options import rawmaster,load_old_pack,source_image,load_pack,OLD_PACK,PREVIOUS_PACK,OLDER_PACK,SPIRITS_PACK,PARTY_PACK,CONSISTENCY_PACK,PREVIOUS_TEN_PACK,PREVIOUS_ELEVEN_PACK,PREVIOUS_REGIONAL_PACK,PREVIOUS_BOSSES_PACK
+from build_options import rawmaster,load_old_pack,source_image,load_pack,OLD_PACK,PREVIOUS_PACK,OLDER_PACK,SPIRITS_PACK,PARTY_PACK,CONSISTENCY_PACK,PREVIOUS_TEN_PACK,PREVIOUS_ELEVEN_PACK,PREVIOUS_REGIONAL_PACK,PREVIOUS_BOSSES_PACK,PREVIOUS_DENSITY_PACK
 from audit_story_layout import loadarc
 from story_scripts_25 import records,text_at,encode
 from campaign_bonus_scripts import EARLY
@@ -15,7 +15,7 @@ HERE=Path(__file__).resolve().parent
 
 class Profiles:
  def __init__(self):
-  f=io.BytesIO((HERE.parent/'release_v20261107.4/patcher/OGG_options.bin').read_bytes())
+  f=io.BytesIO((HERE.parent/'release_v20261107.5/patcher/OGG_options.bin').read_bytes())
   def n(fmt):return struct.unpack(fmt,f.read(struct.calcsize(fmt)))
   def blob():return f.read(n('<I')[0])
   assert f.read(8)==b'OGGOPT01';assert n('<I')[0]==1
@@ -103,23 +103,32 @@ def ram(p,mask):
 
 def legacy_set_checks(p,path):
  regions,features,source_hash=load_pack(path);count=0
+ # Imported art is identical across an older release's profiles. Read and hash
+ # those constant ranges once, rather than rereading the ISO for every mask.
+ with (SOURCE.open('rb') if len(features)==8 else source_image()) as old_source:
+  base=[]
+  for at,b in p.regions:old_source.seek(at);base.append(bytearray(old_source.read(len(b))))
+ for at,b in regions:
+  i=bisect.bisect_right(p.starts,at)-1;rel=at-p.starts[i];base[i][rel:rel+len(b)]=b
+ dirty={bisect.bisect_right(p.starts,at)-1 for es in features for at,b in es};base=[bytes(b) for b in base];constant={i:hashlib.sha256(b).digest() for i,b in enumerate(base) if i not in dirty}
  for mask in range(1<<len(features)):
-  image=Image(p,0);image.f.close()
-  with (SOURCE.open('rb') if len(features)==8 else source_image()) as old_source:
-   for i,(at,b) in enumerate(p.regions):old_source.seek(at);image.data[i]=bytearray(old_source.read(len(b)))
-  for at,b in regions:
-   i=bisect.bisect_right(p.starts,at)-1;rel=at-p.starts[i];image.data[i][rel:rel+len(b)]=b
+  data=[bytearray(b) if i in dirty else b for i,b in enumerate(base)]
   for bit,es in enumerate(features):
    if mask&(1<<bit):
     for at,b in es:
-     i=bisect.bisect_right(p.starts,at)-1;rel=at-p.starts[i];image.data[i][rel:rel+len(b)]=b
+     i=bisect.bisect_right(p.starts,at)-1;rel=at-p.starts[i];data[i][rel:rel+len(b)]=b
   h=hashlib.sha256()
-  for (at,_),b in zip(p.regions,image.data):h.update(struct.pack('<QI',at,len(b)));h.update(hashlib.sha256(b).digest())
+  for i,((at,_),b) in enumerate(zip(p.regions,data)):h.update(struct.pack('<QI',at,len(b)));h.update(constant[i] if i in constant else hashlib.sha256(b).digest())
   assert p.known[h.digest()]==(mask if len(features)>=9 else mask&127);count+=1
  return count
 
-def legacy_checks(p):
+def _legacy_checks_through_bosses(p):
  return {'previous_8_option_profiles_recognized':legacy_set_checks(p,OLD_PACK),'v20261106_1_profiles_recognized':legacy_set_checks(p,OLDER_PACK),'v20261106_2_profiles_recognized':legacy_set_checks(p,SPIRITS_PACK),'v20261106_3_profiles_recognized':legacy_set_checks(p,PARTY_PACK),'v20261106_4_profiles_recognized':legacy_set_checks(p,CONSISTENCY_PACK),'v20261106_5_profiles_recognized':legacy_set_checks(p,PREVIOUS_PACK),'v20261107_profiles_recognized':legacy_set_checks(p,PREVIOUS_TEN_PACK),'v20261107_1_profiles_recognized':legacy_set_checks(p,PREVIOUS_ELEVEN_PACK),'v20261107_2_profiles_recognized':legacy_set_checks(p,PREVIOUS_REGIONAL_PACK),'v20261107_3_profiles_recognized':legacy_set_checks(p,PREVIOUS_BOSSES_PACK),'removed_SP_bit_not_exposed':True}
+
+def legacy_checks(p):
+ result=_legacy_checks_through_bosses(p)
+ result['v20261107_4_profiles_recognized']=legacy_set_checks(p,PREVIOUS_DENSITY_PACK)
+ return result
 
 def price_and_sp_checks(p):
  from catalog import u16
@@ -137,9 +146,11 @@ def price_and_sp_checks(p):
     if index!=65535:keys.setdefault(index,key)
    for index,at,row in m.rows('Plot'):
     if index<old.tables['Plot'][2]:expected=old.b[old.tables['Plot'][0]+12+index*148:old.tables['Plot'][0]+12+(index+1)*148]
+    elif keys.get(index)==1930:
+     oi=u16(old.b,old.tables['PTbl'][0]+12+1094*2);expected=old.b[old.tables['Plot'][0]+12+oi*148:old.tables['Plot'][0]+12+(oi+1)*148]
     else:
      item=cast[keys[index]];key=1091 if item['pilot_name']=='이글렛' else item['pilot'];oi=u16(shared.b,shared.tables['PTbl'][0]+12+key*2);expected=shared.b[shared.tables['Plot'][0]+12+oi*148:shared.tables['Plot'][0]+12+(oi+1)*148]
-    if index>=old.tables['Plot'][2]:expected=apply_to_row(item['pilot_name'],expected)
+    if index>=old.tables['Plot'][2] and keys.get(index)!=1930:expected=apply_to_row(item['pilot_name'],expected)
     for slot in range(6):
      assert row[0x72+slot]==expected[0x72+slot]
      if index in keys:assert vm.cpu.run(0x272730,[vm.master,keys[index],slot])==expected[0x72+slot];cases+=1
@@ -263,7 +274,7 @@ def common_weapon_cross_checks(p):
  return {'whole_weapon_table_comparisons':comparisons,'native_accessor_checks':native,'common_weapon_toggle_independent_of_maintenance':True,'unrelated_and_cloned_weapon_rows_preserved':True}
 
 def main():
- p=Profiles();result={'passed':True,'pack_sha256':hashlib.sha256((HERE.parent/'release_v20261107.4/patcher/OGG_options.bin').read_bytes()).hexdigest(),'supply_story_independence':supply_checks(p)}
+ p=Profiles();result={'passed':True,'pack_sha256':hashlib.sha256((HERE.parent/'release_v20261107.5/patcher/OGG_options.bin').read_bytes()).hexdigest(),'supply_story_independence':supply_checks(p)}
  result['sp_costs_and_upgrade_prices']=price_and_sp_checks(p)
  result['legacy_inputs']=legacy_checks(p)
  result['party_profiles']=party_profile_checks(p)

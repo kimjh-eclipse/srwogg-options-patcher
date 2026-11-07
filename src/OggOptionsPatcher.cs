@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Windows.Forms;
 internal static class OggOptionsPatcher
 {
     const string ExpectedPackSha = "__PACK_SHA__";
-    const string Version = "v20261107.4";
+    const string Version = "v20261107.5";
     sealed class Region { public long Offset; public byte[] Original, Zero; }
     sealed class Edit { public long Offset; public byte[] Data; }
     sealed class Pack {
@@ -47,7 +47,7 @@ internal static class OggOptionsPatcher
                 for(int j=0;j<n;j++) { long at=r.ReadInt64(); int length=r.ReadInt32(); if(length<1 || length>p.Size || at<0 || at>p.Size-length) throw new InvalidDataException("옵션 범위 오류"); p.Features[i].Add(new Edit { Offset=at, Data=ReadExact(r,length) }); } }
             int profiles=r.ReadInt32(); if(profiles!=(1<<count)) throw new InvalidDataException("조합 수 오류"); p.Profiles=new byte[profiles][];
             for(int i=0;i<profiles;i++) { if(r.ReadInt32()!=i) throw new InvalidDataException("조합 순서 오류"); p.Profiles[i]=ReadExact(r,32); p.Known.Add(Hex(p.Profiles[i]),i); }
-            p.Known[Hex(ReadExact(r,32))]=-1; int legacy=r.ReadInt32(); if(legacy<0 || legacy>16384) throw new InvalidDataException("이전 버전 오류");
+            p.Known[Hex(ReadExact(r,32))]=-1; int legacy=r.ReadInt32(); if(legacy<0 || legacy>32768) throw new InvalidDataException("이전 버전 오류");
             for(int i=0;i<legacy;i++) { string key=Hex(ReadExact(r,32)); int mask=r.ReadInt32(); p.Known[key]=mask; }
             if(r.BaseStream.Position!=r.BaseStream.Length) throw new InvalidDataException("패치 뒤에 잉여 데이터가 있습니다.");
         } return p;
@@ -164,7 +164,7 @@ internal static class OggOptionsPatcher
             pack=p; Text="슈퍼로봇대전 OG외전 옵션 패처 "+Version; Font=new Font("맑은 고딕",10); ClientSize=new Size(900,880); MinimumSize=new Size(800,820); StartPosition=FormStartPosition.CenterScreen;
             TableLayoutPanel main=new TableLayoutPanel { Dock=DockStyle.Fill,Padding=new Padding(16),ColumnCount=1,RowCount=5 };
             main.RowStyles.Add(new RowStyle(SizeType.Absolute,60));main.RowStyles.Add(new RowStyle(SizeType.Absolute,44));main.RowStyles.Add(new RowStyle(SizeType.Percent,100));main.RowStyles.Add(new RowStyle(SizeType.Absolute,86));main.RowStyles.Add(new RowStyle(SizeType.Absolute,48)); Controls.Add(main);
-            Label intro=new Label { Dock=DockStyle.Fill,Text="필요한 옵션을 선택해 한글판 ISO에 적용하세요.\n25편성 시나리오는 새 게임에서 시작해 주세요. 국지전은 시험판이며 34화 종료 전 선택하고 다섯 작전 동안 유지하세요.",AutoSize=false }; main.Controls.Add(intro,0,0);
+            Label intro=new Label { Dock=DockStyle.Fill,Text="필요한 옵션을 선택해 한글판 ISO에 적용하세요.\n25편성 시나리오는 새 게임에서 시작해 주세요. 12번은 34화 종료 전 선택하고 베오울프전까지 유지하세요.",AutoSize=false }; main.Controls.Add(intro,0,0);
             TableLayoutPanel picker=new TableLayoutPanel { Dock=DockStyle.Fill,ColumnCount=2 };picker.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100));picker.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,110));path.Dock=DockStyle.Fill;path.Margin=new Padding(0,5,8,5);picker.Controls.Add(path,0,0);
             Button choose=new Button { Text="ISO 선택",Dock=DockStyle.Fill };choose.Click+=delegate { using(OpenFileDialog d=new OpenFileDialog { Filter="PS2 ISO (*.iso)|*.iso",Title="패치할 OG외전 한글판 ISO를 선택하세요" }) if(d.ShowDialog()==DialogResult.OK) path.Text=d.FileName; };picker.Controls.Add(choose,1,0);main.Controls.Add(picker,0,1);actions.Add(choose);actions.Add(path);
             FlowLayoutPanel options=new FlowLayoutPanel { Dock=DockStyle.Fill,FlowDirection=FlowDirection.TopDown,WrapContents=false,AutoScroll=true,Padding=new Padding(0,4,0,0) };
