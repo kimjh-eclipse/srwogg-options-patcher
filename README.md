@@ -4,7 +4,7 @@
 
 ## 이번 시험판
 
-[국지전 5편 시험판 다운로드](https://github.com/kimjh-eclipse/srwogg-options-patcher/releases/tag/v20261107.2)
+[전체 패처 ZIP 다운로드 — EXE·BIN·설명서 포함](https://github.com/kimjh-eclipse/srwogg-options-patcher/releases/download/v20261107.2/SRWOGG_Options_kr_v20261107.2.zip)
 
 **34화 → 추가35~39화 → 본래35화(표시40화) → 본래36화(표시41화·최종전)** 순서로 진행합니다. 액셀·알피미의 정식 합류 이후입니다. 기존 전장을 사용하고 보유 기체12기 선택 출격·적16기로 구성했습니다.
 

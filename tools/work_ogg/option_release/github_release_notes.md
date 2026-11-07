@@ -1,3 +1,11 @@
+## 전체 패처 ZIP 다운로드
+
+[**SRWOGG_Options_kr_v20261107.2.zip 다운로드**](https://github.com/kimjh-eclipse/srwogg-options-patcher/releases/download/v20261107.2/SRWOGG_Options_kr_v20261107.2.zip)
+
+EXE·BIN·설명서가 함께 들어 있습니다. ZIP을 압축 해제한 뒤 `patcher/OGG_Options_Patcher.exe`를 실행하세요. EXE와 BIN은 같은 폴더에 그대로 두시면 됩니다.
+
+---
+
 34화 이후 **지역전 5편**을 독립된 **12번 옵션**으로 추가한 시험판입니다. 기존 맵을 재사용하고 각 지역의 잔존 병기와 교전합니다. 최신 안정판 v20261107.1은 유지합니다.
 
 ## 추가 작전
