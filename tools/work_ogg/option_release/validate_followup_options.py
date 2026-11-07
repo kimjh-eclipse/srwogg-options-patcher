@@ -30,6 +30,10 @@ def main():
  refinement=json.loads((ROOT/'followup_refinement_prepared.json').read_text(encoding='utf-8'));overrides={(scene['chapter'],m['string_id']):__import__('story_scripts_25').encode(m['text']) for scene in refinement['scenes'] for m in scene['messages']}
  regional=json.loads((ROOT/'regional_five_prepared.json').read_text(encoding='utf8'));regional_checks=0
  beowulf=json.loads((ROOT/'beowulf_stage_prepared.json').read_text(encoding='utf8'));beowulf_checks=0
+ intermission=json.loads((ROOT/'intermission_six_prepared.json').read_text(encoding='utf8'));iscenes={x['key']:x for x in intermission['scenes']}
+ for scene in regional['scenes']:
+  item=iscenes[scene['key']];scene['story_gates']=item['old_story_gates']+item['new_story_gates']
+ item=iscenes[2040];beowulf['story_gates']=item['old_story_gates']+item['new_story_gates']
  r_weapons=json.loads((ROOT/'huckebein_r_weapons_prepared.json').read_text(encoding='utf-8'));unit_profiles=0
  for mask in range(4096):
   image=Image(p,mask)
@@ -74,6 +78,9 @@ def main():
    for item in beowulf['spawn']:
     pos=44+item['row']*336;assert __import__('struct').unpack_from('<6I',ub,pos+0x38)==tuple([item['base_grade']+(2 if mask&16 else 0)]*6)
    beowulf_checks+=1
+   for scene in intermission['scenes']:
+    _,at,size=next(e for e in es if scene['key'] in e[0]);assert at==scene['logo']['offset'] and size==scene['logo']['size'];image.seek(at);blob=image.read(size)
+    for msg in scene['messages']:assert text_at(blob,msg['sid'])==__import__('story_scripts_25').encode(msg['text'])
    _,at,size=next(e for e in es if 2003 in e[0]);image.seek(at);blob=image.read(size)
    start,end=guarded_block(blob,EARLY_FLAG);rs=records(blob)
    assert rs[start+1][4]==(0 if mask&512 else 2)
@@ -142,7 +149,7 @@ def main():
     key=vm.cpu.read(body+0x24+w['slot']*2,2);assert key==(w['private_key'] if mask&1024 else w['source_key']);assert vm.cpu.run(0x274ff0,[vm.master,key])==(w['after_power'] if mask&1024 else w['before_power']);assert vm.cpu.run(0x274ff0,[vm.master,w['private_key']])==(w['after_power'] if mask&1024 else w['before_power']);native_weapons.append({'mask':mask,'archive':ar,'slot':w['slot'],'power':w['after_power'] if mask&1024 else w['before_power']})
   image.f.close()
  result['native_R_unit_weapon_accessors']=native_weapons
- result.update(beowulf_profile_checks=beowulf_checks,beowulf_profiles=4096,additional_battles=6,shared_option_bit=11,no_thirteenth_option=True)
+ result.update(intermission_profiles=4096,intermission_scenes=12,intermission_new_lines=225,tactical_expansions=6,beowulf_profile_checks=beowulf_checks,beowulf_profiles=4096,additional_battles=6,shared_option_bit=11,no_thirteenth_option=True)
  (HERE/'followup_options_validation.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8');print(json.dumps(result,ensure_ascii=False,indent=2),flush=True)
 
 if __name__=='__main__':main()

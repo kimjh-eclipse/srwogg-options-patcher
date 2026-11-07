@@ -11,7 +11,7 @@ using System.Windows.Forms;
 internal static class OggOptionsPatcher
 {
     const string ExpectedPackSha = "__PACK_SHA__";
-    const string Version = "v20261107.5";
+    const string Version = "v20261107.6";
     sealed class Region { public long Offset; public byte[] Original, Zero; }
     sealed class Edit { public long Offset; public byte[] Data; }
     sealed class Pack {

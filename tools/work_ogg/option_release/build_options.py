@@ -16,10 +16,11 @@ sys.path.insert(0,str(ROOT/'upstream_base'))
 from source_image import source_image,DATA as BASE_INFO,CHANGES as BASE_CHANGES
 
 HERE=Path(__file__).resolve().parent
-VERSION='v20261107.5'
+VERSION='v20261107.6'
 DIST=ROOT/('release_'+VERSION)
 OLD_PACK=ROOT/'release_v20261106/patcher/OGG_options.bin'
 PREVIOUS_PACK=ROOT/'release_v20261106.5/patcher/OGG_options.bin'
+PREVIOUS_BEOWULF_PACK=ROOT/'release_v20261107.5/patcher/OGG_options.bin'
 PREVIOUS_DENSITY_PACK=ROOT/'release_v20261107.4/patcher/OGG_options.bin'
 PREVIOUS_BOSSES_PACK=ROOT/'release_v20261107.3/patcher/OGG_options.bin'
 PREVIOUS_REGIONAL_PACK=ROOT/'release_v20261107.2/patcher/OGG_options.bin'
@@ -224,6 +225,12 @@ def plan():
    at=item['offset']+44+row['row']*336+0x38;switch(4,at,struct.pack('<6I',*([row['base_grade']]*6)),struct.pack('<6I',*([row['base_grade']+2]*6)))
   switch(11,e['offset']+sb+40*12,om.b[ob+40*12:ob+41*12],m.b[sb+40*12:sb+41*12])
   proof.update(beowulf_stage=True,additional_battles=6,beowulf_minions=30,beowulf_endless_reinforcements=True,beowulf_native_checks=json.loads((ROOT/'beowulf_stage_validation.json').read_text(encoding='utf8'))['checks'])
+  ip=json.loads((ROOT/'intermission_six_prepared.json').read_text(encoding='utf8'))
+  for scene in ip['scenes']:
+   item=scene['logo'];blob=read(current,item['offset'],item['size']);rs=records(blob)
+   for ix in scene['old_story_gates']+scene['new_story_gates']:
+    on=rs[ix];assert on[0]==0x91;zero=on.copy();zero[4]=2;record_switch(0,item['offset'],blob,ix,zero,on)
+  proof.update(intermission_scenes=12,intermission_new_lines=ip['new_lines'],tactical_expansions=6,ship_alerts_before_selection=True)
   proof.update(regional_five=True,regional_five_experimental=True,regional_story_gates=sum(len(x['story_gates']) for x in rp['scenes']),regional_enemy_records=160,regional_native_checks=json.loads((ROOT/'regional_five_validation.json').read_text(encoding='utf8'))['native_checks'],live_playthrough=False)
  # Deduplicate aliases and require independent options to touch disjoint bytes.
  for lists in [features,off]:
@@ -283,10 +290,10 @@ def load_pack(path):
 def load_old_pack():return load_pack(OLD_PACK)[:2]
 
 def build():
- PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();old=load_old_pack();previous_pack=load_pack(PREVIOUS_PACK);older_pack=load_pack(OLDER_PACK);spirits_pack=load_pack(SPIRITS_PACK);party_pack=load_pack(PARTY_PACK);consistency_pack=load_pack(CONSISTENCY_PACK);previous_ten_pack=load_pack(PREVIOUS_TEN_PACK);previous_eleven_pack=load_pack(PREVIOUS_ELEVEN_PACK);previous_regional_pack=load_pack(PREVIOUS_REGIONAL_PACK);previous_bosses_pack=load_pack(PREVIOUS_BOSSES_PACK);previous_density_pack=load_pack(PREVIOUS_DENSITY_PACK);spans=[(p,p+len(b)) for p,b in old[0]]+[(p,p+len(b)) for p,b,a in BASE_CHANGES]+[(p,p+len(b)) for p,b in previous_pack[0]]+[(p,p+len(b)) for p,b in older_pack[0]]+[(p,p+len(b)) for p,b in spirits_pack[0]]+[(p,p+len(b)) for p,b in party_pack[0]]+[(p,p+len(b)) for p,b in consistency_pack[0]]+[(p,p+len(b)) for p,b in previous_ten_pack[0]]+[(p,p+len(b)) for p,b in previous_eleven_pack[0]]+[(p,p+len(b)) for p,b in previous_regional_pack[0]]+[(p,p+len(b)) for p,b in previous_bosses_pack[0]]+[(p,p+len(b)) for p,b in previous_density_pack[0]];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
+ PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();old=load_old_pack();previous_pack=load_pack(PREVIOUS_PACK);older_pack=load_pack(OLDER_PACK);spirits_pack=load_pack(SPIRITS_PACK);party_pack=load_pack(PARTY_PACK);consistency_pack=load_pack(CONSISTENCY_PACK);previous_ten_pack=load_pack(PREVIOUS_TEN_PACK);previous_eleven_pack=load_pack(PREVIOUS_ELEVEN_PACK);previous_regional_pack=load_pack(PREVIOUS_REGIONAL_PACK);previous_bosses_pack=load_pack(PREVIOUS_BOSSES_PACK);previous_density_pack=load_pack(PREVIOUS_DENSITY_PACK);previous_beowulf_pack=load_pack(PREVIOUS_BEOWULF_PACK);spans=[(p,p+len(b)) for p,b in old[0]]+[(p,p+len(b)) for p,b,a in BASE_CHANGES]+[(p,p+len(b)) for p,b in previous_pack[0]]+[(p,p+len(b)) for p,b in older_pack[0]]+[(p,p+len(b)) for p,b in spirits_pack[0]]+[(p,p+len(b)) for p,b in party_pack[0]]+[(p,p+len(b)) for p,b in consistency_pack[0]]+[(p,p+len(b)) for p,b in previous_ten_pack[0]]+[(p,p+len(b)) for p,b in previous_eleven_pack[0]]+[(p,p+len(b)) for p,b in previous_regional_pack[0]]+[(p,p+len(b)) for p,b in previous_bosses_pack[0]]+[(p,p+len(b)) for p,b in previous_density_pack[0]]+[(p,p+len(b)) for p,b in previous_beowulf_pack[0]];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
  # Full-resource journals also include unchanged trailing padding. Cover it so
  # recognizing an older input can safely restore the exact earlier bytes.
- for journal in ['support_overhaul_journal.json','beowulf_stage_journal.json']:
+ for journal in ['support_overhaul_journal.json','beowulf_stage_journal.json','intermission_six_journal.json']:
   for e in json.loads((ROOT/journal).read_text(encoding='utf-8'))['edits']:
    at=e['offset'];n=len(unpack(e,'before'));spans.append((at//4096*4096,(at+n+4095)//4096*4096))
  print('Scanning original and canonical ISO without creating images...',flush=True)
@@ -321,10 +328,10 @@ def build():
  legacy_inputs={fingerprint(ranges,legacy):4095}
  # Recognize the earlier canonical states before base/SP/price updates.
  previous=[bytearray(b) for b in legacy]
- for name in ['beowulf_stage_journal.json','regional_density_journal.json','regional_bosses_journal.json','regional_five_journal.json','followup_refinement_journal.json','huckebein_r_weapons_journal.json','huckebein_r_early_journal.json','early_equipment_journal.json','followup_story_journal.json','support_overhaul_journal.json','story_consistency_journal.json','party_25_journal.json','spirit_balance_25_journal.json','upstream_rebase_journal.json','sp_and_prices_revision_journal.json']:
+ for name in ['intermission_six_journal.json','beowulf_stage_journal.json','regional_density_journal.json','regional_bosses_journal.json','regional_five_journal.json','followup_refinement_journal.json','huckebein_r_weapons_journal.json','huckebein_r_early_journal.json','early_equipment_journal.json','followup_story_journal.json','support_overhaul_journal.json','story_consistency_journal.json','party_25_journal.json','spirit_balance_25_journal.json','upstream_rebase_journal.json','sp_and_prices_revision_journal.json']:
   journal=json.loads((ROOT/name).read_text(encoding='utf-8'))
   for e in journal['edits']:setbytes(previous,e['offset'],unpack(e,'before'))
-  legacy_inputs[fingerprint(ranges,previous)]=4095 if name in ['beowulf_stage_journal.json','regional_density_journal.json','regional_bosses_journal.json'] else 2047 if name in ['regional_five_journal.json','followup_refinement_journal.json'] else 1023 if name in ['huckebein_r_weapons_journal.json','huckebein_r_early_journal.json'] else 511 if name in ['early_equipment_journal.json','followup_story_journal.json'] else 127
+  legacy_inputs[fingerprint(ranges,previous)]=4095 if name in ['intermission_six_journal.json','beowulf_stage_journal.json','regional_density_journal.json','regional_bosses_journal.json'] else 2047 if name in ['regional_five_journal.json','followup_refinement_journal.json'] else 1023 if name in ['huckebein_r_weapons_journal.json','huckebein_r_early_journal.json'] else 511 if name in ['early_equipment_journal.json','followup_story_journal.json'] else 127
  with SOURCE.open('rb') as old_source:old_original=[read(old_source,p,len(b)) for p,b,_ in ranges]
  legacy_inputs[fingerprint(ranges,old_original)]=0
 
@@ -334,7 +341,7 @@ def build():
   if len(b)==1:setbytes(canonical_after,at,b)
  for at,b in features[6]:setbytes(canonical_after,at,b)
  legacy_inputs[fingerprint(ranges,canonical_after)]=4095
- for regions,fs,base_hash in [load_pack(OLD_PACK),older_pack,spirits_pack,party_pack,consistency_pack,previous_pack,previous_ten_pack,previous_eleven_pack,previous_regional_pack,previous_bosses_pack,previous_density_pack]:
+ for regions,fs,base_hash in [load_pack(OLD_PACK),older_pack,spirits_pack,party_pack,consistency_pack,previous_pack,previous_ten_pack,previous_eleven_pack,previous_regional_pack,previous_bosses_pack,previous_density_pack,previous_beowulf_pack]:
   source_data=old_original if base_hash!=sh.digest() else [r[1] for r in ranges]
   old_base=[bytearray(b) for b in source_data]
   for at,b in regions:setbytes(old_base,at,b)

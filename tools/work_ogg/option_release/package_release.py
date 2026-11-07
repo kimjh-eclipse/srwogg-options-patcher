@@ -1,12 +1,14 @@
 """One ZIP: twelve-option patcher, sixth-battle documentation and optional HD."""
 from pathlib import Path
 import json,hashlib,zipfile
-HERE=Path(__file__).resolve().parent;WORK=HERE.parent;VERSION='v20261107.5';DIST=WORK/('release_'+VERSION)
+HERE=Path(__file__).resolve().parent;WORK=HERE.parent;VERSION='v20261107.6';DIST=WORK/('release_'+VERSION)
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def report(name):return json.loads((HERE/name).read_text(encoding='utf-8-sig'))
 meta=report('build_metadata.json')
-readme='''슈퍼로봇대전 OG외전12옵션 패처 v20261107.5 — 베오울프 결전 시험판
+readme='''슈퍼로봇대전 OG외전12옵션 패처 v20261107.6 — 베오울프 결전 시험판
 
+추가 전장6편에 전투 전·후 함내 장면12개와 전투 중 교신을 추가했습니다.
+새 발언225개, 게임 대화창226개이며 전함 승무원의 경보와 출격 지시로 시작합니다.
 기존12번 옵션 하나에 국지전5편과 베오울프전1편을 함께 묶었습니다.
 선택 항목은12개이며 베오울프 전용 체크박스는 추가하지 않습니다.
 최신 안정판은 v20261107.1이며, 이번 배포는 실플레이 확인 전의 시험판입니다.
@@ -48,7 +50,7 @@ ISO 적용과 HD텍스처 설치는 별개입니다. 미설치 시 이식한 기
 원복과 이전 버전
 - 기본 옵션은 모두 꺼짐입니다. 이전 지원 적용본의 선택값을 인식합니다.
 - v20261107.2/.3/.4의 각4096개 조합을 지원합니다.12번을 켜면 새 베오울프전도 포함됩니다.
-- 첫 적용 전 변경 구간을 .v20261107.5.oggbak에 보관합니다. 전체 ISO 사본은 아닙니다.
+- 첫 적용 전 변경 구간을 .v20261107.6.oggbak에 보관합니다. 전체 ISO 사본은 아닙니다.
 - [처음 상태 복원]은 최초 입력 ISO 상태로 돌아갑니다. 세이브의 보유품은 삭제하지 않습니다.
 - 새 전장에 들어간 상태에서12번을 끄지 마세요.
 
@@ -69,7 +71,7 @@ ISO4096회 반복 적용이나 PCSX2 전편 검증을 완료했다고 주장하�
 게임ISO·BIOS·원본 대사 덤프·메모리 덤프·세이브는 포함하지 않습니다.
 '''
 (DIST/'읽어주세요.txt').write_text(readme,encoding='utf-8-sig')
-for source,dest in [('beowulf_stage_details.md','베오울프전_변경내역.md'),('regional_five_details.md','국지전5편_시나리오.md'),('huckebein_r_details.md','휴케바인R_변경내역.md'),('followup_story_details.md','후속시나리오_대사.md'),('support_overhaul_details.md','지원장비_후반정비.md'),('party_preservation_details.md','편성보존_수정내역.md'),('spirit_balance_details.md','정신기_조정내역.md'),('story_consistency_details.md','본편연결_수정내역.md')]:
+for source,dest in [('intermission_six_details.md','추가전장_전후대사.md'),('beowulf_stage_details.md','베오울프전_변경내역.md'),('regional_five_details.md','국지전5편_시나리오.md'),('huckebein_r_details.md','휴케바인R_변경내역.md'),('followup_story_details.md','후속시나리오_대사.md'),('support_overhaul_details.md','지원장비_후반정비.md'),('party_preservation_details.md','편성보존_수정내역.md'),('spirit_balance_details.md','정신기_조정내역.md'),('story_consistency_details.md','본편연결_수정내역.md')]:
  (DIST/dest).write_text((HERE/source).read_text(encoding='utf8'),encoding='utf8')
 addon=WORK.parent/'work_ogs/dist/SRWOGS_Beowulf_MkIII_HD_Addon_v20261106.zip';hd=[]
 with zipfile.ZipFile(addon) as z:
@@ -78,6 +80,7 @@ with zipfile.ZipFile(addon) as z:
   dest=DIST/'textures/SLPS-25836/replacements/beowulf_mk3'/Path(name).name;dest.parent.mkdir(parents=True,exist_ok=True);b=z.read(name);assert b[:8]==b'\x89PNG\r\n\x1a\n';dest.write_bytes(b);hd.append(dict(file=dest.relative_to(DIST).as_posix(),sha256=sha(dest)))
 assert len(hd)==27
 validation=dict(passed=True,experimental=True,live_playthrough=False,playtesting_owner='user',full_iso_profile_exercise_run=False,profile_selftest=report('selftest.json'),previous_base_read_only_verification=report('source_verification.json'),canonical_verification=report('canonical_verification.json'),option_composition=report('followup_options_validation.json'),regional_options=report('regional_options_validation.json'),original_resources_preservation=report('preservation_validation.json'),beowulf=json.loads((WORK/'beowulf_stage_validation.json').read_text(encoding='utf8')),regional_density=json.loads((WORK/'regional_density_validation.json').read_text(encoding='utf8')),official_base=meta['upstream_base'])
+validation['intermission']=json.loads((WORK/'intermission_six_validation.json').read_text(encoding='utf8'));assert validation['intermission']['passed']
 validation['sp_and_upgrade_prices']=report('sp_prices_validation.json')
 for k in ['profile_selftest','previous_base_read_only_verification','canonical_verification','option_composition','regional_options','original_resources_preservation','beowulf','regional_density','sp_and_upgrade_prices']:assert validation[k]['passed']
 assert validation['profile_selftest']['checkboxes']==12 and validation['profile_selftest']['profiles']==4096;assert validation['canonical_verification']['sha256']==meta['canonical_iso_sha256'];assert validation['option_composition']['pack_sha256']==meta['pack_sha256']

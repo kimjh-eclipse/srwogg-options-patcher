@@ -3,7 +3,7 @@ from pathlib import Path
 import sys,struct,zlib,io,json,bisect,hashlib
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from inspect_iso import SOURCE,OUT,inventory,u32
-from build_options import rawmaster,load_old_pack,source_image,load_pack,OLD_PACK,PREVIOUS_PACK,OLDER_PACK,SPIRITS_PACK,PARTY_PACK,CONSISTENCY_PACK,PREVIOUS_TEN_PACK,PREVIOUS_ELEVEN_PACK,PREVIOUS_REGIONAL_PACK,PREVIOUS_BOSSES_PACK,PREVIOUS_DENSITY_PACK
+from build_options import rawmaster,load_old_pack,source_image,load_pack,OLD_PACK,PREVIOUS_PACK,OLDER_PACK,SPIRITS_PACK,PARTY_PACK,CONSISTENCY_PACK,PREVIOUS_TEN_PACK,PREVIOUS_ELEVEN_PACK,PREVIOUS_REGIONAL_PACK,PREVIOUS_BOSSES_PACK,PREVIOUS_DENSITY_PACK,PREVIOUS_BEOWULF_PACK
 from audit_story_layout import loadarc
 from story_scripts_25 import records,text_at,encode
 from campaign_bonus_scripts import EARLY
@@ -15,7 +15,7 @@ HERE=Path(__file__).resolve().parent
 
 class Profiles:
  def __init__(self):
-  f=io.BytesIO((HERE.parent/'release_v20261107.5/patcher/OGG_options.bin').read_bytes())
+  f=io.BytesIO((HERE.parent/'release_v20261107.6/patcher/OGG_options.bin').read_bytes())
   def n(fmt):return struct.unpack(fmt,f.read(struct.calcsize(fmt)))
   def blob():return f.read(n('<I')[0])
   assert f.read(8)==b'OGGOPT01';assert n('<I')[0]==1
@@ -127,6 +127,7 @@ def _legacy_checks_through_bosses(p):
 
 def legacy_checks(p):
  result=_legacy_checks_through_bosses(p)
+ result['v20261107_5_profiles_recognized']=legacy_set_checks(p,PREVIOUS_BEOWULF_PACK)
  result['v20261107_4_profiles_recognized']=legacy_set_checks(p,PREVIOUS_DENSITY_PACK)
  return result
 
@@ -274,7 +275,7 @@ def common_weapon_cross_checks(p):
  return {'whole_weapon_table_comparisons':comparisons,'native_accessor_checks':native,'common_weapon_toggle_independent_of_maintenance':True,'unrelated_and_cloned_weapon_rows_preserved':True}
 
 def main():
- p=Profiles();result={'passed':True,'pack_sha256':hashlib.sha256((HERE.parent/'release_v20261107.5/patcher/OGG_options.bin').read_bytes()).hexdigest(),'supply_story_independence':supply_checks(p)}
+ p=Profiles();result={'passed':True,'pack_sha256':hashlib.sha256((HERE.parent/'release_v20261107.6/patcher/OGG_options.bin').read_bytes()).hexdigest(),'supply_story_independence':supply_checks(p)}
  result['sp_costs_and_upgrade_prices']=price_and_sp_checks(p)
  result['legacy_inputs']=legacy_checks(p)
  result['party_profiles']=party_profile_checks(p)

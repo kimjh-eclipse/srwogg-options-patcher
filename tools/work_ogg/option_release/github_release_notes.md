@@ -1,6 +1,16 @@
+추가 전장6편의 전투 전·후 함내 장면12개와 전투 중 교신6곳을 보강했습니다. **새 발언225개(게임 대화창226개)**이며 추가25인 모두가 기존 멤버와 대화합니다.
+
+- 출격 선택 전 에이타·윤의 경보, 테츠야·레피나의 출격 지시.
+- 전투 결과 처리 뒤 귀환·회수·정비 보고와 인물 간 후속 대화.
+- 무인 보스를 알아본 관련 인물들의 전투 중 교신.
+- 기존12번은 전장·공통 승무원 대사,1번은 추가 인물 상호 대사를 제어합니다.
+- 별도 정비 메뉴나 새 배경CG는 추가하지 않습니다. 기체·무장·배치·보상·무한 증원은 유지합니다.
+
+[전체 새 대사](https://github.com/kimjh-eclipse/srwogg-options-patcher/blob/v20261107.6/docs/intermission-six-v20261107.6.md)
+
 최종전 직전에 **베오울프와 아인스트 부대의 결전 「푸른 늑대의 잔향」**을 추가했습니다. **기존12번 옵션 하나**로 국지전5편과 베오울프전1편을 함께 선택합니다. 체크박스는12개를 유지합니다.
 
-[**패처·설명서·선택 HD자료 ZIP 다운로드**](https://github.com/kimjh-eclipse/srwogg-options-patcher/releases/download/v20261107.5/SRWOGG_Options_kr_v20261107.5.zip)
+[**패처·설명서·선택 HD자료 ZIP 다운로드**](https://github.com/kimjh-eclipse/srwogg-options-patcher/releases/download/v20261107.6/SRWOGG_Options_kr_v20261107.6.zip)
 
 ZIP을 풀고 `patcher/OGG_Options_Patcher.exe`를 실행하세요. 릴리즈 첨부는 ZIP 하나입니다.
 
@@ -21,7 +31,7 @@ ZIP을 풀고 `patcher/OGG_Options_Patcher.exe`를 실행하세요. 릴리즈 �
 
 선택 HD자료는 OGs 제작본의 PNG27개이며 `textures/SLPS-25836/replacements/beowulf_mk3`로 제공합니다. PCSX2의 텍스처 검색 폴더에 합쳐 설치하고 Load Textures를 켜세요. 전체 HD팩은 포함하지 않습니다.
 
-[전장 편성·이식 수치·검증 범위](https://github.com/kimjh-eclipse/srwogg-options-patcher/blob/v20261107.5/docs/beowulf-stage-v20261107.5.md)
+[전장 편성·이식 수치·검증 범위](https://github.com/kimjh-eclipse/srwogg-options-patcher/blob/v20261107.6/docs/beowulf-stage-v20261107.6.md)
 
 패처4096조합과 이전 적용본 인식을 확인했습니다. 반복 증원100회·동시 격파7기·보스 격파 후 중지/승리 판정은 맵 생성 부분을 시험용 상태로 대체해 점검했고, 실제 게임의 준비 생성192조건을 별도로 확인했습니다. **실제 NPC 재생성·퇴장·충돌·AI·연출·장기 보상·메모리카드 로드는 PCSX2 플레이 테스트가 필요**합니다. 이번 배포는 시험판이며 최신 안정판v20261107.1은 유지합니다.
 
