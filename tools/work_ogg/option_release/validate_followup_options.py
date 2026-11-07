@@ -58,6 +58,9 @@ def main():
     _,at,size=next(e for e in es if scene['key'] in e[0]);image.seek(at);blob=image.read(size);rr=records(blob)
     assert all(rr[ix][4]==(0 if mask&1 else 2) for ix in scene['story_gates'])
     _,at,size=next(e for e in units if scene['key'] in e[0]);image.seek(at);ub=image.read(size)
+    assert __import__('inspect_iso').u32(ub,40)==44
+    assert sum(__import__('inspect_iso').u32(ub,44+i*336+8)==2 for i in range(44))==32
+    assert sum(0x780<=__import__('inspect_iso').u32(ub,44+i*336)<0x78a for i in range(44))==2
     for ix in range(__import__('inspect_iso').u32(ub,40)):
      pos=44+ix*336
      if __import__('inspect_iso').u32(ub,pos+8)==2:assert __import__('struct').unpack_from('<6I',ub,pos+0x38)==tuple([8 if mask&16 else 6]*6)
@@ -100,7 +103,7 @@ def main():
  assert [b for at,b in p.features[2]]==[b for at,b in old[2]]
  for bit in [3,6,7]:assert p.features[bit]==old[bit],bit
  assert [b for at,b in p.features[5]]==[b for at,b in old[5]]
- assert set(old[4])<=set(p.features[4]) and len(p.features[4])==len(old[4])+80
+ assert set(old[4])<=set(p.features[4]) and len(p.features[4])==len(old[4])+160
  assert p.features[8][:-1]==old[8][:-1]
  assert p.features[8][-1][1]==old[8][-1][1]
  assert len(p.features[8][-1][1])==96

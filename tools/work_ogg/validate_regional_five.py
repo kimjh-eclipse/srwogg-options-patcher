@@ -58,8 +58,9 @@ def main(prepared=None,folder=None,output=None):
  for k,number in [(2033,40),(2034,41)]:assert c.run(0x2705c0,[vm.master,2,k-2000])==number;checks+=1
  for s in p['scenes']:
   blob=(folder/s['logo']['file']).read_bytes();rows=records(blob);unit=(folder/s['untd']['file']).read_bytes();vm=VM(base);c=vm.cpu;load_campaign_master(vm,master);at=0x1800000;c.mem[at:at+len(blob)]=blob;c.run(0x5363c0,[vm.ctx,at]);prefix=u32(blob,32)
-  assert len(unit)==44+u32(unit,40)*336 and u32(unit,40)==28
-  ur=[unit[44+i*336:44+(i+1)*336] for i in range(u32(unit,40))];assert sum(u32(r,8)==6 for r in ur)==12 and sum(u32(r,8)==2 for r in ur)==16
+  enemies=p.get('enemies_per_mission',16)
+  assert len(unit)==44+u32(unit,40)*336 and u32(unit,40)==12+enemies
+  ur=[unit[44+i*336:44+(i+1)*336] for i in range(u32(unit,40))];assert sum(u32(r,8)==6 for r in ur)==12 and sum(u32(r,8)==2 for r in ur)==enemies
   for r in ur:
    if u32(r,8)==2:
     assert u32(r,32) in [1029,1023,1237]
@@ -86,7 +87,7 @@ def main(prepared=None,folder=None,output=None):
    assert vm.op(command(0xba,0x10071,0,flag))==10;assert vm.op(command(0x93,0x10071,0,flag,0x800f,NONE,NONE,NONE))==10;assert vm.readreg(0x800f)==1;checks+=2
   nxt=next(r[2] for r in rows if r[0]==0xa1 and r[2]<100);assert nxt==(s['key']-2000+1 if s['key']<2039 else 33)
   truth=[]
-  for allies,enemies,started in [(0,0,False),(0,16,False),(12,16,True),(12,1,True),(12,0,True),(1,16,True),(0,16,True)]:
+  for allies,enemies,started in [(0,0,False),(0,enemies,False),(12,enemies,True),(12,1,True),(12,0,True),(1,enemies,True),(0,enemies,True)]:
    for event in ['defeat','ending']:
     vm=condition_machine(base,allies,enemies);vm.cpu.write(vm.ctx+0x74cc,1,2)
     if started:assert vm.op(command(0xba,0x10071,0,0))==10
