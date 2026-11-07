@@ -23,10 +23,12 @@ def extend(old,content,speakers):
  template=next(r.copy() for r in rs if r[0]==0x30 and r[13]==0x100a8 and r[3]==NONE)
  strings=[];messages=[];blocks={};notes={}
  for phase,point in [('pre',pre),('tactical',mid),('post',post)]:
+  if not content.get(phase):continue
   added=[];gates=[]
   if phase=='pre':added.append(command(0xaf,60,0x10012))
   for kind,lines in content[phase]:
-   assert kind in ['common','story']
+   assert kind in ['common','story','commands']
+   if kind=='commands':added.extend([r.copy() for r in lines]);continue
    if kind=='story':
     added.append(command(0x9a,0,0x800e));gate=len(added);added.append(command(0x91,0x800e,0x8000,0,DEAD,DEAD,0));gates.append(gate)
    for who,text in lines:
@@ -36,7 +38,7 @@ def extend(old,content,speakers):
    if kind=='story':added[gate][7]=len(added)-gate
   added.append(command(0x7b,0x100ef,0x10086,0x10041))
   if phase=='pre':added.append(command(0xb0,1,0x10012))
-  blocks[point]=added;notes[phase]=dict(before_old_row=point,gates=gates,lines=sum(len(lines) for _,lines in content[phase]))
+  blocks[point]=added;notes[phase]=dict(before_old_row=point,gates=gates,lines=sum(len(lines) for kind,lines in content[phase] if kind!='commands'))
  out=[];positions={};starts={}
  for i,r in enumerate(rs):
   starts[i]=len(out)

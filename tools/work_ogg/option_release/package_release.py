@@ -1,40 +1,49 @@
 """One ZIP: twelve-option patcher, sixth-battle documentation and optional HD."""
 from pathlib import Path
 import json,hashlib,zipfile
-HERE=Path(__file__).resolve().parent;WORK=HERE.parent;VERSION='v20261107.6';DIST=WORK/('release_'+VERSION)
+HERE=Path(__file__).resolve().parent;WORK=HERE.parent;VERSION='v20261107.7';DIST=WORK/('release_'+VERSION)
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def report(name):return json.loads((HERE/name).read_text(encoding='utf-8-sig'))
 meta=report('build_metadata.json')
-readme='''슈퍼로봇대전 OG외전12옵션 패처 v20261107.6 — 베오울프 결전 시험판
+readme='''슈퍼로봇대전 OG외전12옵션 패처 v20261107.7 — 시빌워 5부작 시험판
 
-추가 전장6편에 전투 전·후 함내 장면12개와 전투 중 교신을 추가했습니다.
-새 발언225개, 게임 대화창226개이며 전함 승무원의 경보와 출격 지시로 시작합니다.
-기존12번 옵션 하나에 국지전5편과 베오울프전1편을 함께 묶었습니다.
-선택 항목은12개이며 베오울프 전용 체크박스는 추가하지 않습니다.
-최신 안정판은 v20261107.1이며, 이번 배포는 실플레이 확인 전의 시험판입니다.
+최종전 바로 전에 정치적 갈등·인질 구출·잠입·재합류로 이어지는5부작을 추가했습니다.
+사전 정치 인터미션5곳, 각 전장 전후 교신과26개 교전 상대 조합의 자동 상호 대사를 포함합니다.
+새 시빌워 관련 대화창330개이며, 기존 추가6개 전장의225개 발언도 유지합니다.
+설득 명령을 누르지 않아도 관련 인물들이 처음 교전하면 한 번 표시됩니다.
+공격 순서와 관계없습니다. 필요한 인물을 출격시키지 않으면 그 조합의 대사는 나오지 않습니다.
+같은 인물의 후속 교전은 해당 화의 상황에 맞게 이어집니다.
 
 진행 순서
-원본34화 → 추가35~39화 → 원본35화(표시40화)
-→ 베오울프전41화「푸른 늑대의 잔향」→ 원본36화(표시42화·최종전).
+원본34화 → 추가35~39화 → 원본35화(표시40화) → 베오울프41화
+→ 시빌워42~46화 → 원본36화(표시47화·최종전).
+기존12번 옵션 하나로 추가11개 전장을 선택합니다. 선택 항목은12개를 유지합니다.
+최신 안정판은 v20261107.1이며 이번 배포는 실플레이 확인 전의 시험판입니다.
+
+시빌워
+- 각 전장 적32기, 중립 인질 수송기1기, 선택 출격12기. 기존 맵 재사용.
+- 42/43/44/45화는 중계기2/2/3/2개 제압,46화는 반란 지휘부4기 제압으로 승리.
+- 아군 전멸 또는 인질 수송기 격파 시 패배. 나머지 적 전멸은 필요하지 않습니다.
+- 레피나의 정규 경비대는 인질 때문에 대립하고, 반란조4인은 정치 세력과 결탁합니다.
+- 라미아와 추가 잠입조는42화 이후 임시 분리되어45화에 복귀합니다.
+- 정규 경비대는45화 종료, 반란조는46화 종료 후 감시 조건으로 복귀합니다.
+- 기존 기체·파일럿의 개조·장비·EXP·PP·격추수를 삭제하지 않습니다.
+- 레몬은 액셀렌과 구출대에 남습니다. 두 사람의 자매 인연을 이어갑니다.
+- 자세한 명단과 대사 전문은 시빌워5부작_대사와편성.md를 보세요.
 
 베오울프 전장
-- 넓고 장애물이 적은 아인스트 공간, 선택 출격12기, 초기 적32기.
-- 아이젠10·녹헨8·리토6·게미유트6·레지세이아1·베오울프1.
-- 일반 아인스트30기는 베오울프가 살아 있는 동안 격파된 개체만 다시 보충합니다.
-- 베오울프 격파 시 증원이 멈추고 승리합니다. 남은 적 전멸은 필요하지 않습니다.
-- 베오울프와 레지세이아는 재생성하지 않습니다.
-- OGs에서 제작한 전용 기체·무장6종·초상화·컷인 자료를 별도로 이식했습니다.
-- 베오울프 기본HP135000, 무장공격력3300/3200/4500/5300/6300/4800.
-- 기존국지전5편의 각32기 편성,25인 합류·밸런스와 기존 보상 설정은 유지합니다.
+넓은 아인스트 맵에서 초기 적32기 중 일반 아인스트30기가 베오울프 생존 중 계속 보충됩니다.
+베오울프 격파 시 증원이 멈추고 승리합니다. 레지세이아와 베오울프는 재생성하지 않습니다.
+기존 국지전5편의32기 편성,25인 합류·밸런스와 보상 설정을 유지합니다.
 
 적용 방법
 1. ZIP을 풀고 patcher 폴더의 EXE와 BIN을 같은 폴더에 둡니다.
 2. PCSX2를 완전히 종료합니다.
 3. 패처 실행 → ISO 선택 → 검사 → 옵션 선택 → 패치 적용 순서로 진행합니다.
 4. 완료 후 완전히 새로 부팅하고 일반 세이브를 불러옵니다.
-5.12번은34화 종료 이벤트 이전부터 선택하고 추가 전장을 모두 마칠 때까지 유지하세요.
-6. 이미 지난 합류·보상·전장 삽입 이벤트는 소급 실행되지 않습니다.
-7. 추가25인 시나리오는 새 게임부터 같은 설정을 유지하세요.
+5.12번은34화 종료 이벤트 이전부터 켜고 모든 추가 전장을 마칠 때까지 유지하세요.
+6.1번 추가25인 시나리오는 새 게임부터 같은 설정을 유지하세요.
+7.이미 지난 합류·보상·전장 삽입 이벤트는 소급 실행되지 않습니다.
 
 선택 기능
 '''
@@ -49,8 +58,8 @@ ISO 적용과 HD텍스처 설치는 별개입니다. 미설치 시 이식한 기
 
 원복과 이전 버전
 - 기본 옵션은 모두 꺼짐입니다. 이전 지원 적용본의 선택값을 인식합니다.
-- v20261107.2/.3/.4의 각4096개 조합을 지원합니다.12번을 켜면 새 베오울프전도 포함됩니다.
-- 첫 적용 전 변경 구간을 .v20261107.6.oggbak에 보관합니다. 전체 ISO 사본은 아닙니다.
+- v20261107.2부터 .6까지 이전 각4096개 조합을 지원합니다.12번을 켜면 추가11편을 모두 포함합니다.
+- 첫 적용 전 변경 구간을 .v20261107.7.oggbak에 보관합니다. 전체 ISO 사본은 아닙니다.
 - [처음 상태 복원]은 최초 입력 ISO 상태로 돌아갑니다. 세이브의 보유품은 삭제하지 않습니다.
 - 새 전장에 들어간 상태에서12번을 끄지 마세요.
 
@@ -71,7 +80,7 @@ ISO4096회 반복 적용이나 PCSX2 전편 검증을 완료했다고 주장하�
 게임ISO·BIOS·원본 대사 덤프·메모리 덤프·세이브는 포함하지 않습니다.
 '''
 (DIST/'읽어주세요.txt').write_text(readme,encoding='utf-8-sig')
-for source,dest in [('intermission_six_details.md','추가전장_전후대사.md'),('beowulf_stage_details.md','베오울프전_변경내역.md'),('regional_five_details.md','국지전5편_시나리오.md'),('huckebein_r_details.md','휴케바인R_변경내역.md'),('followup_story_details.md','후속시나리오_대사.md'),('support_overhaul_details.md','지원장비_후반정비.md'),('party_preservation_details.md','편성보존_수정내역.md'),('spirit_balance_details.md','정신기_조정내역.md'),('story_consistency_details.md','본편연결_수정내역.md')]:
+for source,dest in [('civil_war_details.md','시빌워5부작_대사와편성.md'),('intermission_six_details.md','추가전장_전후대사.md'),('beowulf_stage_details.md','베오울프전_변경내역.md'),('regional_five_details.md','국지전5편_시나리오.md'),('huckebein_r_details.md','휴케바인R_변경내역.md'),('followup_story_details.md','후속시나리오_대사.md'),('support_overhaul_details.md','지원장비_후반정비.md'),('party_preservation_details.md','편성보존_수정내역.md'),('spirit_balance_details.md','정신기_조정내역.md'),('story_consistency_details.md','본편연결_수정내역.md')]:
  (DIST/dest).write_text((HERE/source).read_text(encoding='utf8'),encoding='utf8')
 addon=WORK.parent/'work_ogs/dist/SRWOGS_Beowulf_MkIII_HD_Addon_v20261106.zip';hd=[]
 with zipfile.ZipFile(addon) as z:
@@ -81,11 +90,17 @@ with zipfile.ZipFile(addon) as z:
 assert len(hd)==27
 validation=dict(passed=True,experimental=True,live_playthrough=False,playtesting_owner='user',full_iso_profile_exercise_run=False,profile_selftest=report('selftest.json'),previous_base_read_only_verification=report('source_verification.json'),canonical_verification=report('canonical_verification.json'),option_composition=report('followup_options_validation.json'),regional_options=report('regional_options_validation.json'),original_resources_preservation=report('preservation_validation.json'),beowulf=json.loads((WORK/'beowulf_stage_validation.json').read_text(encoding='utf8')),regional_density=json.loads((WORK/'regional_density_validation.json').read_text(encoding='utf8')),official_base=meta['upstream_base'])
 validation['intermission']=json.loads((WORK/'intermission_six_validation.json').read_text(encoding='utf8'));assert validation['intermission']['passed']
+validation['civil_war']=json.loads((WORK/'civil_war_validation.json').read_text(encoding='utf8'));assert validation['civil_war']['passed']
+validation['civil_war_Beowulf_bridge']=json.loads((WORK/'civil_war_beowulf_bridge_validation.json').read_text(encoding='utf8'));assert validation['civil_war_Beowulf_bridge']['passed']
+validation['civil_war_failures']=json.loads((WORK/'civil_war_failure_validation.json').read_text(encoding='utf8'));assert validation['civil_war_failures']['passed']
+validation['civil_war_party']=json.loads((WORK/'civil_war_party_validation.json').read_text(encoding='utf8'));assert validation['civil_war_party']['passed']
+validation['civil_war_resources']=json.loads((WORK/'civil_war_resource_validation.json').read_text(encoding='utf8'));assert validation['civil_war_resources']['passed']
+validation['prior_Beowulf_native_checks_scope']='Original sixth battle unchanged; current byte preservation and composition checked separately'
 validation['sp_and_upgrade_prices']=report('sp_prices_validation.json')
 for k in ['profile_selftest','previous_base_read_only_verification','canonical_verification','option_composition','regional_options','original_resources_preservation','beowulf','regional_density','sp_and_upgrade_prices']:assert validation[k]['passed']
 assert validation['profile_selftest']['checkboxes']==12 and validation['profile_selftest']['profiles']==4096;assert validation['canonical_verification']['sha256']==meta['canonical_iso_sha256'];assert validation['option_composition']['pack_sha256']==meta['pack_sha256']
 (DIST/'검증결과.json').write_text(json.dumps(validation,ensure_ascii=False,indent=2),encoding='utf8')
-info={k:v for k,v in meta.items() if k not in ['proof','shutdown_requested']};info.update(experimental=True,prerelease=True,live_playthrough=False,additional_battles=6,beowulf_endless_minions=30,optional_HD_files=hd,executable_sha256=sha(DIST/'patcher/OGG_Options_Patcher.exe'))
+info={k:v for k,v in meta.items() if k not in ['proof','shutdown_requested']};info.update(experimental=True,prerelease=True,live_playthrough=False,additional_battles=11,beowulf_endless_minions=30,optional_HD_files=hd,executable_sha256=sha(DIST/'patcher/OGG_Options_Patcher.exe'))
 (DIST/'PATCH_INFO.json').write_text(json.dumps(info,ensure_ascii=False,indent=2),encoding='utf8')
 files=sorted(p for p in DIST.rglob('*') if p.is_file() and p.name!='SHA256SUMS.txt');(DIST/'SHA256SUMS.txt').write_text(''.join(sha(p)+'  '+p.relative_to(DIST).as_posix()+'\n' for p in files),encoding='utf8')
 zip_path=WORK/('SRWOGG_Options_kr_'+VERSION+'.zip')
@@ -93,5 +108,5 @@ with zipfile.ZipFile(zip_path,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  for p in sorted(DIST.rglob('*')):
   if p.is_file():z.write(p,'SRWOGG_Options_kr_'+VERSION+'/'+p.relative_to(DIST).as_posix())
 with zipfile.ZipFile(zip_path) as z:assert z.testzip() is None and all(not n.lower().endswith(('.iso','.oggbak','.p2s','.ps2')) for n in z.namelist())
-summary=dict(passed=True,zip=str(zip_path),zip_bytes=zip_path.stat().st_size,zip_sha256=sha(zip_path),canonical_sha256=meta['canonical_iso_sha256'],options=12,verified_profiles=4096,additional_battles=6,experimental=True,live_playthrough=False,optional_HD_files=27,extra_full_ISOs_created=0)
+summary=dict(passed=True,zip=str(zip_path),zip_bytes=zip_path.stat().st_size,zip_sha256=sha(zip_path),canonical_sha256=meta['canonical_iso_sha256'],options=12,verified_profiles=4096,additional_battles=11,experimental=True,live_playthrough=False,optional_HD_files=27,extra_full_ISOs_created=0)
 (HERE/'release_completion.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding='utf8');print(json.dumps(summary,ensure_ascii=False,indent=2))

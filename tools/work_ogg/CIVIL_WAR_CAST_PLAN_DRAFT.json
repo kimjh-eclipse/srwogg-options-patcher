@@ -1,0 +1,126 @@
+{
+  "status": "authorized implementation; applied to canonical test ISO",
+  "guard_rebels_meaning": "USER CONFIRMED: collaborators with political hostage-takers, a traitorous faction distinct from Lefina regular guards",
+  "teams": {
+    "경비대 반란조": {
+      "기존": [],
+      "추가": [
+        "빈델",
+        "웬드로",
+        "아치볼드",
+        "이글렛"
+      ]
+    },
+    "구출대 잠입조": {
+      "기존": [
+        "라미아"
+      ],
+      "추가": [
+        "유리아",
+        "에키드나",
+        "토머스"
+      ]
+    },
+    "경비대 — 레피나 측": {
+      "기존": [
+        "레피나",
+        "숀",
+        "윤",
+        "카티나",
+        "러셀",
+        "타스크",
+        "레오나",
+        "아이비스",
+        "츠구미",
+        "슬레이",
+        "유우키",
+        "카라",
+        "료우토",
+        "리오",
+        "라다",
+        "라울",
+        "피오나",
+        "미즈호",
+        "라지"
+      ],
+      "추가": [
+        "린",
+        "비안",
+        "메키보스",
+        "비가지",
+        "아기하",
+        "시카로그",
+        "템페스트",
+        "가루인",
+        "지벨",
+        "텐잔"
+      ]
+    },
+    "구출대 — 테츠야 측": {
+      "기존": [
+        "테츠야",
+        "에이타",
+        "쿄스케",
+        "액셀렌",
+        "불릿",
+        "쿠스하",
+        "류세이",
+        "라이",
+        "아야",
+        "마이",
+        "비렛타",
+        "카이",
+        "라투니",
+        "아라도",
+        "제올라",
+        "샤인",
+        "젠가",
+        "레첼",
+        "길리엄",
+        "리슈",
+        "이름",
+        "마사키",
+        "류네",
+        "코우타",
+        "쇼코",
+        "폴카",
+        "페르난도",
+        "아리온",
+        "액셀",
+        "알피미"
+      ],
+      "추가": [
+        "잉그램",
+        "레몬",
+        "오우카",
+        "울즈",
+        "스리사즈",
+        "안사즈",
+        "워단",
+        "아타드"
+      ]
+    }
+  },
+  "conditional_members": {
+    "슈우": "Do not give regular command or covert duties; preserve original finale role.",
+    "데스피니스": "Original35 recruit. Add to guard medical/hostage support only if insertion follows original35."
+  },
+  "constraints": [
+    "Lemon stays with Excellen, never infiltration.",
+    "SRX core three stay on one side.",
+    "Kyosuke/Excellen and Bullet/Kusuha and Kohta/Shoko stay paired.",
+    "All speakers include subpilots/crew; headcount is not sortie-unit count.",
+    "Inserted immediately before native finale; display chapters42..46, native finale47."
+  ],
+  "pre_story_intermission_file": "CIVIL_WAR_POLITICAL_PROLOGUE_DRAFT.txt",
+  "persuasion_policy": [
+    "First relevant engagement has a mutual exchange.",
+    "Further exchanges follow actual discoveries about hostages and orders.",
+    "Intermediate outcomes may hold fire or open a route without changing faction.",
+    "Final defection follows hostage safety and verified orders, not one dialogue button.",
+    "No permanent roster loss; four collaborators return under supervised emergency deployment after chapter46."
+  ],
+  "guard_rebels_meaning_confirmed": true,
+  "individual_roster_status": "accepted in the subsequent request to implement the consolidated five-part plan",
+  "consolidated_document": "CIVIL_WAR_MASTER_DRAFT.txt"
+}

@@ -15,7 +15,7 @@ HERE=Path(__file__).resolve().parent
 
 class Profiles:
  def __init__(self):
-  f=io.BytesIO((HERE.parent/'release_v20261107.6/patcher/OGG_options.bin').read_bytes())
+  f=io.BytesIO((HERE.parent/'release_v20261107.7/patcher/OGG_options.bin').read_bytes())
   def n(fmt):return struct.unpack(fmt,f.read(struct.calcsize(fmt)))
   def blob():return f.read(n('<I')[0])
   assert f.read(8)==b'OGGOPT01';assert n('<I')[0]==1
@@ -126,7 +126,9 @@ def _legacy_checks_through_bosses(p):
  return {'previous_8_option_profiles_recognized':legacy_set_checks(p,OLD_PACK),'v20261106_1_profiles_recognized':legacy_set_checks(p,OLDER_PACK),'v20261106_2_profiles_recognized':legacy_set_checks(p,SPIRITS_PACK),'v20261106_3_profiles_recognized':legacy_set_checks(p,PARTY_PACK),'v20261106_4_profiles_recognized':legacy_set_checks(p,CONSISTENCY_PACK),'v20261106_5_profiles_recognized':legacy_set_checks(p,PREVIOUS_PACK),'v20261107_profiles_recognized':legacy_set_checks(p,PREVIOUS_TEN_PACK),'v20261107_1_profiles_recognized':legacy_set_checks(p,PREVIOUS_ELEVEN_PACK),'v20261107_2_profiles_recognized':legacy_set_checks(p,PREVIOUS_REGIONAL_PACK),'v20261107_3_profiles_recognized':legacy_set_checks(p,PREVIOUS_BOSSES_PACK),'removed_SP_bit_not_exposed':True}
 
 def legacy_checks(p):
+ from build_options import PREVIOUS_INTERMISSION_PACK
  result=_legacy_checks_through_bosses(p)
+ result['v20261107_6_profiles_recognized']=legacy_set_checks(p,PREVIOUS_INTERMISSION_PACK)
  result['v20261107_5_profiles_recognized']=legacy_set_checks(p,PREVIOUS_BEOWULF_PACK)
  result['v20261107_4_profiles_recognized']=legacy_set_checks(p,PREVIOUS_DENSITY_PACK)
  return result
@@ -149,9 +151,12 @@ def price_and_sp_checks(p):
     if index<old.tables['Plot'][2]:expected=old.b[old.tables['Plot'][0]+12+index*148:old.tables['Plot'][0]+12+(index+1)*148]
     elif keys.get(index)==1930:
      oi=u16(old.b,old.tables['PTbl'][0]+12+1094*2);expected=old.b[old.tables['Plot'][0]+12+oi*148:old.tables['Plot'][0]+12+(oi+1)*148]
+    elif keys.get(index,0)>=1961:
+     civil=json.loads((HERE.parent/'civil_war_prepared.json').read_text(encoding='utf8'));source=next((r['source_pilot'] for r in civil['master']['named'] if r['key']==keys[index]),1029)
+     oi=u16(m.b,m.tables['PTbl'][0]+12+source*2);expected=m.b[m.tables['Plot'][0]+12+oi*148:m.tables['Plot'][0]+12+(oi+1)*148]
     else:
      item=cast[keys[index]];key=1091 if item['pilot_name']=='이글렛' else item['pilot'];oi=u16(shared.b,shared.tables['PTbl'][0]+12+key*2);expected=shared.b[shared.tables['Plot'][0]+12+oi*148:shared.tables['Plot'][0]+12+(oi+1)*148]
-    if index>=old.tables['Plot'][2] and keys.get(index)!=1930:expected=apply_to_row(item['pilot_name'],expected)
+    if index>=old.tables['Plot'][2] and keys.get(index) in cast:expected=apply_to_row(item['pilot_name'],expected)
     for slot in range(6):
      assert row[0x72+slot]==expected[0x72+slot]
      if index in keys:assert vm.cpu.run(0x272730,[vm.master,keys[index],slot])==expected[0x72+slot];cases+=1
@@ -275,7 +280,7 @@ def common_weapon_cross_checks(p):
  return {'whole_weapon_table_comparisons':comparisons,'native_accessor_checks':native,'common_weapon_toggle_independent_of_maintenance':True,'unrelated_and_cloned_weapon_rows_preserved':True}
 
 def main():
- p=Profiles();result={'passed':True,'pack_sha256':hashlib.sha256((HERE.parent/'release_v20261107.6/patcher/OGG_options.bin').read_bytes()).hexdigest(),'supply_story_independence':supply_checks(p)}
+ p=Profiles();result={'passed':True,'pack_sha256':hashlib.sha256((HERE.parent/'release_v20261107.7/patcher/OGG_options.bin').read_bytes()).hexdigest(),'supply_story_independence':supply_checks(p)}
  result['sp_costs_and_upgrade_prices']=price_and_sp_checks(p)
  result['legacy_inputs']=legacy_checks(p)
  result['party_profiles']=party_profile_checks(p)
