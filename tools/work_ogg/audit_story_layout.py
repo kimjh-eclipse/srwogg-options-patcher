@@ -5,10 +5,20 @@ from collections import Counter
 TARGET=ROOT.parent/'SRWOGS_EX_K_TEST.ISO'
 
 def loadarc(f,slot):
- a=json.loads((OUT/f'MAP.BIN.{slot}.json').read_text(encoding='utf8'))
- result=[]
- for e in a['entries']:
-  off,size=struct.unpack('<II',read(f,a['directory']+8+e['index']*8,8));result.append((e['keys'],a['directory']+off,size))
+ cached=json.loads((OUT/f'MAP.BIN.{slot}.json').read_text(encoding='utf8'))
+ # Directory membership can grow in optional mission releases. Cached metadata
+ # supplies only the archive location, never its active key mapping or count.
+ base=cached['offset'];head=read(f,base,16);assert head[:4]==b'LICE'
+ rel,count,slots=struct.unpack_from('<III',head,4);directory=base+rel
+ mapping=struct.unpack('<%dH'%slots,read(f,base+16,slots*2))
+ assert read(f,directory,4)==b'Wpbb' and u32(read(f,directory+4,4))==count
+ a={**cached,'count':count,'slots':slots,'directory':directory,'entries':[]};result=[];by_index=[[] for _ in range(count)]
+ for k,v in enumerate(mapping):
+  if v!=65535:assert v<count;by_index[v].append(k)
+ for i in range(count):
+  off,size=struct.unpack('<II',read(f,directory+8+i*8,8));keys=by_index[i]
+  a['entries'].append(dict(index=i,keys=keys,offset=directory+off,size=size))
+  result.append((keys,directory+off,size))
  return a,result
 
 def strings(b):

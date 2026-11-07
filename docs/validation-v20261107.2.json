@@ -1,0 +1,1005 @@
+{
+  "passed": true,
+  "experimental": true,
+  "live_playthrough": false,
+  "playtesting_owner": "user",
+  "full_iso_profile_exercise_run": false,
+  "profile_selftest": {
+    "passed": true,
+    "profiles": 4096,
+    "checkboxes": 12
+  },
+  "previous_base_read_only_verification": {
+    "passed": true,
+    "mask": 0,
+    "sha256": "a9f7f03c4cb722f9e0709860a1cf5a16fc52d8bf116a9458403ffc5a67fd7f63"
+  },
+  "canonical_verification": {
+    "passed": true,
+    "mask": 4095,
+    "sha256": "c50ddf9c88348fb6367165c768b054598862451764e28b085f3e49990cbceac8"
+  },
+  "option_composition": {
+    "passed": true,
+    "pack_sha256": "2a2e541a269cfa90fe9fc3aa5e60d420a6a82871cea4f64879530768eb55a39a",
+    "profiles": 4096,
+    "scene_profile_checks": 20480,
+    "encoded_dialogue_comparisons": 149504,
+    "story_off_uses_original_scripts": true,
+    "other_feature_edits_preserved": true,
+    "new_chapter32_directory_switch_checked": true,
+    "chapter29_native_composed_profiles": [
+      {
+        "mask": 1,
+        "followup_boxes": 16,
+        "maintenance_boxes": 0,
+        "repeat_boxes": 0
+      },
+      {
+        "mask": 257,
+        "followup_boxes": 16,
+        "maintenance_boxes": 3,
+        "repeat_boxes": 0
+      }
+    ],
+    "early_equipment_selection_checks": 4096,
+    "early_equipment_independence": [
+      {
+        "mask": 0,
+        "story": false,
+        "eight_supplies": false,
+        "early_equipment": false,
+        "early_grants": 0,
+        "supply_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 1,
+        "story": true,
+        "eight_supplies": false,
+        "early_equipment": false,
+        "early_grants": 0,
+        "supply_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 4,
+        "story": false,
+        "eight_supplies": true,
+        "early_equipment": false,
+        "early_grants": 0,
+        "supply_grants": 8,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 5,
+        "story": true,
+        "eight_supplies": true,
+        "early_equipment": false,
+        "early_grants": 0,
+        "supply_grants": 8,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 512,
+        "story": false,
+        "eight_supplies": false,
+        "early_equipment": true,
+        "early_grants": 5,
+        "supply_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 513,
+        "story": true,
+        "eight_supplies": false,
+        "early_equipment": true,
+        "early_grants": 5,
+        "supply_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 516,
+        "story": false,
+        "eight_supplies": true,
+        "early_equipment": true,
+        "early_grants": 5,
+        "supply_grants": 8,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 517,
+        "story": true,
+        "eight_supplies": true,
+        "early_equipment": true,
+        "early_grants": 5,
+        "supply_grants": 8,
+        "repeat_grants": 0
+      }
+    ],
+    "legacy_recognition": {
+      "previous_8_option_profiles_recognized": 256,
+      "v20261106_1_profiles_recognized": 128,
+      "v20261106_2_profiles_recognized": 128,
+      "v20261106_3_profiles_recognized": 128,
+      "v20261106_4_profiles_recognized": 128,
+      "v20261106_5_profiles_recognized": 512,
+      "v20261107_profiles_recognized": 1024,
+      "v20261107_1_profiles_recognized": 2048,
+      "removed_SP_bit_not_exposed": true
+    },
+    "huckebein_R_body_profile_checks": 8192,
+    "regional_profile_checks": 57344,
+    "regional_profiles": 4096,
+    "regional_new_battles": 5,
+    "refined_boxes": 17,
+    "live_playthrough": false,
+    "ISO_writes_performed": false,
+    "native_R_unit_weapon_accessors": [
+      {
+        "mask": 0,
+        "archive": "SHARED.BIN",
+        "slot": 0,
+        "power": 1200
+      },
+      {
+        "mask": 0,
+        "archive": "SHARED.BIN",
+        "slot": 1,
+        "power": 2800
+      },
+      {
+        "mask": 0,
+        "archive": "SHARED.BIN",
+        "slot": 2,
+        "power": 3700
+      },
+      {
+        "mask": 0,
+        "archive": "SHARED.BIN",
+        "slot": 3,
+        "power": 4300
+      },
+      {
+        "mask": 0,
+        "archive": "SHARED.BIN",
+        "slot": 8,
+        "power": 3000
+      },
+      {
+        "mask": 0,
+        "archive": "IM.BIN",
+        "slot": 0,
+        "power": 1200
+      },
+      {
+        "mask": 0,
+        "archive": "IM.BIN",
+        "slot": 1,
+        "power": 2800
+      },
+      {
+        "mask": 0,
+        "archive": "IM.BIN",
+        "slot": 2,
+        "power": 3500
+      },
+      {
+        "mask": 0,
+        "archive": "IM.BIN",
+        "slot": 3,
+        "power": 3800
+      },
+      {
+        "mask": 0,
+        "archive": "IM.BIN",
+        "slot": 8,
+        "power": 3000
+      },
+      {
+        "mask": 32,
+        "archive": "SHARED.BIN",
+        "slot": 0,
+        "power": 1200
+      },
+      {
+        "mask": 32,
+        "archive": "SHARED.BIN",
+        "slot": 1,
+        "power": 2800
+      },
+      {
+        "mask": 32,
+        "archive": "SHARED.BIN",
+        "slot": 2,
+        "power": 3700
+      },
+      {
+        "mask": 32,
+        "archive": "SHARED.BIN",
+        "slot": 3,
+        "power": 4300
+      },
+      {
+        "mask": 32,
+        "archive": "SHARED.BIN",
+        "slot": 8,
+        "power": 3000
+      },
+      {
+        "mask": 32,
+        "archive": "IM.BIN",
+        "slot": 0,
+        "power": 1200
+      },
+      {
+        "mask": 32,
+        "archive": "IM.BIN",
+        "slot": 1,
+        "power": 2800
+      },
+      {
+        "mask": 32,
+        "archive": "IM.BIN",
+        "slot": 2,
+        "power": 3500
+      },
+      {
+        "mask": 32,
+        "archive": "IM.BIN",
+        "slot": 3,
+        "power": 3800
+      },
+      {
+        "mask": 32,
+        "archive": "IM.BIN",
+        "slot": 8,
+        "power": 3000
+      },
+      {
+        "mask": 1024,
+        "archive": "SHARED.BIN",
+        "slot": 0,
+        "power": 1400
+      },
+      {
+        "mask": 1024,
+        "archive": "SHARED.BIN",
+        "slot": 1,
+        "power": 3000
+      },
+      {
+        "mask": 1024,
+        "archive": "SHARED.BIN",
+        "slot": 2,
+        "power": 3900
+      },
+      {
+        "mask": 1024,
+        "archive": "SHARED.BIN",
+        "slot": 3,
+        "power": 4500
+      },
+      {
+        "mask": 1024,
+        "archive": "SHARED.BIN",
+        "slot": 8,
+        "power": 3200
+      },
+      {
+        "mask": 1024,
+        "archive": "IM.BIN",
+        "slot": 0,
+        "power": 1400
+      },
+      {
+        "mask": 1024,
+        "archive": "IM.BIN",
+        "slot": 1,
+        "power": 3000
+      },
+      {
+        "mask": 1024,
+        "archive": "IM.BIN",
+        "slot": 2,
+        "power": 3700
+      },
+      {
+        "mask": 1024,
+        "archive": "IM.BIN",
+        "slot": 3,
+        "power": 4000
+      },
+      {
+        "mask": 1024,
+        "archive": "IM.BIN",
+        "slot": 8,
+        "power": 3200
+      },
+      {
+        "mask": 1056,
+        "archive": "SHARED.BIN",
+        "slot": 0,
+        "power": 1400
+      },
+      {
+        "mask": 1056,
+        "archive": "SHARED.BIN",
+        "slot": 1,
+        "power": 3000
+      },
+      {
+        "mask": 1056,
+        "archive": "SHARED.BIN",
+        "slot": 2,
+        "power": 3900
+      },
+      {
+        "mask": 1056,
+        "archive": "SHARED.BIN",
+        "slot": 3,
+        "power": 4500
+      },
+      {
+        "mask": 1056,
+        "archive": "SHARED.BIN",
+        "slot": 8,
+        "power": 3200
+      },
+      {
+        "mask": 1056,
+        "archive": "IM.BIN",
+        "slot": 0,
+        "power": 1400
+      },
+      {
+        "mask": 1056,
+        "archive": "IM.BIN",
+        "slot": 1,
+        "power": 3000
+      },
+      {
+        "mask": 1056,
+        "archive": "IM.BIN",
+        "slot": 2,
+        "power": 3700
+      },
+      {
+        "mask": 1056,
+        "archive": "IM.BIN",
+        "slot": 3,
+        "power": 4000
+      },
+      {
+        "mask": 1056,
+        "archive": "IM.BIN",
+        "slot": 8,
+        "power": 3200
+      }
+    ]
+  },
+  "regional_options": {
+    "passed": true,
+    "pack_sha256": "2a2e541a269cfa90fe9fc3aa5e60d420a6a82871cea4f64879530768eb55a39a",
+    "regional_profile_checks": 57344,
+    "regional_profiles": 4096,
+    "regional_new_battles": 5,
+    "story_and_native_bridge_routes_checked": true,
+    "hidden_stage_titles_when_off": true,
+    "enemy_grade_option_independent": true,
+    "extra_dialogue_option_independent": true,
+    "ISO_writes_performed": false
+  },
+  "original_resources_preservation": {
+    "passed": true,
+    "unchanged_original_UNTD": 186,
+    "unchanged_original_LOGO": 42,
+    "original_combat_master_tables_preserved": true,
+    "original_finale_clear_command_preserved": true,
+    "original_35_36_battle_scripts_preserved": true,
+    "only_original_34_script_gained_bridge": true,
+    "live_playthrough": false
+  },
+  "regional_native": {
+    "passed": true,
+    "native_checks": 476,
+    "missions": [
+      {
+        "key": 2035,
+        "title": "철의 기억",
+        "dialogue_boxes": 22,
+        "next_index": 36,
+        "victory_defeat_truth_table": [
+          {
+            "allies": 0,
+            "enemies": 0,
+            "deployment_finished": false,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 0,
+            "deployment_finished": false,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": false,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": false,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 1,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 1,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 0,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 0,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": 36
+          },
+          {
+            "allies": 1,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 1,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": 4294967295
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          }
+        ]
+      },
+      {
+        "key": 2036,
+        "title": "빼앗긴 보급로",
+        "dialogue_boxes": 23,
+        "next_index": 37,
+        "victory_defeat_truth_table": [
+          {
+            "allies": 0,
+            "enemies": 0,
+            "deployment_finished": false,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 0,
+            "deployment_finished": false,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": false,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": false,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 1,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 1,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 0,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 0,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": 37
+          },
+          {
+            "allies": 1,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 1,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": 4294967295
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          }
+        ]
+      },
+      {
+        "key": 2037,
+        "title": "폐기되지 않은 이름",
+        "dialogue_boxes": 24,
+        "next_index": 38,
+        "victory_defeat_truth_table": [
+          {
+            "allies": 0,
+            "enemies": 0,
+            "deployment_finished": false,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 0,
+            "deployment_finished": false,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": false,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": false,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 1,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 1,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 0,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 0,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": 38
+          },
+          {
+            "allies": 1,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 1,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": 4294967295
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          }
+        ]
+      },
+      {
+        "key": 2038,
+        "title": "닫히지 않은 침공로",
+        "dialogue_boxes": 24,
+        "next_index": 39,
+        "victory_defeat_truth_table": [
+          {
+            "allies": 0,
+            "enemies": 0,
+            "deployment_finished": false,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 0,
+            "deployment_finished": false,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": false,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": false,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 1,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 1,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 0,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 0,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": 39
+          },
+          {
+            "allies": 1,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 1,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": 4294967295
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          }
+        ]
+      },
+      {
+        "key": 2039,
+        "title": "그림자의 귀로",
+        "dialogue_boxes": 29,
+        "next_index": 33,
+        "victory_defeat_truth_table": [
+          {
+            "allies": 0,
+            "enemies": 0,
+            "deployment_finished": false,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 0,
+            "deployment_finished": false,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": false,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": false,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 1,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 1,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 0,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 12,
+            "enemies": 0,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": 33
+          },
+          {
+            "allies": 1,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": null
+          },
+          {
+            "allies": 1,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "defeat",
+            "next_index": 4294967295
+          },
+          {
+            "allies": 0,
+            "enemies": 16,
+            "deployment_finished": true,
+            "event": "ending",
+            "next_index": null
+          }
+        ]
+      }
+    ],
+    "all_25_story_participants_covered": true,
+    "original_geometry_and_unit_weapon_pilot_tables_preserved": true,
+    "new_dialogue_only_when_story_enabled": true,
+    "party_creation_or_removal": false,
+    "persistent_Save_Diff_reload_cases": [
+      {
+        "previous_index": 32,
+        "next_index": 35,
+        "played_flag_byte": "0x2d0",
+        "roster_stats_preserved": true
+      },
+      {
+        "previous_index": 35,
+        "next_index": 36,
+        "played_flag_byte": "0x2d0",
+        "roster_stats_preserved": true
+      },
+      {
+        "previous_index": 36,
+        "next_index": 37,
+        "played_flag_byte": "0x2d0",
+        "roster_stats_preserved": true
+      },
+      {
+        "previous_index": 37,
+        "next_index": 38,
+        "played_flag_byte": "0x2d0",
+        "roster_stats_preserved": true
+      },
+      {
+        "previous_index": 38,
+        "next_index": 39,
+        "played_flag_byte": "0x2d0",
+        "roster_stats_preserved": true
+      },
+      {
+        "previous_index": 39,
+        "next_index": 33,
+        "played_flag_byte": "0x2d0",
+        "roster_stats_preserved": true
+      },
+      {
+        "previous_index": 33,
+        "next_index": 34,
+        "played_flag_byte": "0x2d0",
+        "roster_stats_preserved": true
+      }
+    ],
+    "memory_card_IO_tested": false,
+    "scope": "native text/history/stage getters/event registration/annihilation guards/next-stage handler and persistent array reload; army counts supplied by fixture, result/deployment UI and memory-card load not emulated",
+    "battle_playthrough_verified": false,
+    "ready_for_experimental_apply": true
+  },
+  "official_base": {
+    "passed": true,
+    "official_repository": "https://github.com/z3oo3z/PS2-SRWOGG-KPatch",
+    "release": "SRWOGG",
+    "version": "1.4.3s",
+    "source_md5": "cb7dc4485f46f220c46095c966a3aad0",
+    "base_sha256": "e819f1e524513bc7e273b004ba02e3977dd4fff365a5887b4eb1c8a9fc9d1e04",
+    "base_md5": "a5254cd5d4deabc57e03a3dcbb6a88d7",
+    "bytes": 4666294272,
+    "xdelta_target_checksums_verified": true,
+    "verified_windows": 557,
+    "changed_pages_from_previous_base": 64,
+    "extra_full_ISOs_created": 0
+  }
+}

@@ -28,8 +28,9 @@ def main():
  old_native=json.loads((ROOT/'followup_story_validation.json').read_text(encoding='utf-8'))
  assert old_native['passed'];count=messages=0
  refinement=json.loads((ROOT/'followup_refinement_prepared.json').read_text(encoding='utf-8'));overrides={(scene['chapter'],m['string_id']):__import__('story_scripts_25').encode(m['text']) for scene in refinement['scenes'] for m in scene['messages']}
+ regional=json.loads((ROOT/'regional_five_prepared.json').read_text(encoding='utf8'));regional_checks=0
  r_weapons=json.loads((ROOT/'huckebein_r_weapons_prepared.json').read_text(encoding='utf-8'));unit_profiles=0
- for mask in range(2048):
+ for mask in range(4096):
   image=Image(p,mask)
   try:
    _,es=loadarc(image,14)
@@ -48,6 +49,19 @@ def main():
      assert at!=scene['offset']
      assert not any(r[0]==0x93 and r[2:5]==[0x100c1,*scene['flag']] for r in records(blob))
     count+=1
+   bridge=next(x for x in regional['bridge'] if x['mode']==('story' if mask&1 else 'native'))
+   _,at,size=next(e for e in es if 2032 in e[0]);assert (at,size)==(bridge['offset'],bridge['size']);image.seek(at);blob=image.read(size);rr=records(blob)
+   assert rr[bridge['route_row']][2]==(35 if mask&2048 else 33)
+   st,en=guarded_block(blob,[58,0]);assert rr[st+1][4]==(0 if mask&2048 else 2);regional_checks+=2
+   _,units=loadarc(image,13)
+   for scene in regional['scenes']:
+    _,at,size=next(e for e in es if scene['key'] in e[0]);image.seek(at);blob=image.read(size);rr=records(blob)
+    assert all(rr[ix][4]==(0 if mask&1 else 2) for ix in scene['story_gates'])
+    _,at,size=next(e for e in units if scene['key'] in e[0]);image.seek(at);ub=image.read(size)
+    for ix in range(__import__('inspect_iso').u32(ub,40)):
+     pos=44+ix*336
+     if __import__('inspect_iso').u32(ub,pos+8)==2:assert __import__('struct').unpack_from('<6I',ub,pos+0x38)==tuple([8 if mask&16 else 6]*6)
+    regional_checks+=2
    _,at,size=next(e for e in es if 2003 in e[0]);image.seek(at);blob=image.read(size)
    start,end=guarded_block(blob,EARLY_FLAG);rs=records(blob)
    assert rs[start+1][4]==(0 if mask&512 else 2)
@@ -55,7 +69,11 @@ def main():
    assert all(r[3:6]==[0xdeaddeed]*3 for r in rs[start:end] if r[0]==0x5f)
    assert end==guarded_block(blob,[63,7])[0]
    for ar,item in r_weapons['masters'].items():
-    _,m=__import__('build_options').rawmaster(image,ar);idx=__import__('catalog').u16(m.b,m.tables['UTbl'][0]+12+1209*2);at=m.tables['Unit'][0]+12+idx*100;assert bytes(m.b[at:at+100])==bytes.fromhex(item['after_unit_hex'] if mask&1024 else item['before_unit_hex']);unit_profiles+=1
+    _,m=__import__('build_options').rawmaster(image,ar)
+    if ar=='SHARED.BIN':
+     sb=__import__('regional_five_policy').stage_base(m);assert [m.b[sb+i*12+6] for i in [33,34]]==([40,41] if mask&2048 else [35,36]);regional_checks+=1
+     assert all((__import__('catalog').u16(m.b,sb+i*12)==65535)==(not bool(mask&2048)) for i in range(35,40));regional_checks+=1
+    idx=__import__('catalog').u16(m.b,m.tables['UTbl'][0]+12+1209*2);at=m.tables['Unit'][0]+12+idx*100;assert bytes(m.b[at:at+100])==bytes.fromhex(item['after_unit_hex'] if mask&1024 else item['before_unit_hex']);unit_profiles+=1
     for w in item['weapons']:
      wi=__import__('catalog').u16(m.b,m.tables['WTbl'][0]+12+w['private_key']*2);assert __import__('catalog').u16(m.b,m.tables['Weap'][0]+12+wi*36+8)==(w['after_power'] if mask&1024 else w['before_power'])
   finally:image.f.close()
@@ -80,7 +98,8 @@ def main():
  assert moved==2
  assert len(p.features[2])==len(old[2])==2
  assert [b for at,b in p.features[2]]==[b for at,b in old[2]]
- for bit in range(3,8):assert p.features[bit]==old[bit],bit
+ for bit in [3,5,6,7]:assert p.features[bit]==old[bit],bit
+ assert set(old[4])<=set(p.features[4]) and len(p.features[4])==len(old[4])+80
  assert p.features[8][:-1]==old[8][:-1]
  assert p.features[8][-1][1]==old[8][-1][1]
  assert len(p.features[8][-1][1])==96
@@ -100,7 +119,7 @@ def main():
   assert early_execute(vm,blob,bool(mask&512))==0
   for key,name in WEAPONS:assert qty(vm,key)==int(bool(mask&512))
   equipment.append({'mask':mask,'story':bool(mask&1),'eight_supplies':bool(mask&4),'early_equipment':bool(mask&512),'early_grants':len(UNITS)+len(WEAPONS) if mask&512 else 0,'supply_grants':grants,'repeat_grants':0})
- result={'passed':True,'pack_sha256':meta['pack_sha256'],'profiles':2048,'scene_profile_checks':count,'encoded_dialogue_comparisons':messages,'story_off_uses_original_scripts':True,'other_feature_edits_preserved':True,'new_chapter32_directory_switch_checked':True,'chapter29_native_composed_profiles':native,'early_equipment_selection_checks':2048,'early_equipment_independence':equipment,'legacy_recognition':legacy_checks(p),'huckebein_R_body_profile_checks':unit_profiles,'refined_boxes':17,'live_playthrough':False,'ISO_writes_performed':False}
+ result={'passed':True,'pack_sha256':meta['pack_sha256'],'profiles':4096,'scene_profile_checks':count,'encoded_dialogue_comparisons':messages,'story_off_uses_original_scripts':True,'other_feature_edits_preserved':True,'new_chapter32_directory_switch_checked':True,'chapter29_native_composed_profiles':native,'early_equipment_selection_checks':4096,'early_equipment_independence':equipment,'legacy_recognition':legacy_checks(p),'huckebein_R_body_profile_checks':unit_profiles,'regional_profile_checks':regional_checks,'regional_profiles':4096,'regional_new_battles':5,'refined_boxes':17,'live_playthrough':False,'ISO_writes_performed':False}
  native_weapons=[]
  for mask in [0,32,1024,1056]:
   image=Image(p,mask)

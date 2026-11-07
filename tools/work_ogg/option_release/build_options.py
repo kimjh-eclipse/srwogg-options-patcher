@@ -1,4 +1,4 @@
-"""Build an eleven-option patch without ever creating another full ISO."""
+"""Build a twelve-option patch without ever creating another full ISO."""
 from pathlib import Path
 import sys,struct,json,hashlib,zlib,base64,bisect,zipfile
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
@@ -16,10 +16,11 @@ sys.path.insert(0,str(ROOT/'upstream_base'))
 from source_image import source_image,DATA as BASE_INFO,CHANGES as BASE_CHANGES
 
 HERE=Path(__file__).resolve().parent
-VERSION='v20261107.1'
+VERSION='v20261107.2'
 DIST=ROOT/('release_'+VERSION)
 OLD_PACK=ROOT/'release_v20261106/patcher/OGG_options.bin'
 PREVIOUS_PACK=ROOT/'release_v20261106.5/patcher/OGG_options.bin'
+PREVIOUS_ELEVEN_PACK=ROOT/'release_v20261107.1/patcher/OGG_options.bin'
 PREVIOUS_TEN_PACK=ROOT/'release_v20261107/patcher/OGG_options.bin'
 CONSISTENCY_PACK=ROOT/'release_v20261106.4/patcher/OGG_options.bin'
 PARTY_PACK=ROOT/'release_v20261106.3/patcher/OGG_options.bin'
@@ -37,7 +38,8 @@ OPTIONS=[
  ('4화 수리·보급장치 추가','수리장치·보급장치 각1개. 시나리오 선택과 별개로 한 번 지급'),
  ('30화부터 일부 기체 정비','추가 아군6기의 무장9종 EN·탄수 소폭 개선. 기본 화력 유지'),
  ('3화 기체·무장 조기 입수','빌트팔켄 L·아슈세이버·휴케바인 Mk-3 R 각1기와 무장2종. 파일럿 추가 없음'),
- ('휴케바인 Mk-3 R 무장 +200','기본 장착 무장5종 공격력 +200. 조기 입수와 독립 선택, 다른 기체의 원래 무장 유지')]
+ ('휴케바인 Mk-3 R 무장 +200','기본 장착 무장5종 공격력 +200. 조기 입수와 독립 선택, 다른 기체의 원래 무장 유지'),
+ ('34화 이후 국지전 5편 [시험판]','기존 전장 재사용. 새35~39화 뒤 본편40~41화. 34화 종료 전부터 선택 유지')]
 
 def unpack(e,side):
  if side in e:return bytes.fromhex(e[side])
@@ -81,6 +83,8 @@ def plan():
     at=dp(a,chapter['key']);zero=read(original,at,8);one=read(current,at,8)
     if slot==14 and chapter['key']==2003:zero=newptr
     if slot==14 and chapter['key']==2026:zero=recovery_ptr
+    if slot==14 and chapter['key']==2032:
+     regional=json.loads((ROOT/'regional_five_prepared.json').read_text(encoding='utf8'));nb=next(s for s in regional['bridge'] if s['mode']=='native');zero=struct.pack('<II',nb['offset']-la['directory'],nb['size'])
     if slot==14 and chapter['key']==2050:zero=bytes.fromhex(native_support['pointer_hex'])
     switch(0,at,zero,one)
   # Chapter32 gains dialogue only; its UNTD stays native.
@@ -134,7 +138,9 @@ def plan():
   seen=set()
   for keys,p,n in ue:
    if not any(2001<=k<=2070 for k in keys):continue
-   key=next(k for k in keys if 2001<=k<=2070);at=dp(ua,key);rel,size=struct.unpack('<II',read(original,at,8));stock=read(original,ua['directory']+rel,size)
+   key=next(k for k in keys if 2001<=k<=2070)
+   if key in range(2035,2040):continue
+   at=dp(ua,key);rel,size=struct.unpack('<II',read(original,at,8));stock=read(original,ua['directory']+rel,size)
    for bp,blob in [(ua['directory']+rel,stock),(p,read(current,p,n))]:
     for i in range(u32(stock,40)):
      pos=44+i*336
@@ -179,6 +185,25 @@ def plan():
    entry,master=rawmaster(current,archive)
    for at,old,replacement,key in edits_for_master(master.b,[r['key'] for ch in json.loads((ROOT/'story_25_prepared.json').read_text(encoding='utf-8'))['chapters'] for r in ch['recruits']]):common.append((entry['offset']+at,replacement))
   proof.update(party_preservation=True,native_recovery_script_offset=NATIVE_RECOVERY,native_recovery_script_size=len(recovery),spirit_balanced_pilots=len(POLICY),native_supply_script_offset=allocation,native_supply_script_size=len(new),native_supply_messages=note['messages'],early_equipment_native_messages=early_note['messages'],story_directory_edits=len(features[0]),enemy_record_edits=len([x for x in features[4] if len(x[1])==24]))
+  # Independent regional route, plus story dialogue/enemy-grade cross options.
+  from regional_five_policy import stage_base
+  rp=json.loads((ROOT/'regional_five_prepared.json').read_text(encoding='utf8'))
+  for item in rp['bridge']:
+   blob=read(current,item['offset'],item['size']);rs=records(blob);ix=next(i for i,r in enumerate(rs) if r[0]==0x93 and r[2:5]==[0x100c1,58,0]);on=rs[ix+1];zero=on.copy();zero[4]=2;record_switch(11,item['offset'],blob,ix+1,zero,on)
+   ix=item['route_row'];on=rs[ix];assert on[0]==0xa1 and on[2]==35;zero=on.copy();zero[2]=33;record_switch(11,item['offset'],blob,ix,zero,on)
+  for item in rp['scenes']:
+   bp=item['logo']['offset'];blob=read(current,bp,item['logo']['size']);rs=records(blob)
+   for ix in item['story_gates']:
+    on=rs[ix];zero=on.copy();zero[4]=2;record_switch(0,bp,blob,ix,zero,on)
+   bp=item['untd']['offset'];blob=read(current,bp,item['untd']['size'])
+   for ix in range(u32(blob,40)):
+    pos=44+ix*336
+    if u32(blob,pos+8)==2:switch(4,bp+pos+0x38,struct.pack('<6I',*([6]*6)),blob[pos+0x38:pos+0x50])
+  e,m=rawmaster(current,'SHARED.BIN');sb=stage_base(m)
+  _,om=rawmaster(original,'SHARED.BIN');ob=stage_base(om)
+  for index in range(35,40):switch(11,e['offset']+sb+index*12,om.b[ob+index*12:ob+(index+1)*12],m.b[sb+index*12:sb+(index+1)*12])
+  for index,zero in [(33,35),(34,36)]:switch(11,e['offset']+sb+index*12+6,bytes([zero]),m.b[sb+index*12+6:sb+index*12+7])
+  proof.update(regional_five=True,regional_five_experimental=True,regional_story_gates=sum(len(x['story_gates']) for x in rp['scenes']),regional_enemy_records=80,regional_native_checks=json.loads((ROOT/'regional_five_validation.json').read_text(encoding='utf8'))['native_checks'],live_playthrough=False)
  # Deduplicate aliases and require independent options to touch disjoint bytes.
  for lists in [features,off]:
   for i,es in enumerate(lists):
@@ -210,7 +235,7 @@ def load_pack(path):
  def n(fmt):return struct.unpack(fmt,f.read(struct.calcsize(fmt)))
  def blob():return f.read(n('<I')[0])
  assert f.read(8)==b'OGGOPT01';assert n('<I')[0]==1
- n('<Q');source_hash=f.read(32);count=n('<I')[0];assert count in [7,8,9,10,11]
+ n('<Q');source_hash=f.read(32);count=n('<I')[0];assert count in [7,8,9,10,11,12]
  for _ in range(count):blob();blob()
  regions=[]
  for _ in range(n('<I')[0]):
@@ -225,7 +250,7 @@ def load_pack(path):
 def load_old_pack():return load_pack(OLD_PACK)[:2]
 
 def build():
- PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();old=load_old_pack();previous_pack=load_pack(PREVIOUS_PACK);older_pack=load_pack(OLDER_PACK);spirits_pack=load_pack(SPIRITS_PACK);party_pack=load_pack(PARTY_PACK);consistency_pack=load_pack(CONSISTENCY_PACK);previous_ten_pack=load_pack(PREVIOUS_TEN_PACK);spans=[(p,p+len(b)) for p,b in old[0]]+[(p,p+len(b)) for p,b,a in BASE_CHANGES]+[(p,p+len(b)) for p,b in previous_pack[0]]+[(p,p+len(b)) for p,b in older_pack[0]]+[(p,p+len(b)) for p,b in spirits_pack[0]]+[(p,p+len(b)) for p,b in party_pack[0]]+[(p,p+len(b)) for p,b in consistency_pack[0]]+[(p,p+len(b)) for p,b in previous_ten_pack[0]];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
+ PATCHER.mkdir(parents=True,exist_ok=True);common,off,features,proof=plan();old=load_old_pack();previous_pack=load_pack(PREVIOUS_PACK);older_pack=load_pack(OLDER_PACK);spirits_pack=load_pack(SPIRITS_PACK);party_pack=load_pack(PARTY_PACK);consistency_pack=load_pack(CONSISTENCY_PACK);previous_ten_pack=load_pack(PREVIOUS_TEN_PACK);previous_eleven_pack=load_pack(PREVIOUS_ELEVEN_PACK);spans=[(p,p+len(b)) for p,b in old[0]]+[(p,p+len(b)) for p,b,a in BASE_CHANGES]+[(p,p+len(b)) for p,b in previous_pack[0]]+[(p,p+len(b)) for p,b in older_pack[0]]+[(p,p+len(b)) for p,b in spirits_pack[0]]+[(p,p+len(b)) for p,b in party_pack[0]]+[(p,p+len(b)) for p,b in consistency_pack[0]]+[(p,p+len(b)) for p,b in previous_ten_pack[0]]+[(p,p+len(b)) for p,b in previous_eleven_pack[0]];sh=hashlib.sha256();ch=hashlib.sha256();size=TARGET.stat().st_size
  # Full-resource journals also include unchanged trailing padding. Cover it so
  # recognizing an older input can safely restore the exact earlier bytes.
  for e in json.loads((ROOT/'support_overhaul_journal.json').read_text(encoding='utf-8'))['edits']:
@@ -258,13 +283,13 @@ def build():
     for p,b in es:setbytes(data,p,b)
   profiles.append(fingerprint(ranges,data))
  assert len(set(profiles))==(1<<len(OPTIONS)),'Each checkbox must have a distinct reversible profile'
- legacy_inputs={fingerprint(ranges,legacy):2047}
+ legacy_inputs={fingerprint(ranges,legacy):4095}
  # Recognize the earlier canonical states before base/SP/price updates.
  previous=[bytearray(b) for b in legacy]
- for name in ['followup_refinement_journal.json','huckebein_r_weapons_journal.json','huckebein_r_early_journal.json','early_equipment_journal.json','followup_story_journal.json','support_overhaul_journal.json','story_consistency_journal.json','party_25_journal.json','spirit_balance_25_journal.json','upstream_rebase_journal.json','sp_and_prices_revision_journal.json']:
+ for name in ['regional_five_journal.json','followup_refinement_journal.json','huckebein_r_weapons_journal.json','huckebein_r_early_journal.json','early_equipment_journal.json','followup_story_journal.json','support_overhaul_journal.json','story_consistency_journal.json','party_25_journal.json','spirit_balance_25_journal.json','upstream_rebase_journal.json','sp_and_prices_revision_journal.json']:
   journal=json.loads((ROOT/name).read_text(encoding='utf-8'))
   for e in journal['edits']:setbytes(previous,e['offset'],unpack(e,'before'))
-  legacy_inputs[fingerprint(ranges,previous)]=2047 if name=='followup_refinement_journal.json' else 1023 if name in ['huckebein_r_weapons_journal.json','huckebein_r_early_journal.json'] else 511 if name in ['early_equipment_journal.json','followup_story_journal.json'] else 127
+  legacy_inputs[fingerprint(ranges,previous)]=2047 if name in ['regional_five_journal.json','followup_refinement_journal.json'] else 1023 if name in ['huckebein_r_weapons_journal.json','huckebein_r_early_journal.json'] else 511 if name in ['early_equipment_journal.json','followup_story_journal.json'] else 127
  with SOURCE.open('rb') as old_source:old_original=[read(old_source,p,len(b)) for p,b,_ in ranges]
  legacy_inputs[fingerprint(ranges,old_original)]=0
 
@@ -273,8 +298,8 @@ def build():
  for at,b in common:
   if len(b)==1:setbytes(canonical_after,at,b)
  for at,b in features[6]:setbytes(canonical_after,at,b)
- legacy_inputs[fingerprint(ranges,canonical_after)]=2047
- for regions,fs,base_hash in [load_pack(OLD_PACK),older_pack,spirits_pack,party_pack,consistency_pack,previous_pack,previous_ten_pack]:
+ legacy_inputs[fingerprint(ranges,canonical_after)]=4095
+ for regions,fs,base_hash in [load_pack(OLD_PACK),older_pack,spirits_pack,party_pack,consistency_pack,previous_pack,previous_ten_pack,previous_eleven_pack]:
   source_data=old_original if base_hash!=sh.digest() else [r[1] for r in ranges]
   for mask in range(1<<len(fs)):
    data=[bytearray(b) for b in source_data]

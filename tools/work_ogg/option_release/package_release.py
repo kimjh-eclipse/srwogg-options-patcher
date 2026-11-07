@@ -1,201 +1,75 @@
+"""Package the experimental twelve-option build without game images."""
 from pathlib import Path
 import json,hashlib,zipfile
-
-HERE=Path(__file__).resolve().parent
-WORK=HERE.parent
-DIST=WORK/'release_v20261107.1'
-meta=json.loads((HERE/'build_metadata.json').read_text(encoding='utf-8'))
+HERE=Path(__file__).resolve().parent;WORK=HERE.parent;DIST=WORK/'release_v20261107.2';VERSION='v20261107.2'
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def report(name):return json.loads((HERE/name).read_text(encoding='utf-8-sig'))
+meta=report('build_metadata.json')
+readme="""슈퍼로봇대전 OG외전 12옵션 패처 v20261107.2 — 국지전 5편 시험판
 
-readme='''슈퍼로봇대전 OG외전 한글판 옵션 패처 v20261107.1 — 휴케바인 R·대사 다듬기
+PCSX2 실제 전투 진행 확인 전의 시험판입니다. 최신 안정판은 v20261107.1입니다.
+새 12번 옵션: 34화 → 추가35~39화 → 본래35화(표시40화) → 본래36화(표시41화·최종전).
+각 전장은 보유 기체12기 선택 출격, 적16기. 기존 전장·기체·무기를 재사용합니다.
+새 인물·기체·물품은 중복 지급하지 않습니다. 추가25인 대사는 기존1번 옵션에 따릅니다.
+레몬·액셀렌의 자매 인연은 마지막 지역전에서 이어집니다.
 
 사용 방법
-1. ZIP을 압축 해제합니다. patcher 폴더의 EXE와 BIN은 같은 폴더에 두세요.
-2. PCSX2를 완전히 종료하고 OGG_Options_Patcher.exe를 실행합니다.
-3. [ISO 선택]으로 패치할 파일을 고르고 [검사]를 누릅니다.
-4. 원하는 옵션을 선택한 뒤 [패치 적용]을 누릅니다.
-5. 완료 문구를 확인하고 PCSX2에서 게임을 완전히 새로 부팅합니다.
-   이전 상태 저장(세이브 스테이트)을 불러오면 이전 코드가 실행될 수 있습니다.
+1. ZIP을 압축 해제하고 patcher 폴더의 EXE와 BIN을 같은 폴더에 둡니다.
+2. PCSX2를 완전히 종료합니다. ISO 선택 → 검사 → 옵션 선택 → 패치 적용 순서로 진행합니다.
+3. 완료 뒤 PCSX2를 완전히 새로 부팅하고 일반 세이브를 불러옵니다.
+4. 국지전은 34화 종료 이벤트 이전부터 12번을 선택하고, 다섯 작전 동안 유지하세요.
+   이미 본래35화로 넘어간 세이브에는 소급 삽입되지 않습니다.
+5. 추가25인 합류 시나리오(1번)는 기존 안내대로 새 게임부터 같은 설정을 유지하세요.
 
-대상
-- 베이스: z3oo3z/PS2-SRWOGG-KPatch v1.4.3s 공식 릴리즈.
-  https://github.com/z3oo3z/PS2-SRWOGG-KPatch/releases/tag/SRWOGG
-- 일본판 원본 MD5 cb7dc4485f46f220c46095c966a3aad0에 공식 한글 패치를 적용한 뒤 사용하세요.
-- 공식 한글 패치 결과 MD5: a5254cd5d4deabc57e03a3dcbb6a88d7.
-- 기존 v20261106 적용본도 지원하며 새 베이스로 업데이트합니다.
-- 원본 OG외전 한글판 SRWOGS_EX_K.ISO 또는 이 패처가 지원하는 적용본.
-- 파일 크기: 4,666,294,272바이트.
-- 기준 원본 SHA-256:
-  e819f1e524513bc7e273b004ba02e3977dd4fff365a5887b4eb1c8a9fc9d1e04
-- 현재 SRWOGS_EX_K_TEST.ISO도 인식하며 [검사] 시 11개 옵션이 선택됩니다.
-- 다른 개조판이나 지원되지 않는 변경이 있는 ISO는 쓰기 전에 거부합니다.
-- Python이나 xdelta 설치 없이 Windows의 .NET Framework로 실행됩니다.
+원복과 기존 적용본
+- 12개 옵션의 기본값은 모두 꺼짐입니다.
+- v20261107.1의 2,048개 조합을 포함한 지원 적용본의 선택값을 유지합니다.
+  이전11옵션 입력에서는 새12번만 꺼짐으로 인식합니다. 옛 SP1은 다시 노출하지 않습니다.
+- 첫 적용 전 변경 구간만 .v20261107.2.oggbak에 보관합니다. 전체 ISO 복사본이 아닙니다.
+- [처음 상태 복원]은 최초 입력 상태로 되돌립니다. 받은 기체나 물품을 세이브에서 삭제하지는 않습니다.
+- 국지전을 끄면 원래34→35→36 진행과 화수 표시로 돌아갑니다. 원작 최종전 종료 처리를 보존합니다.
+- 기존 옵션 설명의35·36화는 원본 화수입니다. 새12번 선택 시 해당 장면은 표시40·41화입니다.
 
-선택 옵션 (11개, 실행 직후 기본값은 모두 해제)
-1. 25편성 분산 합류·추가 시나리오
-   3화부터 전이 관련 대화, 4~31화에 25편성이 분산 합류합니다.
-   죽기 직전 차원이동 설정과 레몬·액셀렌의 자매 인연을 포함합니다.
-   추가 기체·파일럿 능력치, 독립 무장, 초기 개조 및 단계별 무장 해금도 포함합니다.
-   앞서 제외한 전함·쿠엘보·아기라·세프타긴은 추가 편성에 포함하지 않습니다.
-2. 숨겨진 요소 자동 습득
-   6화: 고성능 전자두뇌 / 13화: 미롱가(양쪽 루트 지원)
-   25화: 시시오 블레이드·용자의 인 / 30화: 부스트 해머·강철의 혼.
-   해당 화의 보상 처리를 진행하면 조건 없이 얻습니다.
-3. 3화 추가 보급 8종
-   시시오 블레이드, 부스트 해머, 강철의 혼, 용자의 인,
-   고성능 전자두뇌, 메가 제너레이터, 부스터, 메가 부스터 각 1개.
-   한 번만 지급하며, 이후 자연 획득 보상은 별도입니다.
-   25편성 시나리오를 해제해도 이 보급 옵션은 독립적으로 작동합니다.
-4. 전투 보상: PP 2배·자금 +20%
-   기존 보너스·분배 후 최종 전투 보상에 적용하며 자금 소수점은 버립니다.
-5. 적 강화
-   적대 판정 파일럿의 전투 능력치 +5.
-   적 편성의 기체·무장 개조 +2(최대 15단계).
-   기본 HP가 1~19,999인 적은 기본 HP의 10%를 추가합니다.
-6. 공통 무장 밸런스
-   OGs에서 정한 공통 무장 27종의 조정을 옮깁니다.
-   외전 고유 강화분과 추가 25편성의 독립 무장 밸런스를 유지합니다.
-7. 무장 개조비 할인
-   OGs의 최종 비용표를 적용합니다. 비용 0·1등급과 3·4등급이 각각 같습니다.
-   10단계 누적: 0/1등급 88,000, 2등급 105,600, 3/4등급 176,000.
-   공격력 개조 상승량은 유지됩니다. 옵션을 해제하면 외전 원래 비용표입니다.
+베이스 한글패치
+공식 v1.4.3s를 먼저 적용하세요. 원본 한글패치 파일은 이 ZIP에 포함하지 않습니다.
+공식 릴리즈: https://github.com/z3oo3z/PS2-SRWOGG-KPatch/releases/tag/SRWOGG
+직접 다운로드: https://github.com/z3oo3z/PS2-SRWOGG-KPatch/releases/download/SRWOGG/OGGv1.4.3sta.7z
+제작자 저장소: https://github.com/z3oo3z/PS2-SRWOGG-KPatch
+일본판 원본 MD5: cb7dc4485f46f220c46095c966a3aad0
+공식 패치 결과 MD5: a5254cd5d4deabc57e03a3dcbb6a88d7
+공식 패치 결과 SHA-256: e819f1e524513bc7e273b004ba02e3977dd4fff365a5887b4eb1c8a9fc9d1e04
 
-8. 4화 수리·보급장치 추가
-   4화 첫 추가 편성 합류 시점에 환장 무장 수리장치·보급장치를 각각 1개 지급합니다.
-   추가 시나리오 옵션과 독립 동작하며, 반복 이벤트·저장 데이터 재로드로 중복 지급하지 않습니다.
-   이미 4화 이벤트를 지난 세이브에 소급 지급하지 않습니다.
-9. 30화부터 일부 기체 정비
-   추가 아군 가루인·텐잔·토머스·유리아·지벨·이글렛의 일부 무장 9종을 정비합니다.
-   29화 전투 후 안내하고, 30화부터 소모 EN을 조금 낮추거나 최대 탄수를 2발 늘립니다.
-   공격력·사거리·기력·P 속성·기체 기본 능력치는 유지합니다.
-   이 여섯 추가 아군을 보유한 경우에 적용하며, 시나리오 해제 시 새로 합류시키지 않습니다.
-   기존 육성과 무장 개조를 유지합니다. 이미 소비한 탄약을 즉시 채워 주지는 않습니다.
-   중간 세이브에서도 진행도 조건을 만족하면 적용하며 안내 이벤트만 소급 재생하지 않습니다.
-
-10. 3화 기체·무장 조기 입수
-   빌트팔켄 타입 L·아슈세이버·휴케바인 Mk-3 타입 R 각 1기, 그라비톤 런처·G 임팩트 스테이크 각 1개.
-   기체만 추가하며 파일럿 추가·강제 탑승은 없습니다. 원래 성능과 기본 무장을 사용합니다.
-   1번 추가 시나리오·3번 8종 보급과 독립 동작하고 중복 지급하지 않습니다.
-   이미 보유한 동일 기체는 복제하거나 육성·개조를 초기화하지 않습니다.
-   3화 해당 이벤트 이후에는 소급 지급하지 않으므로 이벤트 이전 세이브부터 진행하세요.
-
-11. 휴케바인 Mk-3 R 무장 +200
-   기본 장착 무장 5종 공격력을 각각 200 올립니다. 조기 입수와 별도 선택입니다.
-   로슈세이버 등 원래 공유 무장을 다른 기체까지 올리지 않도록 전용 데이터를 사용합니다.
-   사거리·EN·탄수·연출·개조비·개조 상승량과 기체 기본 능력치는 유지합니다.
-
-이번 대사 다듬기
-- 25·29·31·32·36화의 기존 추가 대사 17개를 다듬었습니다.
-- 잉그램·SRX팀의 신뢰 회복과 오우카 일행의 애도를 설명문보다 인물 대화에 맞췄습니다.
-- 사건 순서·결말·합류 화수·대사 이력과 기존 자매 설정은 유지합니다.
-
-이전 후속 시나리오 보강 (1번 옵션 선택 시)
-- 25·29·31·32·36화에 새 장면 5개, 대사 73개를 추가했습니다.
-- 잉그램과 SRX팀의 신뢰 회복, 오우카와 아이들의 상호 돌봄, 비안과 류네의 다른 시간을 다룹니다.
-- 레몬·액셀렌은 대신할 수 없는 두 사람으로서 자매의 인연을 이어 갑니다.
-- 빈델·웬드로는 조건부 공투와 책임을 유지하며, 원작의 죽음과 마지막 대사를 보존합니다.
-- 합류 화수·편성·능력치·무장·보상은 이번 대사 보강으로 바뀌지 않습니다.
-- 자세한 장면과 작성 대사는 후속시나리오_대사.md에 있습니다.
-
-이전 본편 연결 수정 (1번 옵션 선택 시)
-- 13개 화의 대사 31개를 다듬고 최종전 반응 대사 3개를 추가했습니다.
-- 28화의 빈델 장면은 피오나 귀환과 라미아 구출 작전 설명 뒤로 옮겼습니다.
-- 35화의 추가 인물 반응은 라울·미즈호의 데스피니스 구조 뒤로 옮겼습니다.
-- 36화는 비안·잉그램·레몬의 최종전 반응을 추가하고 원작 마지막 대사로 마칩니다.
-- 레몬과 액셀렌의 선택한 자매 관계, 합류 화수, 기체·파일럿 밸런스를 유지합니다.
-- 이번 변경은 기존 추가 시나리오 옵션에 포함되며 별도 체크 항목은 없습니다.
-
-공통 적용
-- 추가한 린의 휴케바인을 원래 휴케바인과 별도 그룹으로 분리했습니다.
-  본편의 원래 기체 이탈 처리가 추가 기체와 탑승 파일럿까지 비활성화하던 문제를 수정합니다.
-- 정비 전·후 형태에 모두 적용합니다. 능력치·정신기·개조·무장은 유지합니다.
-- 이전 버전에서 이미 영향을 받은 경우, 28화 시작 이벤트에서 기존 추가 기체만 재활성화합니다.
-  경험치·PP·개조값을 초기화하지 않고, 없는 기체는 새로 지급하지 않습니다.
-  이 복구는 추가 시나리오 옵션을 꺼도 적용됩니다. 이미 지난 28화 이벤트는 재실행되지 않습니다.
-- 시나리오 해제 시 사용하는 보급·복구 스크립트가 상위 파일 범위에 포함되도록 수정했습니다.
-- 정신기 SP 1 옵션을 제거했습니다. 기존 파일럿은 원래 소모량을, 추가 파일럿 13명은 역할별 조정 소모량을 사용합니다.
-- v20261106.5의 9옵션 512조합을 인식하고 지원 장비·정비 선택을 유지합니다.
-- 이전 8옵션 256조합과 v20261106.1·v20261106.2·v20261106.3·v20261106.4의 7옵션 각 128조합도 인식합니다.
-- 추가 25명 중 13명의 구성·비용·습득 레벨을 조정했습니다. SP 최대치는 유지합니다.
-- 울즈·안사즈의 각성은 SP60·Lv38, 스리사즈는 돌격형 구성입니다.
-- 템페스트의 사랑은 SP65·Lv38이며 비어 있던 트윈 정신기 4개를 보완했습니다.
-- 정찰 SP1은 원작의 정상 비용이므로 유지합니다.
-- 기존 작업의 지형명·도움말·추가 전투 자막 등 한글 표시 수정을 포함합니다.
-- 비활성 추가 기체 데이터와 기능 실행에 공통으로 필요한 자원은 남습니다.
-- 11개 옵션을 모두 해제해도 수정 전 원본과 완전히 같은 파일은 아닙니다.
-  패처 최초 사용 전의 정확한 파일로 돌아가려면 [처음 상태 복원]을 사용하세요.
-
-원복과 옵션 변경
-- 첫 적용 때 ISO 옆에 .v20261107.1.oggbak 복원 기록을 만듭니다.
-  이전 버전의 .oggbak과는 별도로 관리합니다. 기존 기록은 덮어쓰지 않습니다.
-  전체 ISO 복사본이 아니라 변경 구간만 저장하는 작은 파일입니다.
-- [처음 상태 복원]은 해당 기록을 만든 첫 적용 직전의 파일로 복원합니다.
-  처음 입력한 것이 현재 시험 ISO라면 그 시험 ISO 상태로 돌아갑니다.
-- .oggbak은 삭제하거나 다른 ISO의 기록으로 교체하지 마세요.
-- 이후 옵션 변경은 체크를 바꿔 [패치 적용]하면 됩니다.
-- 패치 데이터와 복원 기록을 검증하고, 쓰기 실패 시 변경 전 상태로 되돌립니다.
-
-세이브 관련
-- 25편성 시나리오는 새 게임에서 시작하고 진행 중에는 같은 설정을 유지하세요.
-- 옵션을 해제해도 이미 세이브에 합류한 인물·기체나 받은 물품은 삭제되지 않습니다.
-- 3화 보급과 각 화 숨김 보상은 해당 이벤트 이전 세이브부터 진행해야 합니다.
-  이미 지난 이벤트가 소급해서 실행되지는 않습니다.
-- 전투 보상·적 능력치·공통 무장·원래 SP 소모량은 새 부팅 뒤 적용됩니다.
-  배치 때 저장되는 적 개조 단계는 해당 맵 진입 전부터 진행해 주세요.
-
-검증 범위
-- 새 73개 대사의 실제 게임 문자열·이력 조회 146건과 전체 대사 이력 2,267항목을 확인했습니다.
-- 새 장면의 1회 실행, 반복 건너뛰기 및 영구 저장 데이터를 새 VM에 복원했을 때의 중복 방지를 확인했습니다.
-- 2,048개 옵션 조합을 메모리에서 합성하여 장면의 선택·해제와 29화 정비 옵션 독립 동작을 확인했습니다.
-- 이전 적용본 인식과 패처 자체 검사를 진행했습니다. 이번 버전에서 2,048개 조합을 ISO에 반복 쓰지는 않았습니다.
-- PCSX2 플레이 테스트는 사용자가 진행합니다. 실제 메모리카드 I/O·전편 플레이를 검증했다고 주장하지 않습니다.
-- 배포 ZIP에는 게임 ISO·전체 ISO 백업·제작자의 원본 한글 패치 파일이 포함되지 않습니다.
-'''
+선택 옵션
+"""
+for option in meta['options']:readme+=str(option['bit']+1)+'. '+option['name']+'\n   '+option['description']+'\n'
+readme+="""
+확인 범위
+- 게임 처리 함수를 이용한 문자열·이력·제목·화수·승패 분기·다음 화 이동 점검.
+- 병력 수를 입력한 시험에서 출격 전 오판 방지, 아군 전멸 및 적 생존/전멸 분기를 점검했습니다.
+- C# 패처의4,096조합 자체검사와 메모리 내 기존 기능 조합 검사를 진행했습니다.
+- ISO에4,096번 반복 적용하지 않았습니다. PCSX2 플레이 테스트는 사용자가 진행합니다.
+- 화면상 출격·전투·결과 창·메모리카드 로드·전편 플레이를 검증했다고 주장하지 않습니다.
+- 게임 ISO·BIOS·원본 대사 덤프·메모리 덤프·세이브는 포함하지 않습니다.
+- 자세한 추가 설정, 장소, 적 편성, 모든 작성 대사는 국지전5편_시나리오.md에 있습니다.
+"""
 (DIST/'읽어주세요.txt').write_text(readme,encoding='utf-8-sig')
-(DIST/'지원장비_후반정비.md').write_text((HERE/'support_overhaul_details.md').read_text(encoding='utf-8'),encoding='utf-8')
-(DIST/'본편연결_수정내역.md').write_text((HERE/'story_consistency_details.md').read_text(encoding='utf-8'),encoding='utf-8')
-(DIST/'편성보존_수정내역.md').write_text((HERE/'party_preservation_details.md').read_text(encoding='utf-8'),encoding='utf-8')
-(DIST/'정신기_조정내역.md').write_text((HERE/'spirit_balance_details.md').read_text(encoding='utf-8'),encoding='utf-8')
-validation={
- 'passed':True,'live_playthrough':False,'playtesting_owner':'user',
- 'full_iso_profile_exercise_run':False,
- 'profile_selftest':report('selftest.json'),
- 'previous_base_read_only_verification':report('source_verification.json'),
- 'followup_dialogue':json.loads((WORK/'followup_story_validation.json').read_text(encoding='utf-8')),
- 'option_composition':report('followup_options_validation.json'),
- 'huckebein_R_early':json.loads((WORK/'huckebein_r_early_validation.json').read_text(encoding='utf-8')),
- 'huckebein_R_weapons':json.loads((WORK/'huckebein_r_weapons_validation.json').read_text(encoding='utf-8')),
- 'dialogue_refinement':json.loads((WORK/'followup_refinement_validation.json').read_text(encoding='utf-8')),
- 'R_weapon_revision':{k:v for k,v in json.loads((WORK/'huckebein_r_weapons_journal.json').read_text(encoding='utf-8')).items() if k!='edits'},
- 'R_early_revision':{k:v for k,v in json.loads((WORK/'huckebein_r_early_journal.json').read_text(encoding='utf-8')).items() if k!='edits'},
- 'refinement_revision':{k:v for k,v in json.loads((WORK/'followup_refinement_journal.json').read_text(encoding='utf-8')).items() if k!='edits'},
- 'early_equipment':json.loads((WORK/'early_equipment_validation.json').read_text(encoding='utf-8')),
- 'early_equipment_revision':{k:v for k,v in json.loads((WORK/'early_equipment_journal.json').read_text(encoding='utf-8')).items() if k!='edits'},
- 'canonical_revision':{k:v for k,v in json.loads((WORK/'followup_story_journal.json').read_text(encoding='utf-8')).items() if k!='edits'},
- 'canonical_verification':report('canonical_verification.json'),
- 'official_base':meta['upstream_base']}
-assert all(validation[k]['passed'] for k in ['profile_selftest','previous_base_read_only_verification','followup_dialogue','option_composition','early_equipment','huckebein_R_early','huckebein_R_weapons','dialogue_refinement','canonical_verification'])
-assert validation['profile_selftest']['profiles']==meta['profile_count'] and validation['profile_selftest']['checkboxes']==len(meta['options'])
-assert validation['option_composition']['pack_sha256']==meta['pack_sha256']
+for source,dest in [('regional_five_details.md','국지전5편_시나리오.md'),('huckebein_r_details.md','휴케바인R_변경내역.md'),('followup_story_details.md','후속시나리오_대사.md'),('support_overhaul_details.md','지원장비_후반정비.md'),('party_preservation_details.md','편성보존_수정내역.md'),('spirit_balance_details.md','정신기_조정내역.md'),('story_consistency_details.md','본편연결_수정내역.md')]:
+ (DIST/dest).write_text((HERE/source).read_text(encoding='utf8'),encoding='utf8')
+validation=dict(passed=True,experimental=True,live_playthrough=False,playtesting_owner='user',full_iso_profile_exercise_run=False,profile_selftest=report('selftest.json'),previous_base_read_only_verification=report('source_verification.json'),canonical_verification=report('canonical_verification.json'),option_composition=report('followup_options_validation.json'),regional_options=report('regional_options_validation.json'),original_resources_preservation=report('preservation_validation.json'),regional_native=json.loads((WORK/'regional_five_validation.json').read_text(encoding='utf8')),official_base=meta['upstream_base'])
+for key in ['profile_selftest','previous_base_read_only_verification','canonical_verification','option_composition','regional_options','regional_native','original_resources_preservation']:assert validation[key]['passed']
+assert validation['profile_selftest']['profiles']==4096 and validation['profile_selftest']['checkboxes']==12
 assert validation['canonical_verification']['sha256']==meta['canonical_iso_sha256']
-(DIST/'휴케바인R_변경내역.md').write_text((HERE/'huckebein_r_details.md').read_text(encoding='utf-8'),encoding='utf-8')
-(DIST/'후속시나리오_대사.md').write_text((HERE/'followup_story_details.md').read_text(encoding='utf-8'),encoding='utf-8')
-(DIST/'검증결과.json').write_text(json.dumps(validation,ensure_ascii=False,indent=2),encoding='utf-8')
-info={k:v for k,v in meta.items() if k not in ['proof','shutdown_requested']}
-info.update(executable_sha256=sha(DIST/'patcher/OGG_Options_Patcher.exe'),canonical_iso_preserved_during_option_tests=True,canonical_revision_applied=True,source_iso_preserved=True,live_playthrough=False)
-(DIST/'PATCH_INFO.json').write_text(json.dumps(info,ensure_ascii=False,indent=2),encoding='utf-8')
+assert validation['option_composition']['pack_sha256']==meta['pack_sha256']
+(DIST/'검증결과.json').write_text(json.dumps(validation,ensure_ascii=False,indent=2),encoding='utf8')
+info={k:v for k,v in meta.items() if k not in ['proof','shutdown_requested']};info.update(experimental=True,prerelease=True,live_playthrough=False,executable_sha256=sha(DIST/'patcher/OGG_Options_Patcher.exe'))
+(DIST/'PATCH_INFO.json').write_text(json.dumps(info,ensure_ascii=False,indent=2),encoding='utf8')
 files=sorted(p for p in DIST.rglob('*') if p.is_file() and p.name!='SHA256SUMS.txt')
-(DIST/'SHA256SUMS.txt').write_text(''.join(sha(p)+'  '+p.relative_to(DIST).as_posix()+'\n' for p in files),encoding='utf-8')
-zip_path=WORK/'SRWOGG_Options_kr_v20261107.1.zip'
+(DIST/'SHA256SUMS.txt').write_text(''.join(sha(p)+'  '+p.relative_to(DIST).as_posix()+'\n' for p in files),encoding='utf8')
+zip_path=WORK/('SRWOGG_Options_kr_'+VERSION+'.zip')
 with zipfile.ZipFile(zip_path,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  for p in sorted(DIST.rglob('*')):
-  if p.is_file():z.write(p,'SRWOGG_Options_kr_v20261107.1/'+p.relative_to(DIST).as_posix())
+  if p.is_file():z.write(p,'SRWOGG_Options_kr_'+VERSION+'/'+p.relative_to(DIST).as_posix())
 with zipfile.ZipFile(zip_path) as z:
- assert z.testzip() is None
- assert all(not n.lower().endswith(('.iso','.oggbak')) for n in z.namelist())
- for p in sorted(DIST.rglob('*')):
-  if p.is_file():assert hashlib.sha256(z.read('SRWOGG_Options_kr_v20261107.1/'+p.relative_to(DIST).as_posix())).hexdigest()==sha(p)
-summary={'passed':True,'zip':str(zip_path),'zip_bytes':zip_path.stat().st_size,'zip_sha256':sha(zip_path),'canonical_sha256':meta['canonical_iso_sha256'],'options':11,'verified_profiles':2048,'extra_full_ISOs_created':0}
-(HERE/'release_completion.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding='utf-8')
-print(json.dumps(summary,ensure_ascii=False,indent=2))
+ assert z.testzip() is None and all(not n.lower().endswith(('.iso','.oggbak')) for n in z.namelist())
+summary=dict(passed=True,zip=str(zip_path),zip_bytes=zip_path.stat().st_size,zip_sha256=sha(zip_path),canonical_sha256=meta['canonical_iso_sha256'],options=12,verified_profiles=4096,experimental=True,live_playthrough=False,extra_full_ISOs_created=0)
+(HERE/'release_completion.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding='utf8');print(json.dumps(summary,ensure_ascii=False,indent=2))

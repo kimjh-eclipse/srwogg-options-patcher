@@ -12,7 +12,7 @@ Python 3.11에서 작성했습니다. 외부 라이브러리는 `requirements.tx
 - `story_content_25.py`, `story_*.py`, `apply_story_25.py`: 작성한 대사, 합류 일정, 시나리오와 네이티브 훅.
 - `campaign_*.py`, `apply_campaign_tuning.py`: 보상·적 강화·공통 무장 조정.
 - `validate_*.py`, `story_vm.py`: 구조와 실제 게임 루틴 검사.
-- `option_release/build_options.py`: 검증된 원본·최종 ISO와 변경 기록을 이용한 11옵션 데이터 생성.
+- `option_release/build_options.py`: 검증된 원본·최종 ISO와 변경 기록을 이용한 12옵션 데이터 생성.
 - `option_release/validate_options.py`: 옵션을 합성하여 시나리오/보급 및 보상/적 강화 독립 동작 검사.
 
 대부분은 `work_ogg/analysis`, ISO, 변경 저널, 이전 단계의 JSON 등 로컬 입력이 필요합니다. 입력에는 게임에서 추출한 데이터·RAM 덤프가 포함될 수 있어 이 저장소에 넣지 않았습니다. 따라서 이 소스만으로 게임 변경 과정을 처음부터 재현할 수는 없습니다. 배포용 패처는 릴리즈의 BIN과 루트 `build.ps1`만으로 빌드할 수 있습니다.
@@ -58,3 +58,13 @@ Python 3.11에서 작성했습니다. 외부 라이브러리는 `requirements.tx
 11번 옵션은 Unit1209의 무장 참조와 전용 무장 5종의 공격력 필드를 함께 전환합니다. 이미 지급되어 저장된 전용 환장 무장도 옵션 해제 시 원래 공격력이 되어야 하므로 참조만 바꾸면 안 됩니다. 이전 9·10옵션은 모든 선택 비트를 유지하여 인식하고, 제거된 SP1이 있는 7·8옵션만 하위7비트로 이관합니다.
 
 `followup_refinement_policy.py`·`prepare_followup_refinement.py`·`apply_followup_refinement.py`는 추가 대사 17개의 증분 수정입니다. 크기·대사ID·명령·플래그·이력은 유지하고 다른 문자열도 보존합니다. 최초 `followup_story_content.py`와 준비된 페이로드는 역사적 입력이므로 재적용하면 이 수정이 되돌아갑니다. 현재 대사는 `docs/followup-story-v20261107.1.md`에서 확인하세요. 현재 조합 검사는 `option_release/validate_followup_options.py`가 담당합니다.
+
+## 국지전5편 시험판
+
+`regional_five_content.py`는 모든 새 대사, `regional_five_policy.py`는 네이티브 출격·승패 가드·대사 묶음·스테이지 제목 구성입니다. `prepare_regional_five.py`는 빈 LICE 키2035~2039에 들어갈 작은 리소스를 준비하고 `apply_regional_five.py`는 단일 시험 ISO에 배타적으로 적용하며 역방향 해시를 확인합니다. 원작34화는 두 변형 모두 연결 장면과 분기를 갖고, 기존35·36화 스크립트와 최종전 종료 처리는 그대로입니다.
+
+`audit_story_layout.loadarc`는 캐시의 위치만 이용하고 키·개수는 현재 파일에서 읽습니다. LICE13/14에5개씩 추가되고 기존 UNTD 상위 범위에서 빠져 있던6,144바이트도 보완합니다. 새 영구 플래그58,0은34화 연결 장면에 예약합니다. 새 전장 내부의 시작·통신·종료 플래그는 맵 로컬0,0~2입니다.
+
+`validate_regional_five.py`는 제목·문자열·이력·이벤트 등록과 게임의 병력 수 비교·다음 화 처리 함수를 실행합니다. 병력 수는 시험에서 공급하며 화면상 배치·전투를 실행하지 않습니다.25인 육성 보존과 영구 Save/Diff 배열의7개 새 VM 복원도 점검합니다. 메모리카드 파일 I/O를 흉내 낸 검사가 아닙니다. 실제 PCSX2 테스트는 사용자가 진행합니다.
+
+원래 화수와 표시 화수를 혼동하지 마세요. 기존 `CHAPTER_KEYS`와25인 후속 장면의35·36은 원래2033·2034를 뜻하며,12번ON일 때만 표시40·41입니다. 새35~39는2035~2039입니다. 추가25인 옵션은 새 전장 내 추가 인물 대사만 제어하고,12번은 진입·연결 장면·Stag 제목·화수를 제어합니다. 적 강화는 새 적80기의6/8단계를 독립 전환합니다.
