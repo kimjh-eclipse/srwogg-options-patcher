@@ -9,15 +9,15 @@ def main():
   if p.name in ['build_options.py','validate_options.py','validate_followup_options.py','package_release.py','publish_release.py','finish_local.py','sync_repo.py','audit_release.py'] or p.suffix=='.md':shutil.copy2(p,REPO/'tools/work_ogg/option_release'/p.name)
  for n in ['civil_guard_content.py','prepare_civil_guard.py','validate_civil_guard.py','validate_civil_guard_waves.py','apply_civil_guard.py','validate_ragnarok_access.py','civil_reinforcement_policy.py','prepare_civil_reinforcements.py','validate_civil_reinforcements.py','validate_civil_reinforcement_resources.py','apply_civil_reinforcements.py','civil_war_audit.py','civil_war_content.py','civil_war_policy.py','prepare_civil_war.py','validate_civil_war.py','validate_civil_war_beowulf_bridge.py','validate_civil_war_failures.py','validate_civil_war_party.py','validate_civil_war_resources.py','apply_civil_war.py','CIVIL_WAR_CAST_PLAN_DRAFT.json','CIVIL_WAR_MASTER_DRAFT.txt','CIVIL_WAR_POLITICAL_PROLOGUE_DRAFT.txt','CIVIL_WAR_BATTLE_PERSUASION_DRAFT.txt','intermission_six_content.py','intermission_six_policy.py','prepare_intermission_six.py','validate_intermission_six.py','apply_intermission_six.py','inspect_iso.py','beowulf_source_image.py','inspect_beowulf_import.py','audit_beowulf_resources.py','beowulf_stage_content.py','beowulf_stage_policy.py','prepare_beowulf_stage.py','validate_beowulf_stage.py','apply_beowulf_stage.py']:shutil.copy2(WORK/n,REPO/'tools/work_ogg'/n)
  for src,dst in [('시빌워_편성과증원.md','civil-formations-v20261107.8.md'),('시빌워7부작_대사와편성.md','civil-war-v20261107.8.md'),('추가전장_전후대사.md','intermission-six-v20261107.8.md'),('베오울프전_변경내역.md','beowulf-stage-v20261107.8.md'),('국지전5편_시나리오.md','regional-five-v20261107.8.md'),('PATCH_INFO.json','patch-info-v20261107.8.json'),('검증결과.json','validation-v20261107.8.json'),('읽어주세요.txt','사용안내.txt')]:shutil.copy2(dist/src,REPO/'docs'/dst)
- info=dict(version=version,file='OGG_options.bin',sha256=meta['pack_sha256'],bytes=meta['pack_size'],options=12,profiles=4096,prerelease=True,distribution='zip-only',release_zip_sha256=completion['zip_sha256']);(REPO/'patch-data.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+ info=dict(version=version,file='OGG_options.bin',sha256=meta['pack_sha256'],bytes=meta['pack_size'],options=12,profiles=4096,prerelease=False,distribution='zip-only',release_zip_sha256=completion['zip_sha256']);(REPO/'patch-data.json').write_text(json.dumps(info,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
  p=REPO/'README.md';old=p.read_text(encoding='utf8');rest=old[old.index('## 베이스 한글패치'):].replace('v20261107.4','v20261107.8').replace('v20261107.5','v20261107.8').replace('v20261107.6','v20261107.8').replace('v20261107.7','v20261107.8')
- rest=rest.replace('v20261107.2와 v20261107.3 적용본은','v20261107.2·.3·.4 적용본은').replace('| 34화 이후 국지전5편 | 시험판. 추가35~39화 각32기 뒤 본편40~41화 |','| 추가 전장13편·시빌워·베오울프 | 시험판. 국지전5편·베오울프·시빌워7부작 |').replace('표시40·41화','표시40·49화')
- rest=rest.replace('| 추가 전장6편·베오울프 | 시험판. 국지전5편+최종전 직전 무한 증원 결전 |','| 추가 전장13편·시빌워·베오울프 | 시험판. 국지전5편·베오울프·시빌워7부작 |').replace('표시40·42화입니다.','표시40·49화입니다.').replace('v20261107.2·.3·.4·.5 적용본은','v20261107.2·.3·.4·.5·.6 적용본은')
+ rest=rest.replace('v20261107.2와 v20261107.3 적용본은','v20261107.2·.3·.4 적용본은').replace('| 34화 이후 국지전5편 |. 추가35~39화 각32기 뒤 본편40~41화 |','| 추가 전장13편·시빌워·베오울프 |. 국지전5편·베오울프·시빌워7부작 |').replace('표시40·41화','표시40·49화')
+ rest=rest.replace('| 추가 전장6편·베오울프 |. 국지전5편+최종전 직전 무한 증원 결전 |','| 추가 전장13편·시빌워·베오울프 |. 국지전5편·베오울프·시빌워7부작 |').replace('표시40·42화입니다.','표시40·49화입니다.').replace('v20261107.2·.3·.4·.5 적용본은','v20261107.2·.3·.4·.5·.6 적용본은')
  section=rest.index('## 확인 범위와 소스');rest=rest[:section]+'''## 확인 범위와 소스
 
 패처4096조합과 이전 적용본 인식을 점검합니다. 새 전장의 native 등록·조건 처리와 기존 베오울프 준비 생성192조건과 기존 시빌워320조건 및 경비대 확장834검사·교전69경우·준비생성230조건·증원168경우을 확인했습니다. 원래 기체·파일럿·무장·초상화·연출 자원, 추가25인 육성과 기존5개 전장을 보존합니다.
 
-반복 증원100회·동시 격파7기·보스 격파 후 중지와 승리 판정은 맵 생성 부분을 시험용 상태로 대체하여 점검했습니다. 실제 NPC 재생성·퇴장·충돌·AI·연출·장기 보상·메모리카드 로드는 PCSX2 플레이 확인이 필요합니다. 사용자가 플레이 테스트를 진행하며 현재 배포는 시험판입니다. [검증 결과](docs/validation-v20261107.8.json)를 제공합니다.
+반복 증원100회·동시 격파7기·보스 격파 후 중지와 승리 판정은 맵 생성 부분을 시험용 상태로 대체하여 점검했습니다. 실제 NPC 재생성·퇴장·충돌·AI·연출·장기 보상·메모리카드 로드는 PCSX2 플레이 확인이 필요합니다. 사용자가 플레이 테스트를 진행합니다. [검증 결과](docs/validation-v20261107.8.json)를 제공합니다.
 
 `src`는 Windows패처, `tools/work_ogg`는 제작·분석·검증 소스입니다. 게임에서 추출한 로컬 입력과 OGs 제작본의 베오울프 자료는 저장소에 포함하지 않아 모든 제작을 이 저장소만으로 재현하지는 못합니다. 역사적 빌더를 현재 ISO에 재실행하지 마세요. [제작 도구 안내](tools/README.md)를 참고하세요.
 
@@ -25,11 +25,11 @@ def main():
 '''
  intro='''# OG외전 한글판 옵션 패처
 
-공식 한글패치 기반 Windows 추가 패처입니다. **v20261107.8는 최종전 직전 시빌워7부작을 포함한 추가 전장13편 시험판**이며 [최신 안정판v20261107.1](https://github.com/kimjh-eclipse/srwogg-options-patcher/releases/tag/v20261107.1)은 유지합니다.
+공식 한글패치 기반 Windows 추가 패처입니다. **v20261107.8는 최종전 직전 시빌워7부작을 포함한 추가 전장13편**입니다.
 
 [**패처·설명서·선택 HD자료 ZIP 다운로드**](https://github.com/kimjh-eclipse/srwogg-options-patcher/releases/download/v20261107.8/SRWOGG_Options_kr_v20261107.8.zip)
 
-## 이번 시험판: 시빌워 후방 증원
+## 이번 배포: 시빌워 후방 증원
 
 각 화의 아군2·3·4턴에 일반병6기씩, 총18기가 증원됩니다. 초기 적32기(이름 있는 파일럿 포함)를 두고 화당 최대50기입니다. 일반병은 레벨52입니다.45·46화는 레피나 측 경비대를 직접 조작하는 선제 반격전이고47화는 양 함대의 합동 구출전입니다. 라그나로크는 숙련도0에서도 직접 연결되는 경로를 검사했습니다. 전함 두 척이면 그 시점 위치 주변에3기씩, 한 척이면6기이며 전함이 없으면 인질 수송기를 기준으로 합니다. 중복 증원을 막고 기존 승리 조건과 대사는 유지했습니다. [화별 편성·기체·승리 조건](docs/civil-formations-v20261107.8.md)을 확인하세요.
 
@@ -63,7 +63,7 @@ def main():
 
 '''
  rest=rest.replace('v20261107.2·.3·.4·.5·.6 적용본은','v20261107.2·.3·.4·.5·.6·.7 적용본은').replace('추가 전장11편','추가 전장13편').replace('시빌워5부작','시빌워7부작').replace('표시40·47화','표시40·49화')
- p.write_text(intro+rest,encoding='utf8')
+ p.write_text((intro+rest).replace('시험판. ','').replace('시험판',''),encoding='utf8')
  p=REPO/'tools/README.md';s=p.read_text(encoding='utf8');s=s[:s.index('\n## 베오울프 결전과 개별 무한 증원')] if '\n## 베오울프 결전과 개별 무한 증원' in s else s;s+='''
 ## 베오울프 결전과 개별 무한 증원
 

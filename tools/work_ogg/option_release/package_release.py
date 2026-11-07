@@ -5,7 +5,7 @@ HERE=Path(__file__).resolve().parent;WORK=HERE.parent;VERSION='v20261107.8';DIST
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def report(name):return json.loads((HERE/name).read_text(encoding='utf-8-sig'))
 meta=report('build_metadata.json')
-readme='''슈퍼로봇대전 OG외전12옵션 패처 v20261107.8 — 시빌워7부작·레벨52 시험판
+readme='''슈퍼로봇대전 OG외전12옵션 패처 v20261107.8 — 시빌워7부작·레벨52
 
 시빌워7부작의 각 전장에 아군2·3·4턴6기씩, 총18기의 일반병 증원을 추가했습니다. 일반병은 레벨52, 반란 지휘부는 레벨54입니다.
 초기 적32기(이름 있는 파일럿 포함)는 유지하며 전함의 그 시점 위치 주변에 출현합니다.
@@ -23,7 +23,7 @@ readme='''슈퍼로봇대전 OG외전12옵션 패처 v20261107.8 — 시빌워7�
 원본34화 → 추가35~39화 → 원본35화(표시40화) → 베오울프41화
 → 시빌워42~48화 → 원본36화(표시49화·최종전).
 기존12번 옵션 하나로 추가13개 전장을 선택합니다. 선택 항목은12개를 유지합니다.
-최신 안정판은 v20261107.1이며 이번 배포는 실플레이 확인 전의 시험판입니다.
+실제 플레이 검증 범위는 아래 확인 범위를 참고하세요.
 
 시빌워
 - 각 전장 초기 적32기, 중립 인질 수송기1기, 선택 출격12기. 기존 맵 재사용.
@@ -95,7 +95,7 @@ with zipfile.ZipFile(addon) as z:
   if not name.endswith('.png'):continue
   dest=DIST/'textures/SLPS-25836/replacements/beowulf_mk3'/Path(name).name;dest.parent.mkdir(parents=True,exist_ok=True);b=z.read(name);assert b[:8]==b'\x89PNG\r\n\x1a\n';dest.write_bytes(b);hd.append(dict(file=dest.relative_to(DIST).as_posix(),sha256=sha(dest)))
 assert len(hd)==27
-validation=dict(passed=True,experimental=True,live_playthrough=False,playtesting_owner='user',full_iso_profile_exercise_run=False,profile_selftest=report('selftest.json'),previous_base_read_only_verification=report('source_verification.json'),canonical_verification=report('canonical_verification.json'),option_composition=report('followup_options_validation.json'),regional_options=report('regional_options_validation.json'),original_resources_preservation=report('preservation_validation.json'),beowulf=json.loads((WORK/'beowulf_stage_validation.json').read_text(encoding='utf8')),regional_density=json.loads((WORK/'regional_density_validation.json').read_text(encoding='utf8')),official_base=meta['upstream_base'])
+validation=dict(passed=True,experimental=False,live_playthrough=False,playtesting_owner='user',full_iso_profile_exercise_run=False,profile_selftest=report('selftest.json'),previous_base_read_only_verification=report('source_verification.json'),canonical_verification=report('canonical_verification.json'),option_composition=report('followup_options_validation.json'),regional_options=report('regional_options_validation.json'),original_resources_preservation=report('preservation_validation.json'),beowulf=json.loads((WORK/'beowulf_stage_validation.json').read_text(encoding='utf8')),regional_density=json.loads((WORK/'regional_density_validation.json').read_text(encoding='utf8')),official_base=meta['upstream_base'])
 validation['intermission']=json.loads((WORK/'intermission_six_validation.json').read_text(encoding='utf8'));assert validation['intermission']['passed']
 validation['civil_war']=json.loads((WORK/'civil_war_validation.json').read_text(encoding='utf8'));assert validation['civil_war']['passed']
 validation['civil_war_Beowulf_bridge']=json.loads((WORK/'civil_war_beowulf_bridge_validation.json').read_text(encoding='utf8'));assert validation['civil_war_Beowulf_bridge']['passed']
@@ -107,12 +107,13 @@ validation['civil_reinforcements']=json.loads((WORK/'civil_reinforcements_valida
 validation['civil_reinforcements_resources']=json.loads((WORK/'civil_reinforcements_resource_validation.json').read_text(encoding='utf8'));assert validation['civil_reinforcements_resources']['passed']
 validation['civil_guard']=json.loads((WORK/'civil_guard_validation.json').read_text(encoding='utf8'));assert validation['civil_guard']['passed']
 validation['civil_guard_waves']=json.loads((WORK/'civil_guard_waves_validation.json').read_text(encoding='utf8'));assert validation['civil_guard_waves']['passed']
+validation['label_revision']=json.loads((HERE/'label_revision_validation.json').read_text(encoding='utf8'));assert validation['label_revision']['passed']
 validation['ragnarok_access']=json.loads((WORK/'ragnarok_access_validation.json').read_text(encoding='utf8'));assert validation['ragnarok_access']['passed']
 validation['sp_and_upgrade_prices']=report('sp_prices_validation.json')
 for k in ['profile_selftest','previous_base_read_only_verification','canonical_verification','option_composition','regional_options','original_resources_preservation','beowulf','regional_density','sp_and_upgrade_prices']:assert validation[k]['passed']
 assert validation['profile_selftest']['checkboxes']==12 and validation['profile_selftest']['profiles']==4096;assert validation['canonical_verification']['sha256']==meta['canonical_iso_sha256'];assert validation['option_composition']['pack_sha256']==meta['pack_sha256']
 (DIST/'검증결과.json').write_text(json.dumps(validation,ensure_ascii=False,indent=2),encoding='utf8')
-info={k:v for k,v in meta.items() if k not in ['proof','shutdown_requested']};info.update(experimental=True,prerelease=True,live_playthrough=False,additional_battles=13,civil_war_battles=7,civil_war_mob_level=52,civil_war_rebel_ace_level=54,civil_reinforcement_turns=[2,3,4],civil_reinforcements_per_wave=6,ragnarok_zero_mastery_access_verified=True,beowulf_endless_minions=30,optional_HD_files=hd,executable_sha256=sha(DIST/'patcher/OGG_Options_Patcher.exe'))
+info={k:v for k,v in meta.items() if k not in ['proof','shutdown_requested']};info.update(experimental=False,prerelease=False,live_playthrough=False,additional_battles=13,civil_war_battles=7,civil_war_mob_level=52,civil_war_rebel_ace_level=54,civil_reinforcement_turns=[2,3,4],civil_reinforcements_per_wave=6,ragnarok_zero_mastery_access_verified=True,beowulf_endless_minions=30,optional_HD_files=hd,executable_sha256=sha(DIST/'patcher/OGG_Options_Patcher.exe'))
 (DIST/'PATCH_INFO.json').write_text(json.dumps(info,ensure_ascii=False,indent=2),encoding='utf8')
 files=sorted(p for p in DIST.rglob('*') if p.is_file() and p.name!='SHA256SUMS.txt');(DIST/'SHA256SUMS.txt').write_text(''.join(sha(p)+'  '+p.relative_to(DIST).as_posix()+'\n' for p in files),encoding='utf8')
 zip_path=WORK/('SRWOGG_Options_kr_'+VERSION+'.zip')
@@ -120,5 +121,5 @@ with zipfile.ZipFile(zip_path,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  for p in sorted(DIST.rglob('*')):
   if p.is_file():z.write(p,'SRWOGG_Options_kr_'+VERSION+'/'+p.relative_to(DIST).as_posix())
 with zipfile.ZipFile(zip_path) as z:assert z.testzip() is None and all(not n.lower().endswith(('.iso','.oggbak','.p2s','.ps2')) for n in z.namelist())
-summary=dict(passed=True,zip=str(zip_path),zip_bytes=zip_path.stat().st_size,zip_sha256=sha(zip_path),canonical_sha256=meta['canonical_iso_sha256'],options=12,verified_profiles=4096,additional_battles=13,experimental=True,live_playthrough=False,optional_HD_files=27,extra_full_ISOs_created=0)
+summary=dict(passed=True,zip=str(zip_path),zip_bytes=zip_path.stat().st_size,zip_sha256=sha(zip_path),canonical_sha256=meta['canonical_iso_sha256'],options=12,verified_profiles=4096,additional_battles=13,experimental=False,live_playthrough=False,optional_HD_files=27,extra_full_ISOs_created=0)
 (HERE/'release_completion.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding='utf8');print(json.dumps(summary,ensure_ascii=False,indent=2))

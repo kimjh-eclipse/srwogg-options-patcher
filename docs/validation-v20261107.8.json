@@ -1,6 +1,6 @@
 {
   "passed": true,
-  "experimental": true,
+  "experimental": false,
   "live_playthrough": false,
   "playtesting_owner": "user",
   "full_iso_profile_exercise_run": false,
@@ -21,7 +21,7 @@
   },
   "option_composition": {
     "passed": true,
-    "pack_sha256": "0c112abc9e3117bbc92c7cc4dff21e7ad8188631cc2b06043a665af99892684c",
+    "pack_sha256": "feaa452438e2bf73bb365984b365a8aa77c705c31c506b317256f127cccc3b83",
     "profiles": 16,
     "scene_profile_checks": 80,
     "encoded_dialogue_comparisons": 584,
@@ -412,11 +412,15 @@
     ],
     "byte_profile_selftest_count": 4096,
     "shared_option_bit": 11,
-    "no_thirteenth_option": true
+    "no_thirteenth_option": true,
+    "label_only_revision": {
+      "old_pack_sha256": "0c112abc9e3117bbc92c7cc4dff21e7ad8188631cc2b06043a665af99892684c",
+      "gameplay_payload_and_all_profile_bytes_identical": true
+    }
   },
   "regional_options": {
     "passed": true,
-    "pack_sha256": "0c112abc9e3117bbc92c7cc4dff21e7ad8188631cc2b06043a665af99892684c",
+    "pack_sha256": "feaa452438e2bf73bb365984b365a8aa77c705c31c506b317256f127cccc3b83",
     "regional_profile_checks": 224,
     "regional_profiles": 16,
     "regional_new_battles": 5,
@@ -428,7 +432,11 @@
     "ISO_writes_performed": false,
     "story_and_native_bridge_routes_checked": true,
     "enemy_grade_option_independent": true,
-    "extra_dialogue_option_independent": true
+    "extra_dialogue_option_independent": true,
+    "label_only_revision": {
+      "old_pack_sha256": "0c112abc9e3117bbc92c7cc4dff21e7ad8188631cc2b06043a665af99892684c",
+      "gameplay_payload_and_all_profile_bytes_identical": true
+    }
   },
   "original_resources_preservation": {
     "passed": true,
@@ -1063,6 +1071,15 @@
     "guard_side_scenarios_use_Lefina_ship_coordinates": true,
     "repeat_wave_suppressed": true,
     "actual_world_spawn_collision_and_AI_tested": false
+  },
+  "label_revision": {
+    "passed": true,
+    "old_pack_sha256": "0c112abc9e3117bbc92c7cc4dff21e7ad8188631cc2b06043a665af99892684c",
+    "new_pack_sha256": "feaa452438e2bf73bb365984b365a8aa77c705c31c506b317256f127cccc3b83",
+    "unchanged_pack_prefix_bytes": 56,
+    "gameplay_payload_sha256": "4b597809b98160f218252d69d67e42681a2d037844b110ae2910690f48da076b",
+    "gameplay_payload_and_all_profile_bytes_identical": true,
+    "ISO_writes_performed": false
   },
   "ragnarok_access": {
     "passed": true,

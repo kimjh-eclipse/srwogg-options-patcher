@@ -62,15 +62,15 @@
     },
     {
       "bit": 11,
-      "name": "추가 전장 13편·시빌워·베오울프 [시험판]",
+      "name": "추가 전장 13편·시빌워·베오울프",
       "description": "국지전·베오울프·시빌워7편. 일반병Lv52,2·3·4턴마다 전함 주변6기 증원"
     }
   ],
   "profile_count": 4096,
   "managed_ranges": 82,
   "managed_bytes": 34721792,
-  "pack_sha256": "0c112abc9e3117bbc92c7cc4dff21e7ad8188631cc2b06043a665af99892684c",
-  "pack_size": 10758576,
+  "pack_sha256": "feaa452438e2bf73bb365984b365a8aa77c705c31c506b317256f127cccc3b83",
+  "pack_size": 10758564,
   "legacy_profiles": 28950,
   "sp_cost_policy": "native with 13 allied-clone role corrections",
   "weapon_cost_steps": [
@@ -94,8 +94,8 @@
     "changed_pages_from_previous_base": 64,
     "extra_full_ISOs_created": 0
   },
-  "experimental": true,
-  "prerelease": true,
+  "experimental": false,
+  "prerelease": false,
   "live_playthrough": false,
   "additional_battles": 13,
   "civil_war_battles": 7,
@@ -219,5 +219,5 @@
       "sha256": "269af555bcd3af778a92f4a24d1ce7341fadf389b61bfeab5fd6e77f473dd839"
     }
   ],
-  "executable_sha256": "f2724cd7a11f5922535340789ef6055cfc9e530692fc740e4eedec19c7543f3f"
+  "executable_sha256": "3fc8507731af28b583aa525059ebc955408eebf6692b43a1a4103add676bad66"
 }
