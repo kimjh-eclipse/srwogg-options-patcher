@@ -46,17 +46,18 @@ def condition_event(vm,blob,start):
   i+=1
  raise AssertionError('event did not return')
 
-def main():
- p=json.loads((ROOT/'regional_five_prepared.json').read_text(encoding='utf8'));base=ram(Profiles(),2047);checks=0;reports=[]
+def main(prepared=None,folder=None,output=None):
+ folder=Path(folder) if folder is not None else ROOT/'analysis/regional_five'
+ p=prepared or json.loads((ROOT/'regional_five_prepared.json').read_text(encoding='utf8'));base=ram(Profiles(),2047);checks=0;reports=[]
  cast=json.loads((ROOT/'manifest_selected_27.json').read_text(encoding='utf8'))['cast'];expected={x['pilot_name'] for x in cast}-{ '아기라','세프타킨'}
  actual={n for s in SCENARIOS for n in s['focus']};assert actual==expected,(actual^expected)
- master=(ROOT/'analysis/regional_five/SHARED.BIN.master').read_bytes();m=Master(master);vm=VM(base);load_campaign_master(vm,master);c=vm.cpu
+ master=(folder/'SHARED.BIN.master').read_bytes();m=Master(master);vm=VM(base);load_campaign_master(vm,master);c=vm.cpu
  for s in p['scenes']:
   value=c.run(0x2705c0,[vm.master,2,s['key']-2000]);assert value==s['number'];checks+=1
   ptr=c.run(0x270580,[vm.master,2,s['key']-2000]);raw=encode(s['title']);assert bytes(c.mem[ptr:ptr+len(raw)+1])==raw+b'\0';checks+=1
  for k,number in [(2033,40),(2034,41)]:assert c.run(0x2705c0,[vm.master,2,k-2000])==number;checks+=1
  for s in p['scenes']:
-  blob=(ROOT/'analysis/regional_five'/s['logo']['file']).read_bytes();rows=records(blob);unit=(ROOT/'analysis/regional_five'/s['untd']['file']).read_bytes();vm=VM(base);c=vm.cpu;load_campaign_master(vm,master);at=0x1800000;c.mem[at:at+len(blob)]=blob;c.run(0x5363c0,[vm.ctx,at]);prefix=u32(blob,32)
+  blob=(folder/s['logo']['file']).read_bytes();rows=records(blob);unit=(folder/s['untd']['file']).read_bytes();vm=VM(base);c=vm.cpu;load_campaign_master(vm,master);at=0x1800000;c.mem[at:at+len(blob)]=blob;c.run(0x5363c0,[vm.ctx,at]);prefix=u32(blob,32)
   assert len(unit)==44+u32(unit,40)*336 and u32(unit,40)==28
   ur=[unit[44+i*336:44+(i+1)*336] for i in range(u32(unit,40))];assert sum(u32(r,8)==6 for r in ur)==12 and sum(u32(r,8)==2 for r in ur)==16
   for r in ur:
@@ -114,6 +115,6 @@ def main():
   assert vm.cpu.read(vm.diff+0xffc,4)==index and snapshot(vm,owned)==original;checks+=4;reloads.append(dict(previous_index=previous,next_index=index,played_flag_byte=hex(0x2cc+previous//8),roster_stats_preserved=True))
  assert vm.cpu.read(vm.diff+0x2d0,1)&0xfb==0xfb
  report=dict(passed=True,native_checks=checks,missions=reports,all_25_story_participants_covered=True,original_geometry_and_unit_weapon_pilot_tables_preserved=True,new_dialogue_only_when_story_enabled=True,party_creation_or_removal=False,persistent_Save_Diff_reload_cases=reloads,memory_card_IO_tested=False,scope='native text/history/stage getters/event registration/annihilation guards/next-stage handler and persistent array reload; army counts supplied by fixture, result/deployment UI and memory-card load not emulated',battle_playthrough_verified=False,ready_for_experimental_apply=True)
- (ROOT/'regional_five_validation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf8');print(json.dumps(report,ensure_ascii=False,indent=2))
+ (Path(output) if output else ROOT/'regional_five_validation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf8');print(json.dumps({k:v for k,v in report.items() if k!='missions'},ensure_ascii=False));return report
 
 if __name__=='__main__':main()

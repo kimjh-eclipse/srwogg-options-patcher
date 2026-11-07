@@ -1,15 +1,18 @@
 """Package the experimental twelve-option build without game images."""
 from pathlib import Path
 import json,hashlib,zipfile
-HERE=Path(__file__).resolve().parent;WORK=HERE.parent;DIST=WORK/'release_v20261107.2';VERSION='v20261107.2'
+HERE=Path(__file__).resolve().parent;WORK=HERE.parent;DIST=WORK/'release_v20261107.3';VERSION='v20261107.3'
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def report(name):return json.loads((HERE/name).read_text(encoding='utf-8-sig'))
 meta=report('build_metadata.json')
-readme="""슈퍼로봇대전 OG외전 12옵션 패처 v20261107.2 — 국지전 5편 시험판
+readme="""슈퍼로봇대전 OG외전 12옵션 패처 v20261107.3 — 국지전 무인 보스10기 시험판
 
 PCSX2 실제 전투 진행 확인 전의 시험판입니다. 최신 안정판은 v20261107.1입니다.
 새 12번 옵션: 34화 → 추가35~39화 → 본래35화(표시40화) → 본래36화(표시41화·최종전).
-각 전장은 보유 기체12기 선택 출격, 적16기. 기존 전장·기체·무기를 재사용합니다.
+각 전장은 보유 기체12기 선택 출격, 일반 적14기와 무인 보스2기입니다.
+제외했던 전함7편성·세프타킨·아기라형 베르게르밀·쿠엘보형 라즈앙그리프를 재현합니다.
+원래 함장·파일럿은 탑승하지 않으며, 기존 기체와 분리된 보스 전용 성능을 사용합니다.
+38화는 실제 콜로니 우주 맵,39화는 정상 지형의 출격 위치로 수정했습니다.
 새 인물·기체·물품은 중복 지급하지 않습니다. 추가25인 대사는 기존1번 옵션에 따릅니다.
 레몬·액셀렌의 자매 인연은 마지막 지역전에서 이어집니다.
 
@@ -23,9 +26,10 @@ PCSX2 실제 전투 진행 확인 전의 시험판입니다. 최신 안정판은
 
 원복과 기존 적용본
 - 12개 옵션의 기본값은 모두 꺼짐입니다.
+- v20261107.2의 4,096개 조합은 12개 선택값을 모두 유지합니다.
 - v20261107.1의 2,048개 조합을 포함한 지원 적용본의 선택값을 유지합니다.
   이전11옵션 입력에서는 새12번만 꺼짐으로 인식합니다. 옛 SP1은 다시 노출하지 않습니다.
-- 첫 적용 전 변경 구간만 .v20261107.2.oggbak에 보관합니다. 전체 ISO 복사본이 아닙니다.
+- 첫 적용 전 변경 구간만 .v20261107.3.oggbak에 보관합니다. 전체 ISO 복사본이 아닙니다.
 - [처음 상태 복원]은 최초 입력 상태로 되돌립니다. 받은 기체나 물품을 세이브에서 삭제하지는 않습니다.
 - 국지전을 끄면 원래34→35→36 진행과 화수 표시로 돌아갑니다. 원작 최종전 종료 처리를 보존합니다.
 - 기존 옵션 설명의35·36화는 원본 화수입니다. 새12번 선택 시 해당 장면은 표시40·41화입니다.
@@ -55,8 +59,8 @@ readme+="""
 (DIST/'읽어주세요.txt').write_text(readme,encoding='utf-8-sig')
 for source,dest in [('regional_five_details.md','국지전5편_시나리오.md'),('huckebein_r_details.md','휴케바인R_변경내역.md'),('followup_story_details.md','후속시나리오_대사.md'),('support_overhaul_details.md','지원장비_후반정비.md'),('party_preservation_details.md','편성보존_수정내역.md'),('spirit_balance_details.md','정신기_조정내역.md'),('story_consistency_details.md','본편연결_수정내역.md')]:
  (DIST/dest).write_text((HERE/source).read_text(encoding='utf8'),encoding='utf8')
-validation=dict(passed=True,experimental=True,live_playthrough=False,playtesting_owner='user',full_iso_profile_exercise_run=False,profile_selftest=report('selftest.json'),previous_base_read_only_verification=report('source_verification.json'),canonical_verification=report('canonical_verification.json'),option_composition=report('followup_options_validation.json'),regional_options=report('regional_options_validation.json'),original_resources_preservation=report('preservation_validation.json'),regional_native=json.loads((WORK/'regional_five_validation.json').read_text(encoding='utf8')),official_base=meta['upstream_base'])
-for key in ['profile_selftest','previous_base_read_only_verification','canonical_verification','option_composition','regional_options','regional_native','original_resources_preservation']:assert validation[key]['passed']
+validation=dict(passed=True,experimental=True,live_playthrough=False,playtesting_owner='user',full_iso_profile_exercise_run=False,profile_selftest=report('selftest.json'),previous_base_read_only_verification=report('source_verification.json'),canonical_verification=report('canonical_verification.json'),option_composition=report('followup_options_validation.json'),regional_options=report('regional_options_validation.json'),original_resources_preservation=report('preservation_validation.json'),regional_bosses=json.loads((WORK/'regional_bosses_validation.json').read_text(encoding='utf8')),regional_native=json.loads((WORK/'regional_five_validation.json').read_text(encoding='utf8')),official_base=meta['upstream_base'])
+for key in ['profile_selftest','previous_base_read_only_verification','canonical_verification','option_composition','regional_options','regional_native','original_resources_preservation','regional_bosses']:assert validation[key]['passed']
 assert validation['profile_selftest']['profiles']==4096 and validation['profile_selftest']['checkboxes']==12
 assert validation['canonical_verification']['sha256']==meta['canonical_iso_sha256']
 assert validation['option_composition']['pack_sha256']==meta['pack_sha256']

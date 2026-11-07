@@ -11,7 +11,7 @@ using System.Windows.Forms;
 internal static class OggOptionsPatcher
 {
     const string ExpectedPackSha = "__PACK_SHA__";
-    const string Version = "v20261107.2";
+    const string Version = "v20261107.3";
     sealed class Region { public long Offset; public byte[] Original, Zero; }
     sealed class Edit { public long Offset; public byte[] Data; }
     sealed class Pack {
@@ -47,7 +47,7 @@ internal static class OggOptionsPatcher
                 for(int j=0;j<n;j++) { long at=r.ReadInt64(); int length=r.ReadInt32(); if(length<1 || length>p.Size || at<0 || at>p.Size-length) throw new InvalidDataException("옵션 범위 오류"); p.Features[i].Add(new Edit { Offset=at, Data=ReadExact(r,length) }); } }
             int profiles=r.ReadInt32(); if(profiles!=(1<<count)) throw new InvalidDataException("조합 수 오류"); p.Profiles=new byte[profiles][];
             for(int i=0;i<profiles;i++) { if(r.ReadInt32()!=i) throw new InvalidDataException("조합 순서 오류"); p.Profiles[i]=ReadExact(r,32); p.Known.Add(Hex(p.Profiles[i]),i); }
-            p.Known[Hex(ReadExact(r,32))]=-1; int legacy=r.ReadInt32(); if(legacy<0 || legacy>8192) throw new InvalidDataException("이전 버전 오류");
+            p.Known[Hex(ReadExact(r,32))]=-1; int legacy=r.ReadInt32(); if(legacy<0 || legacy>16384) throw new InvalidDataException("이전 버전 오류");
             for(int i=0;i<legacy;i++) { string key=Hex(ReadExact(r,32)); int mask=r.ReadInt32(); p.Known[key]=mask; }
             if(r.BaseStream.Position!=r.BaseStream.Length) throw new InvalidDataException("패치 뒤에 잉여 데이터가 있습니다.");
         } return p;

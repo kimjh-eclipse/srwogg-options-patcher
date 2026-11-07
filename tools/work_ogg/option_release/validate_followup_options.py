@@ -98,7 +98,8 @@ def main():
  assert moved==2
  assert len(p.features[2])==len(old[2])==2
  assert [b for at,b in p.features[2]]==[b for at,b in old[2]]
- for bit in [3,5,6,7]:assert p.features[bit]==old[bit],bit
+ for bit in [3,6,7]:assert p.features[bit]==old[bit],bit
+ assert [b for at,b in p.features[5]]==[b for at,b in old[5]]
  assert set(old[4])<=set(p.features[4]) and len(p.features[4])==len(old[4])+80
  assert p.features[8][:-1]==old[8][:-1]
  assert p.features[8][-1][1]==old[8][-1][1]
