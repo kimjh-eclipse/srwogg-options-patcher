@@ -29,6 +29,6 @@ assert hashlib.sha256(request('GET',asset['browser_download_url'],raw=True,publi
 assert request('GET',base+'/releases/latest',public=True)['tag_name']==tag
 old=request('GET',base+'/releases/tags/v20261107.8');notice='> 설명 표시 문제를 수정한 [v20261110]('+public['html_url']+')이 배포되었습니다. 정신기·특수능력·강화파츠·도감 설명 문제는 최신 버전으로 업데이트해 주세요.\n\n';request('PATCH',base+'/releases/'+str(old['id']),{'body':notice+old['body']})
 request('PATCH',base,{'description':'OG외전 공식 한글패치 기반 12옵션 패처 · 설명 표시 수정·추가25편성·추가 전장13편'})
-state.update(passed=True,release_draft=False,latest_stable_release=public['html_url'],public_access_verified=True,assets=[dict(name=name,bytes=len(b),sha256=digest,url=asset['browser_download_url'],public_download_verified=True)])
+state.update(passed=True,release_draft=False,release_url=public['html_url'],latest_stable_release=public['html_url'],public_access_verified=True,assets=[dict(name=name,bytes=len(b),sha256=digest,url=asset['browser_download_url'],public_download_verified=True)])
 for path in [HERE/'github_publish_state.json',previous_path]:path.write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
 print(json.dumps(state,ensure_ascii=False,indent=2),flush=True)
