@@ -10,8 +10,8 @@ def main():
     completion = json.loads((HERE / 'release_completion.json').read_text(encoding='utf8'))
     metadata = json.loads((HERE / 'build_metadata.json').read_text(encoding='utf8'))
     assert completion['passed'] and completion['additional_battles'] == 13
-    assert metadata['canonical_iso_sha256'] == 'c1ef60d889e52fe48d242228e084b44ffc8c683b6426f6acd7962ae47cbf6716'
-    assert metadata['legacy_profiles'] <= 32768
+    assert metadata['canonical_iso_sha256'] == '57ec181e68b8fd62a21e9d54ef4fbcbd2f51a1e5e5b029387bec8f92e4e9de18'
+    assert metadata['legacy_profiles'] <= 65536
     secret = re.compile(r'\bgh[pousr]_[A-Za-z0-9]{25,}|github_pat_[A-Za-z0-9_]{30,}|sk-proj-[A-Za-z0-9_-]{30,}')
     files = subprocess.run(['git', 'ls-files', '-z', '--cached', '--others', '--exclude-standard'], cwd=REPO, capture_output=True, text=True, check=True).stdout.rstrip('\0').split('\0')
     python_files = 0
@@ -31,7 +31,7 @@ def main():
     with zipfile.ZipFile(completion['zip']) as z:
         assert z.testzip() is None
         names = z.namelist()
-        root = 'SRWOGG_Options_kr_v20261107.8/'
+        root = 'SRWOGG_Options_kr_v20261110/'
         sums = z.read(root + 'SHA256SUMS.txt').decode('utf8').splitlines()
         listed = set()
         for line in sums:

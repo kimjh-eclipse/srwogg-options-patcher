@@ -52,6 +52,9 @@ def get_record(m,tag,keytag,key,stride):
  return idx,bytes(m.b[at:at+stride])
 
 def logical_strings(m,tag):
+ if tag=='Expl':
+  from explanation_tables import explanation_records
+  a,size,_=m.tables[tag];return explanation_records(m.b[a:a+size])
  a,_,n=m.tables[tag];return [m.b[a+u32(m.b,a+12+i*4):m.b.index(0,a+u32(m.b,a+12+i*4))+1] for i in range(n)]
 
 def rebuild(old,units,cast):

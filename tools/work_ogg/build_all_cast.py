@@ -2,9 +2,12 @@
 from build_patch import Plan,put,arc,insert_commands,command,EXPECTED
 from catalog import *
 from localize_ingram import localize
+from explanation_tables import table_records, pack_explanations
 import shutil,os
 
 def compact(table):
+ if table[:4]==b'Expl':return bytearray(pack_explanations(table_records(table)))
+ assert table[:4] in [b'Strg',b'Sent'],'Binary tables cannot be compacted as NUL strings'
  n=u32(table,8);values=[]
  for i in range(n):
   at=u32(table,12+i*4);values.append(bytes(table[at:table.index(0,at)+1]))
@@ -76,10 +79,8 @@ def patch_master(old,rows):
    allowed=set([*range(0x72,0x78),0x7f]) if tag=='Plot' else set()
    assert {j for j in range(stride) if old[a+12+i*stride+j]!=new[b+12+i*stride+j]}<=allowed
  for tag in ['Strg','Expl','Sent']:
-  a,_,n=m.tables[tag];b=nm.tables[tag][0]
-  for i in range(n):
-   q=a+u32(old,a+12+i*4);p=b+u32(new,b+12+i*4)
-   assert old[q:old.index(0,q)+1]==new[p:new.index(0,p)+1]
+  a,size,n=m.tables[tag];b,ns,_=nm.tables[tag]
+  assert table_records(old[a:a+size])==table_records(new[b:b+ns])
  for r in rows:
   for tag,keytag,stride,field in [('Unit','UTbl',100,'unit'),('Plot','PTbl',148,'pilot')]:
    idx=u16(new,nm.tables[keytag][0]+12+r['new_key']*2);assert idx>=m.tables[tag][2]

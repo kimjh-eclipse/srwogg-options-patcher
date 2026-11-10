@@ -1,0 +1,1354 @@
+{
+  "passed": true,
+  "experimental": false,
+  "live_playthrough": false,
+  "playtesting_owner": "user",
+  "full_iso_profile_exercise_run": false,
+  "profile_selftest": {
+    "passed": true,
+    "profiles": 4096,
+    "checkboxes": 12
+  },
+  "previous_base_read_only_verification": {
+    "passed": true,
+    "mask": 0,
+    "sha256": "a9f7f03c4cb722f9e0709860a1cf5a16fc52d8bf116a9458403ffc5a67fd7f63"
+  },
+  "canonical_verification": {
+    "passed": true,
+    "mask": 4095,
+    "sha256": "57ec181e68b8fd62a21e9d54ef4fbcbd2f51a1e5e5b029387bec8f92e4e9de18"
+  },
+  "option_composition": {
+    "passed": true,
+    "pack_sha256": "3b9ca80313d87bbf3e3fc3fe1ee2301afa91a7ff8a2dc2e2366e08b2acb94388",
+    "profiles": 16,
+    "scene_profile_checks": 80,
+    "encoded_dialogue_comparisons": 584,
+    "story_off_uses_original_scripts": true,
+    "other_feature_edits_preserved": true,
+    "new_chapter32_directory_switch_checked": true,
+    "chapter29_native_composed_profiles": [
+      {
+        "mask": 1,
+        "followup_boxes": 16,
+        "maintenance_boxes": 0,
+        "repeat_boxes": 0
+      },
+      {
+        "mask": 257,
+        "followup_boxes": 16,
+        "maintenance_boxes": 3,
+        "repeat_boxes": 0
+      }
+    ],
+    "early_equipment_selection_checks": 16,
+    "early_equipment_independence": [
+      {
+        "mask": 0,
+        "story": false,
+        "eight_supplies": false,
+        "early_equipment": false,
+        "early_grants": 0,
+        "supply_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 1,
+        "story": true,
+        "eight_supplies": false,
+        "early_equipment": false,
+        "early_grants": 0,
+        "supply_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 4,
+        "story": false,
+        "eight_supplies": true,
+        "early_equipment": false,
+        "early_grants": 0,
+        "supply_grants": 8,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 5,
+        "story": true,
+        "eight_supplies": true,
+        "early_equipment": false,
+        "early_grants": 0,
+        "supply_grants": 8,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 512,
+        "story": false,
+        "eight_supplies": false,
+        "early_equipment": true,
+        "early_grants": 5,
+        "supply_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 513,
+        "story": true,
+        "eight_supplies": false,
+        "early_equipment": true,
+        "early_grants": 5,
+        "supply_grants": 0,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 516,
+        "story": false,
+        "eight_supplies": true,
+        "early_equipment": true,
+        "early_grants": 5,
+        "supply_grants": 8,
+        "repeat_grants": 0
+      },
+      {
+        "mask": 517,
+        "story": true,
+        "eight_supplies": true,
+        "early_equipment": true,
+        "early_grants": 5,
+        "supply_grants": 8,
+        "repeat_grants": 0
+      }
+    ],
+    "legacy_recognition": {
+      "previous_8_option_profiles_recognized": 256,
+      "v20261106_1_profiles_recognized": 128,
+      "v20261106_2_profiles_recognized": 128,
+      "v20261106_3_profiles_recognized": 128,
+      "v20261106_4_profiles_recognized": 128,
+      "v20261106_5_profiles_recognized": 512,
+      "v20261107_profiles_recognized": 1024,
+      "v20261107_1_profiles_recognized": 2048,
+      "v20261107_2_profiles_recognized": 4096,
+      "v20261107_3_profiles_recognized": 4096,
+      "removed_SP_bit_not_exposed": true,
+      "v20261107_7_profiles_recognized": 4096,
+      "v20261107_6_profiles_recognized": 4096,
+      "v20261107_5_profiles_recognized": 4096,
+      "v20261107_4_profiles_recognized": 4096,
+      "v20261107_8_profiles_recognized": 4096
+    },
+    "huckebein_R_body_profile_checks": 32,
+    "regional_profile_checks": 224,
+    "regional_profiles": 16,
+    "regional_new_battles": 5,
+    "refined_boxes": 17,
+    "live_playthrough": false,
+    "ISO_writes_performed": false,
+    "native_R_unit_weapon_accessors": [
+      {
+        "mask": 0,
+        "archive": "SHARED.BIN",
+        "slot": 0,
+        "power": 1200
+      },
+      {
+        "mask": 0,
+        "archive": "SHARED.BIN",
+        "slot": 1,
+        "power": 2800
+      },
+      {
+        "mask": 0,
+        "archive": "SHARED.BIN",
+        "slot": 2,
+        "power": 3700
+      },
+      {
+        "mask": 0,
+        "archive": "SHARED.BIN",
+        "slot": 3,
+        "power": 4300
+      },
+      {
+        "mask": 0,
+        "archive": "SHARED.BIN",
+        "slot": 8,
+        "power": 3000
+      },
+      {
+        "mask": 0,
+        "archive": "IM.BIN",
+        "slot": 0,
+        "power": 1200
+      },
+      {
+        "mask": 0,
+        "archive": "IM.BIN",
+        "slot": 1,
+        "power": 2800
+      },
+      {
+        "mask": 0,
+        "archive": "IM.BIN",
+        "slot": 2,
+        "power": 3500
+      },
+      {
+        "mask": 0,
+        "archive": "IM.BIN",
+        "slot": 3,
+        "power": 3800
+      },
+      {
+        "mask": 0,
+        "archive": "IM.BIN",
+        "slot": 8,
+        "power": 3000
+      },
+      {
+        "mask": 32,
+        "archive": "SHARED.BIN",
+        "slot": 0,
+        "power": 1200
+      },
+      {
+        "mask": 32,
+        "archive": "SHARED.BIN",
+        "slot": 1,
+        "power": 2800
+      },
+      {
+        "mask": 32,
+        "archive": "SHARED.BIN",
+        "slot": 2,
+        "power": 3700
+      },
+      {
+        "mask": 32,
+        "archive": "SHARED.BIN",
+        "slot": 3,
+        "power": 4300
+      },
+      {
+        "mask": 32,
+        "archive": "SHARED.BIN",
+        "slot": 8,
+        "power": 3000
+      },
+      {
+        "mask": 32,
+        "archive": "IM.BIN",
+        "slot": 0,
+        "power": 1200
+      },
+      {
+        "mask": 32,
+        "archive": "IM.BIN",
+        "slot": 1,
+        "power": 2800
+      },
+      {
+        "mask": 32,
+        "archive": "IM.BIN",
+        "slot": 2,
+        "power": 3500
+      },
+      {
+        "mask": 32,
+        "archive": "IM.BIN",
+        "slot": 3,
+        "power": 3800
+      },
+      {
+        "mask": 32,
+        "archive": "IM.BIN",
+        "slot": 8,
+        "power": 3000
+      },
+      {
+        "mask": 1024,
+        "archive": "SHARED.BIN",
+        "slot": 0,
+        "power": 1400
+      },
+      {
+        "mask": 1024,
+        "archive": "SHARED.BIN",
+        "slot": 1,
+        "power": 3000
+      },
+      {
+        "mask": 1024,
+        "archive": "SHARED.BIN",
+        "slot": 2,
+        "power": 3900
+      },
+      {
+        "mask": 1024,
+        "archive": "SHARED.BIN",
+        "slot": 3,
+        "power": 4500
+      },
+      {
+        "mask": 1024,
+        "archive": "SHARED.BIN",
+        "slot": 8,
+        "power": 3200
+      },
+      {
+        "mask": 1024,
+        "archive": "IM.BIN",
+        "slot": 0,
+        "power": 1400
+      },
+      {
+        "mask": 1024,
+        "archive": "IM.BIN",
+        "slot": 1,
+        "power": 3000
+      },
+      {
+        "mask": 1024,
+        "archive": "IM.BIN",
+        "slot": 2,
+        "power": 3700
+      },
+      {
+        "mask": 1024,
+        "archive": "IM.BIN",
+        "slot": 3,
+        "power": 4000
+      },
+      {
+        "mask": 1024,
+        "archive": "IM.BIN",
+        "slot": 8,
+        "power": 3200
+      },
+      {
+        "mask": 1056,
+        "archive": "SHARED.BIN",
+        "slot": 0,
+        "power": 1400
+      },
+      {
+        "mask": 1056,
+        "archive": "SHARED.BIN",
+        "slot": 1,
+        "power": 3000
+      },
+      {
+        "mask": 1056,
+        "archive": "SHARED.BIN",
+        "slot": 2,
+        "power": 3900
+      },
+      {
+        "mask": 1056,
+        "archive": "SHARED.BIN",
+        "slot": 3,
+        "power": 4500
+      },
+      {
+        "mask": 1056,
+        "archive": "SHARED.BIN",
+        "slot": 8,
+        "power": 3200
+      },
+      {
+        "mask": 1056,
+        "archive": "IM.BIN",
+        "slot": 0,
+        "power": 1400
+      },
+      {
+        "mask": 1056,
+        "archive": "IM.BIN",
+        "slot": 1,
+        "power": 3000
+      },
+      {
+        "mask": 1056,
+        "archive": "IM.BIN",
+        "slot": 2,
+        "power": 3700
+      },
+      {
+        "mask": 1056,
+        "archive": "IM.BIN",
+        "slot": 3,
+        "power": 4000
+      },
+      {
+        "mask": 1056,
+        "archive": "IM.BIN",
+        "slot": 8,
+        "power": 3200
+      }
+    ],
+    "intermission_profiles": 16,
+    "intermission_scenes": 12,
+    "intermission_new_lines": 225,
+    "tactical_expansions": 6,
+    "beowulf_profile_checks": 64,
+    "beowulf_profiles": 16,
+    "civil_war_profile_checks": 192,
+    "civil_war_battles": 7,
+    "additional_battles": 13,
+    "semantic_masks": [
+      0,
+      1,
+      16,
+      17,
+      2030,
+      2031,
+      2046,
+      2047,
+      2048,
+      2049,
+      2064,
+      2065,
+      4078,
+      4079,
+      4094,
+      4095
+    ],
+    "byte_profile_selftest_count": 4096,
+    "shared_option_bit": 11,
+    "no_thirteenth_option": true
+  },
+  "regional_options": {
+    "passed": true,
+    "pack_sha256": "3b9ca80313d87bbf3e3fc3fe1ee2301afa91a7ff8a2dc2e2366e08b2acb94388",
+    "regional_profile_checks": 224,
+    "regional_profiles": 16,
+    "regional_new_battles": 5,
+    "beowulf_profile_checks": 64,
+    "beowulf_profiles": 16,
+    "additional_battles": 13,
+    "shared_option_bit": 11,
+    "no_thirteenth_option": true,
+    "ISO_writes_performed": false,
+    "story_and_native_bridge_routes_checked": true,
+    "enemy_grade_option_independent": true,
+    "extra_dialogue_option_independent": true
+  },
+  "original_resources_preservation": {
+    "passed": true,
+    "help_text_restore": {
+      "passed": true,
+      "archives": {
+        "SHARED.BIN": {
+          "explanation_records": 2337,
+          "native_count_checks": 2337,
+          "native_line_id_checks": 9605,
+          "native_text_checks": 9605,
+          "native_menu_checks": 790,
+          "menu_categories": {
+            "Sprt": 192,
+            "Skil": 217,
+            "Abil": 155,
+            "Part": 226
+          },
+          "encyclopedia_mapping_checks": {
+            "UnEx": 768,
+            "PlEx": 768,
+            "HlEx": 1024
+          },
+          "all_names_checked": 2146,
+          "samples": [
+            {
+              "category": "Sprt",
+              "index": 0,
+              "name": "－－－－",
+              "first_line": "무시"
+            },
+            {
+              "category": "Sprt",
+              "index": 1,
+              "name": "？？？？",
+              "first_line": "？？？"
+            },
+            {
+              "category": "Sprt",
+              "index": 2,
+              "name": "열혈",
+              "first_line": "한번만　적에게　주는　피해가　２배"
+            },
+            {
+              "category": "Sprt",
+              "index": 3,
+              "name": "번뜩임",
+              "first_line": "한번만　적의　공격을　완전히　피함"
+            },
+            {
+              "category": "Sprt",
+              "index": 4,
+              "name": "불굴",
+              "first_line": "한번만　적에게　받는　피해를　１０으로함"
+            },
+            {
+              "category": "Abil",
+              "index": 0,
+              "name": "없음",
+              "first_line": "무시"
+            },
+            {
+              "category": "Abil",
+              "index": 1,
+              "name": "ＡＢ필드",
+              "first_line": "ＥＮ이　１０이상시、빔공격（배리어관통무기"
+            },
+            {
+              "category": "Part",
+              "index": 0,
+              "name": "－－－－",
+              "first_line": ""
+            },
+            {
+              "category": "Part",
+              "index": 1,
+              "name": "(없음)",
+              "first_line": "기체의　이동력을　１상승"
+            }
+          ],
+          "all_non_text_tables_unchanged": true
+        },
+        "IM.BIN": {
+          "explanation_records": 2231,
+          "native_count_checks": 2231,
+          "native_line_id_checks": 9690,
+          "native_text_checks": 9690,
+          "native_menu_checks": 790,
+          "menu_categories": {
+            "Sprt": 192,
+            "Skil": 217,
+            "Abil": 155,
+            "Part": 226
+          },
+          "encyclopedia_mapping_checks": {
+            "UnEx": 768,
+            "PlEx": 768,
+            "HlEx": 1024
+          },
+          "all_names_checked": 1941,
+          "samples": [],
+          "all_non_text_tables_unchanged": true
+        }
+      },
+      "native_explanation_checks": 43158,
+      "native_menu_checks": 1580,
+      "native_encyclopedia_mapping_checks": 5120,
+      "synthetic_binary_compaction_regression": true,
+      "official_explanation_records_restored": 4568,
+      "existing_gameplay_and_names_preserved": true,
+      "live_PCSX2_UI_playthrough": false
+    },
+    "help_text_all_other_image_bytes_preserved": true,
+    "canonical_sha256": "57ec181e68b8fd62a21e9d54ef4fbcbd2f51a1e5e5b029387bec8f92e4e9de18",
+    "unchanged_original_UNTD": 186,
+    "unchanged_original_LOGO": 41,
+    "original_34_and_35_have_optional_bridges": true,
+    "original_combat_master_rows_preserved": true,
+    "original_models_faces_animations_preserved": true,
+    "original_finale_clear_command_preserved": true,
+    "original_five_added_missions_preserved": true,
+    "civil_war_original_payload_check": {
+      "passed": true,
+      "unchanged_resource_payloads": 9260,
+      "all_declared_archive_bounds_checked": true,
+      "original_MAP_and_BATTLE_payloads_preserved_except_five_dialogue_bridges": true,
+      "new_speech_chunks": 36,
+      "authored_dialogue_boxes": 330,
+      "extra_full_ISOs_created": 0
+    },
+    "civil_war_populated_roster_check": {
+      "passed": true,
+      "members": 75,
+      "native_members": 50,
+      "added_members": 25,
+      "embedded_availability_commands": 111,
+      "unit_upgrades_equipment_and_pilot_EXP_PP_kills_preserved": true,
+      "all_initial_roster_bytes_restored_after_reunion": true,
+      "custom_preinactive_roster_not_tested": true,
+      "live_gameplay": false
+    },
+    "civil_reinforcement_validation": {
+      "passed": true,
+      "checks": 834,
+      "native_encounter_cases": 69,
+      "native_preparation_and_level_cases": 230,
+      "guard_only_membership_checks": 76,
+      "new_guard_missions": 2,
+      "civil_missions": 7,
+      "chapter_order": [
+        2041,
+        2042,
+        2043,
+        2046,
+        2047,
+        2044,
+        2045
+      ],
+      "display_chapters": [
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48
+      ],
+      "final_display_chapter": 49,
+      "mob_level": 52,
+      "new_and_final_rebel_ace_level": 54,
+      "original_final_mob_level": 40,
+      "original_final_boss_level": 48,
+      "all_persistent_roster_bytes_restored": true,
+      "old_coerced_guard_now_allied_in_joint_rescue": true,
+      "original_map_assets_and_original_finale_preserved": true,
+      "actual_world_AI_collision_render_card_tested": false,
+      "ready_to_apply": true
+    },
+    "civil_guard_waves": {
+      "passed": true,
+      "seven_stage_native_wave_cases": 168,
+      "per_wave": 6,
+      "turns": [
+        2,
+        3,
+        4
+      ],
+      "initial_enemies": 32,
+      "total_enemy_cap": 50,
+      "guard_side_scenarios_use_Lefina_ship_coordinates": true,
+      "repeat_wave_suppressed": true,
+      "actual_world_spawn_collision_and_AI_tested": false
+    },
+    "ragnarok_access": {
+      "passed": true,
+      "native_route_cases": 60,
+      "mastery_values": [
+        0,
+        1,
+        17,
+        30,
+        35
+      ],
+      "difficulties": [
+        0,
+        1,
+        2
+      ],
+      "story_and_extra_battles_on_off_checked": true,
+      "destination_native_stage_index": 34,
+      "display_with_additional_battles": 49,
+      "display_without_additional_battles": 36,
+      "artificial_mastery_increase": false,
+      "native_difficulty_calculation_unchanged": true,
+      "source_already_directly_routes_original35_to36": true,
+      "guide_reference": "https://w.atwiki.jp/srwoggaidenkouryaku/pages/105.html",
+      "guide_lists_easy_normal_hard_stage": true,
+      "live_full_game_transition_not_tested": true
+    },
+    "verification_basis": "Prior comparisons, current virtual resource byte comparisons and full inverse image SHA-256",
+    "live_playthrough": false
+  },
+  "beowulf": {
+    "passed": true,
+    "checks": 22196,
+    "native_constructor_cases": 192,
+    "option_count": 12,
+    "single_option_bit": 11,
+    "wide_map": [
+      46,
+      38
+    ],
+    "open_tiles": 1128,
+    "initial_enemies": 32,
+    "endless_minions": 30,
+    "ordinary_kill_respawn_cycles": 100,
+    "simultaneous_kills_replaced": 7,
+    "boss_death_stops_all_respawns": true,
+    "boss_death_wins_with_other_enemies_alive": true,
+    "predeployment_guards": true,
+    "spawn_service": "native CC handler with map-spawn fixture; independent real unit constructors verified",
+    "original_25_party_stats_preserved": true,
+    "original_models_faces_animations_and_master_rows_preserved": true,
+    "ported_OGs_assets_not_rendered_in_PCSX2": true,
+    "live_playthrough": false,
+    "memory_card_IO": false,
+    "ready_to_apply": true
+  },
+  "regional_density": {
+    "passed": true,
+    "checks": 718,
+    "scenes": [
+      {
+        "key": 2035,
+        "enemies": 32,
+        "ordinary": 30,
+        "bosses": 2,
+        "ally_slots": 12,
+        "positions": 44,
+        "original_rows_preserved": 28
+      },
+      {
+        "key": 2036,
+        "enemies": 32,
+        "ordinary": 30,
+        "bosses": 2,
+        "ally_slots": 12,
+        "positions": 44,
+        "original_rows_preserved": 28
+      },
+      {
+        "key": 2037,
+        "enemies": 32,
+        "ordinary": 30,
+        "bosses": 2,
+        "ally_slots": 12,
+        "positions": 44,
+        "original_rows_preserved": 28
+      },
+      {
+        "key": 2038,
+        "enemies": 32,
+        "ordinary": 30,
+        "bosses": 2,
+        "ally_slots": 12,
+        "positions": 44,
+        "original_rows_preserved": 28
+      },
+      {
+        "key": 2039,
+        "enemies": 32,
+        "ordinary": 30,
+        "bosses": 2,
+        "ally_slots": 12,
+        "positions": 44,
+        "original_rows_preserved": 28
+      }
+    ],
+    "added_enemies": 80,
+    "total_regional_enemies": 160,
+    "ordinary": 150,
+    "bosses": 10,
+    "all_220_positions_valid": true,
+    "distinct_spawn_templates": 16,
+    "original_28_rows_per_mission_preserved": true,
+    "masters_and_LOGO_unchanged": true,
+    "original_25_party_stats_preserved": true,
+    "enemy32_victory_gate_verified": true,
+    "live_playthrough": false,
+    "memory_card_IO": false,
+    "ready_to_apply": true
+  },
+  "official_base": {
+    "passed": true,
+    "official_repository": "https://github.com/z3oo3z/PS2-SRWOGG-KPatch",
+    "release": "SRWOGG",
+    "version": "1.4.3s",
+    "source_md5": "cb7dc4485f46f220c46095c966a3aad0",
+    "base_sha256": "e819f1e524513bc7e273b004ba02e3977dd4fff365a5887b4eb1c8a9fc9d1e04",
+    "base_md5": "a5254cd5d4deabc57e03a3dcbb6a88d7",
+    "bytes": 4666294272,
+    "xdelta_target_checksums_verified": true,
+    "verified_windows": 557,
+    "changed_pages_from_previous_base": 64,
+    "extra_full_ISOs_created": 0
+  },
+  "intermission": {
+    "passed": true,
+    "checks": 1276,
+    "missions": 6,
+    "pre_scenes": 6,
+    "post_scenes": 6,
+    "tactical_expansions": 6,
+    "new_lines": 225,
+    "new_boxes": 226,
+    "all_25_added_members_in_ship_scenes": true,
+    "ship_crew_alerts_before_deployment": true,
+    "post_scenes_after_native_result_before_next_stage": true,
+    "native_text_history_and_option_guards": true,
+    "relocated_beowulf_fixture_cycles": 100,
+    "boss_death_stops_respawns_and_routes_to_finale": true,
+    "original_gameplay_records_preserved": true,
+    "live_render_or_playthrough": false,
+    "ready_to_apply": true,
+    "details": [
+      {
+        "key": 2035,
+        "new_boxes": 32,
+        "outcomes": [
+          {
+            "story_enabled": false,
+            "phase": "pre",
+            "new_boxes": 5,
+            "next_index": null
+          },
+          {
+            "story_enabled": false,
+            "phase": "tactical",
+            "new_boxes": 0,
+            "next_index": null
+          },
+          {
+            "story_enabled": false,
+            "phase": "post",
+            "new_boxes": 4,
+            "next_index": 36
+          },
+          {
+            "story_enabled": true,
+            "phase": "pre",
+            "new_boxes": 15,
+            "next_index": null
+          },
+          {
+            "story_enabled": true,
+            "phase": "tactical",
+            "new_boxes": 6,
+            "next_index": null
+          },
+          {
+            "story_enabled": true,
+            "phase": "post",
+            "new_boxes": 11,
+            "next_index": 36
+          }
+        ]
+      },
+      {
+        "key": 2036,
+        "new_boxes": 33,
+        "outcomes": [
+          {
+            "story_enabled": false,
+            "phase": "pre",
+            "new_boxes": 5,
+            "next_index": null
+          },
+          {
+            "story_enabled": false,
+            "phase": "tactical",
+            "new_boxes": 0,
+            "next_index": null
+          },
+          {
+            "story_enabled": false,
+            "phase": "post",
+            "new_boxes": 4,
+            "next_index": 37
+          },
+          {
+            "story_enabled": true,
+            "phase": "pre",
+            "new_boxes": 15,
+            "next_index": null
+          },
+          {
+            "story_enabled": true,
+            "phase": "tactical",
+            "new_boxes": 6,
+            "next_index": null
+          },
+          {
+            "story_enabled": true,
+            "phase": "post",
+            "new_boxes": 12,
+            "next_index": 37
+          }
+        ]
+      },
+      {
+        "key": 2037,
+        "new_boxes": 35,
+        "outcomes": [
+          {
+            "story_enabled": false,
+            "phase": "pre",
+            "new_boxes": 5,
+            "next_index": null
+          },
+          {
+            "story_enabled": false,
+            "phase": "tactical",
+            "new_boxes": 0,
+            "next_index": null
+          },
+          {
+            "story_enabled": false,
+            "phase": "post",
+            "new_boxes": 4,
+            "next_index": 38
+          },
+          {
+            "story_enabled": true,
+            "phase": "pre",
+            "new_boxes": 15,
+            "next_index": null
+          },
+          {
+            "story_enabled": true,
+            "phase": "tactical",
+            "new_boxes": 7,
+            "next_index": null
+          },
+          {
+            "story_enabled": true,
+            "phase": "post",
+            "new_boxes": 13,
+            "next_index": 38
+          }
+        ]
+      },
+      {
+        "key": 2038,
+        "new_boxes": 34,
+        "outcomes": [
+          {
+            "story_enabled": false,
+            "phase": "pre",
+            "new_boxes": 5,
+            "next_index": null
+          },
+          {
+            "story_enabled": false,
+            "phase": "tactical",
+            "new_boxes": 0,
+            "next_index": null
+          },
+          {
+            "story_enabled": false,
+            "phase": "post",
+            "new_boxes": 4,
+            "next_index": 39
+          },
+          {
+            "story_enabled": true,
+            "phase": "pre",
+            "new_boxes": 15,
+            "next_index": null
+          },
+          {
+            "story_enabled": true,
+            "phase": "tactical",
+            "new_boxes": 7,
+            "next_index": null
+          },
+          {
+            "story_enabled": true,
+            "phase": "post",
+            "new_boxes": 12,
+            "next_index": 39
+          }
+        ]
+      },
+      {
+        "key": 2039,
+        "new_boxes": 41,
+        "outcomes": [
+          {
+            "story_enabled": false,
+            "phase": "pre",
+            "new_boxes": 5,
+            "next_index": null
+          },
+          {
+            "story_enabled": false,
+            "phase": "tactical",
+            "new_boxes": 0,
+            "next_index": null
+          },
+          {
+            "story_enabled": false,
+            "phase": "post",
+            "new_boxes": 4,
+            "next_index": 33
+          },
+          {
+            "story_enabled": true,
+            "phase": "pre",
+            "new_boxes": 17,
+            "next_index": null
+          },
+          {
+            "story_enabled": true,
+            "phase": "tactical",
+            "new_boxes": 9,
+            "next_index": null
+          },
+          {
+            "story_enabled": true,
+            "phase": "post",
+            "new_boxes": 15,
+            "next_index": 33
+          }
+        ]
+      },
+      {
+        "key": 2040,
+        "new_boxes": 51,
+        "outcomes": [
+          {
+            "story_enabled": false,
+            "phase": "pre",
+            "new_boxes": 12,
+            "next_index": null
+          },
+          {
+            "story_enabled": false,
+            "phase": "tactical",
+            "new_boxes": 5,
+            "next_index": null
+          },
+          {
+            "story_enabled": false,
+            "phase": "post",
+            "new_boxes": 11,
+            "next_index": 34
+          },
+          {
+            "story_enabled": true,
+            "phase": "pre",
+            "new_boxes": 23,
+            "next_index": null
+          },
+          {
+            "story_enabled": true,
+            "phase": "tactical",
+            "new_boxes": 9,
+            "next_index": null
+          },
+          {
+            "story_enabled": true,
+            "phase": "post",
+            "new_boxes": 19,
+            "next_index": 34
+          }
+        ]
+      }
+    ]
+  },
+  "civil_war": {
+    "passed": true,
+    "checks": 1210,
+    "new_battles": 5,
+    "political_intermission_scenes": 5,
+    "encounter_pairs": 26,
+    "native_pair_cases": 104,
+    "pair_order_independent": true,
+    "no_persuade_command": true,
+    "wrong_pair_silent": true,
+    "encounter_repeats_silent": true,
+    "native_preparation_cases": 320,
+    "owned_25_growth_and_equipment_preserved": true,
+    "split_rejoin_restores_owned_25": true,
+    "route_persistent_reloads": 6,
+    "final_display_chapter": 47,
+    "original_unit_pilot_weapon_rows_preserved": true,
+    "dialogue_boxes": 330,
+    "NPC_spawn_AI_renderer_and_card_IO_tested": false,
+    "ready_to_apply": true
+  },
+  "civil_war_Beowulf_bridge": {
+    "passed": true,
+    "relocated_respawn_cycles": 100,
+    "boss_death_stops_respawns": true,
+    "new_civil_war_route_index": 41,
+    "original_map_spawn_service_is_fixture": true
+  },
+  "civil_war_failures": {
+    "passed": true,
+    "native_loss_cases": 80,
+    "predeployment_does_not_fail": true,
+    "transport_loss_fails": true,
+    "party_annihilation_fails": true,
+    "map_actor_service_is_fixture": true
+  },
+  "civil_war_party": {
+    "passed": true,
+    "members": 75,
+    "native_members": 50,
+    "added_members": 25,
+    "embedded_availability_commands": 111,
+    "unit_upgrades_equipment_and_pilot_EXP_PP_kills_preserved": true,
+    "all_initial_roster_bytes_restored_after_reunion": true,
+    "custom_preinactive_roster_not_tested": true,
+    "live_gameplay": false
+  },
+  "civil_war_resources": {
+    "passed": true,
+    "unchanged_resource_payloads": 9260,
+    "all_declared_archive_bounds_checked": true,
+    "original_MAP_and_BATTLE_payloads_preserved_except_five_dialogue_bridges": true,
+    "new_speech_chunks": 36,
+    "authored_dialogue_boxes": 330,
+    "extra_full_ISOs_created": 0
+  },
+  "prior_Beowulf_native_checks_scope": "Original sixth battle unchanged; current byte preservation and composition checked separately",
+  "civil_reinforcements": {
+    "passed": true,
+    "callback_cases": 1200,
+    "native_constructor_cases": 180,
+    "turns": [
+      2,
+      3,
+      4
+    ],
+    "per_wave": 6,
+    "per_stage_added": 18,
+    "initial_enemies": 32,
+    "total_enemies": 50,
+    "original_native_turn_and_phase_filter_executed": true,
+    "native_pilot_lookup_and_coordinate_getter_executed": true,
+    "native_CB_three_step_coroutine_executed": true,
+    "moving_ship_positions_forwarded": true,
+    "both_ships_split_three_each": true,
+    "no_ship_falls_back_to_transport": true,
+    "once_per_wave": true,
+    "old_story_routes_dialogue_roster_and_initial_rows_preserved": true,
+    "all_owned_25_records_preserved": true,
+    "master_changes_only_18_unit_aliases": true,
+    "actual_map_creation_collision_AI_and_renderer_tested": false,
+    "ready_to_apply": true
+  },
+  "civil_reinforcements_resources": {
+    "passed": true,
+    "unchanged_MAP_payloads": 241,
+    "new_stage_untd_records": 63,
+    "initial_enemy_group_zero": 32,
+    "reserved_reinforcements": 18,
+    "native_callback_registration_and_alert_history": true,
+    "all_declared_archive_bounds_checked": true,
+    "other_gameplay_resources_untouched": true,
+    "extra_full_ISOs_created": 0
+  },
+  "civil_guard": {
+    "passed": true,
+    "checks": 834,
+    "native_encounter_cases": 69,
+    "native_preparation_and_level_cases": 230,
+    "guard_only_membership_checks": 76,
+    "new_guard_missions": 2,
+    "civil_missions": 7,
+    "chapter_order": [
+      2041,
+      2042,
+      2043,
+      2046,
+      2047,
+      2044,
+      2045
+    ],
+    "display_chapters": [
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48
+    ],
+    "final_display_chapter": 49,
+    "mob_level": 52,
+    "new_and_final_rebel_ace_level": 54,
+    "original_final_mob_level": 40,
+    "original_final_boss_level": 48,
+    "all_persistent_roster_bytes_restored": true,
+    "old_coerced_guard_now_allied_in_joint_rescue": true,
+    "original_map_assets_and_original_finale_preserved": true,
+    "actual_world_AI_collision_render_card_tested": false,
+    "ready_to_apply": true
+  },
+  "civil_guard_waves": {
+    "passed": true,
+    "seven_stage_native_wave_cases": 168,
+    "per_wave": 6,
+    "turns": [
+      2,
+      3,
+      4
+    ],
+    "initial_enemies": 32,
+    "total_enemy_cap": 50,
+    "guard_side_scenarios_use_Lefina_ship_coordinates": true,
+    "repeat_wave_suppressed": true,
+    "actual_world_spawn_collision_and_AI_tested": false
+  },
+  "help_text_restore": {
+    "passed": true,
+    "archives": {
+      "SHARED.BIN": {
+        "explanation_records": 2337,
+        "native_count_checks": 2337,
+        "native_line_id_checks": 9605,
+        "native_text_checks": 9605,
+        "native_menu_checks": 790,
+        "menu_categories": {
+          "Sprt": 192,
+          "Skil": 217,
+          "Abil": 155,
+          "Part": 226
+        },
+        "encyclopedia_mapping_checks": {
+          "UnEx": 768,
+          "PlEx": 768,
+          "HlEx": 1024
+        },
+        "all_names_checked": 2146,
+        "samples": [
+          {
+            "category": "Sprt",
+            "index": 0,
+            "name": "－－－－",
+            "first_line": "무시"
+          },
+          {
+            "category": "Sprt",
+            "index": 1,
+            "name": "？？？？",
+            "first_line": "？？？"
+          },
+          {
+            "category": "Sprt",
+            "index": 2,
+            "name": "열혈",
+            "first_line": "한번만　적에게　주는　피해가　２배"
+          },
+          {
+            "category": "Sprt",
+            "index": 3,
+            "name": "번뜩임",
+            "first_line": "한번만　적의　공격을　완전히　피함"
+          },
+          {
+            "category": "Sprt",
+            "index": 4,
+            "name": "불굴",
+            "first_line": "한번만　적에게　받는　피해를　１０으로함"
+          },
+          {
+            "category": "Abil",
+            "index": 0,
+            "name": "없음",
+            "first_line": "무시"
+          },
+          {
+            "category": "Abil",
+            "index": 1,
+            "name": "ＡＢ필드",
+            "first_line": "ＥＮ이　１０이상시、빔공격（배리어관통무기"
+          },
+          {
+            "category": "Part",
+            "index": 0,
+            "name": "－－－－",
+            "first_line": ""
+          },
+          {
+            "category": "Part",
+            "index": 1,
+            "name": "(없음)",
+            "first_line": "기체의　이동력을　１상승"
+          }
+        ],
+        "all_non_text_tables_unchanged": true
+      },
+      "IM.BIN": {
+        "explanation_records": 2231,
+        "native_count_checks": 2231,
+        "native_line_id_checks": 9690,
+        "native_text_checks": 9690,
+        "native_menu_checks": 790,
+        "menu_categories": {
+          "Sprt": 192,
+          "Skil": 217,
+          "Abil": 155,
+          "Part": 226
+        },
+        "encyclopedia_mapping_checks": {
+          "UnEx": 768,
+          "PlEx": 768,
+          "HlEx": 1024
+        },
+        "all_names_checked": 1941,
+        "samples": [],
+        "all_non_text_tables_unchanged": true
+      }
+    },
+    "native_explanation_checks": 43158,
+    "native_menu_checks": 1580,
+    "native_encyclopedia_mapping_checks": 5120,
+    "synthetic_binary_compaction_regression": true,
+    "official_explanation_records_restored": 4568,
+    "existing_gameplay_and_names_preserved": true,
+    "live_PCSX2_UI_playthrough": false
+  },
+  "help_text_option_profiles": {
+    "passed": true,
+    "pack_sha256": "3b9ca80313d87bbf3e3fc3fe1ee2301afa91a7ff8a2dc2e2366e08b2acb94388",
+    "semantic_masks": [
+      0,
+      1,
+      16,
+      17,
+      2030,
+      2031,
+      2046,
+      2047,
+      2048,
+      2049,
+      2064,
+      2065,
+      4078,
+      4079,
+      4094,
+      4095
+    ],
+    "explanation_record_comparisons": 73088,
+    "help_repair_independent_of_all_12_options": true,
+    "no_feature_overwrites_help_tables": true,
+    "ISO_writes_performed": false
+  },
+  "ragnarok_access": {
+    "passed": true,
+    "native_route_cases": 60,
+    "mastery_values": [
+      0,
+      1,
+      17,
+      30,
+      35
+    ],
+    "difficulties": [
+      0,
+      1,
+      2
+    ],
+    "story_and_extra_battles_on_off_checked": true,
+    "destination_native_stage_index": 34,
+    "display_with_additional_battles": 49,
+    "display_without_additional_battles": 36,
+    "artificial_mastery_increase": false,
+    "native_difficulty_calculation_unchanged": true,
+    "source_already_directly_routes_original35_to36": true,
+    "guide_reference": "https://w.atwiki.jp/srwoggaidenkouryaku/pages/105.html",
+    "guide_lists_easy_normal_hard_stage": true,
+    "live_full_game_transition_not_tested": true
+  },
+  "sp_and_upgrade_prices": {
+    "native_SP_accessor_checks": 11148,
+    "native_cost_sum_checks": 150,
+    "ten_stage_totals": [
+      88000,
+      88000,
+      105600,
+      176000,
+      176000
+    ],
+    "role_based_clone_SP_in_all_profiles": true,
+    "price_option_preserves_weapon_growth": true,
+    "passed": true,
+    "validation_basis": "Reused prior native SP/cost checks. Help repair changes only typed explanation lists, equivalent name-string packing and master payload length. All non-text master tables, executable hooks and gameplay payloads are byte-preserved."
+  }
+}
