@@ -1,11 +1,16 @@
 {
-  "version": "v20261121",
+  "version": "v20261121.1",
   "file": "OGG_options.bin",
-  "sha256": "f804a1e8e7eb5b543bac5a7fa1d18037013bb57ad2f31369b0dd300ed97a4d59",
-  "bytes": 11816868,
+  "sha256": "37c85f09b8e0f92fea9267890b95e876c336cd388ab19180858b7911b61317eb",
+  "bytes": 12126351,
   "options": 13,
   "profiles": 8192,
+  "format_version": 2,
   "prerelease": false,
   "distribution": "zip-only",
-  "release_zip_sha256": "452284bb88c9fcd83a131710c947dd256e356b146e6a98934c52ed9c8a91e117"
+  "release_zip_sha256": "7d13f8d38bb0dffb078021cccab717621a57ee41a8952001a8ec0dbe716aad79",
+  "civil_war_requires_options": [
+    1,
+    12
+  ]
 }

@@ -11,13 +11,15 @@ using System.Windows.Forms;
 internal static class OggOptionsPatcher
 {
     const string ExpectedPackSha = "__PACK_SHA__";
-    const string Version = "v20261121";
+    const string Version = "v20261121.1";
     sealed class Region { public long Offset; public byte[] Original, Zero; }
     sealed class Edit { public long Offset; public byte[] Data; }
+    sealed class ConditionalEdits { public int Require, Forbid; public List<Edit> Edits = new List<Edit>(); }
     sealed class Pack {
         public long Size; public byte[] SourceHash; public string[] Names, Descriptions;
         public List<Region> Regions = new List<Region>();
         public List<Edit>[] Features; public byte[][] Profiles;
+        public List<ConditionalEdits> Conditions = new List<ConditionalEdits>();
         public Dictionary<string,int> Known = new Dictionary<string,int>();
     }
     sealed class Inspection { public byte[][] Actual; public string ActualHash, Signature; public int Mask; }
@@ -36,7 +38,8 @@ internal static class OggOptionsPatcher
         string path=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"OGG_options.bin");
         byte[] raw=File.ReadAllBytes(path); if(Hex(Sha(raw))!=ExpectedPackSha) throw new InvalidDataException("OGG_options.bin의 검증값이 다릅니다. 같은 ZIP의 파일들을 함께 사용해 주세요.");
         Pack p=new Pack(); using(BinaryReader r=new BinaryReader(new MemoryStream(raw),Encoding.UTF8)) {
-            if(Encoding.ASCII.GetString(ReadExact(r,8))!="OGGOPT01" || r.ReadInt32()!=1) throw new InvalidDataException("패치 형식 오류");
+            if(Encoding.ASCII.GetString(ReadExact(r,8))!="OGGOPT01") throw new InvalidDataException("패치 형식 오류");
+            int format=r.ReadInt32(); if(format!=1 && format!=2) throw new InvalidDataException("패치 형식 버전 오류");
             p.Size=r.ReadInt64(); p.SourceHash=ReadExact(r,32); int count=r.ReadInt32(); if(count!=13) throw new InvalidDataException("옵션 수 오류");
             p.Names=new string[count]; p.Descriptions=new string[count]; p.Features=new List<Edit>[count];
             for(int i=0;i<count;i++) { p.Names[i]=Encoding.UTF8.GetString(Blob(r)); p.Descriptions[i]=Encoding.UTF8.GetString(Blob(r)); }
@@ -45,6 +48,16 @@ internal static class OggOptionsPatcher
                 Region x=new Region { Offset=at, Original=Inflate(Blob(r),n), Zero=Inflate(Blob(r),n) }; p.Regions.Add(x); end=at+n; }
             for(int i=0;i<count;i++) { p.Features[i]=new List<Edit>(); int n=r.ReadInt32(); if(n<0 || n>100000) throw new InvalidDataException("옵션 구간 오류");
                 for(int j=0;j<n;j++) { long at=r.ReadInt64(); int length=r.ReadInt32(); if(length<1 || length>p.Size || at<0 || at>p.Size-length) throw new InvalidDataException("옵션 범위 오류"); p.Features[i].Add(new Edit { Offset=at, Data=ReadExact(r,length) }); } }
+            if(format==2) {
+                int conditions=r.ReadInt32(); if(conditions<0 || conditions>1024) throw new InvalidDataException("의존 조건 수 오류");
+                for(int i=0;i<conditions;i++) {
+                    ConditionalEdits c=new ConditionalEdits { Require=r.ReadInt32(), Forbid=r.ReadInt32() };
+                    if(c.Require<0 || c.Forbid<0 || (c.Require|c.Forbid)>=(1<<count) || (c.Require&c.Forbid)!=0) throw new InvalidDataException("의존 조건 오류");
+                    int n=r.ReadInt32(); if(n<0 || n>100000) throw new InvalidDataException("의존 구간 수 오류");
+                    for(int j=0;j<n;j++) { long at=r.ReadInt64(); int length=r.ReadInt32(); if(length<1 || length>p.Size || at<0 || at>p.Size-length) throw new InvalidDataException("의존 구간 오류"); c.Edits.Add(new Edit { Offset=at, Data=ReadExact(r,length) }); }
+                    p.Conditions.Add(c);
+                }
+            }
             int profiles=r.ReadInt32(); if(profiles!=(1<<count)) throw new InvalidDataException("조합 수 오류"); p.Profiles=new byte[profiles][];
             for(int i=0;i<profiles;i++) { if(r.ReadInt32()!=i) throw new InvalidDataException("조합 순서 오류"); p.Profiles[i]=ReadExact(r,32); p.Known.Add(Hex(p.Profiles[i]),i); }
             p.Known[Hex(ReadExact(r,32))]=-1; int legacy=r.ReadInt32(); if(legacy<0 || legacy>65536) throw new InvalidDataException("이전 버전 오류");
@@ -61,6 +74,8 @@ internal static class OggOptionsPatcher
         if(mask<0 || mask>=p.Profiles.Length) throw new ArgumentOutOfRangeException("mask"); byte[][] data=new byte[p.Regions.Count][];
         for(int i=0;i<data.Length;i++) data[i]=p.Regions[i].Zero;
         for(int bit=0;bit<p.Features.Length;bit++) if((mask&(1<<bit))!=0) foreach(Edit e in p.Features[bit]) { int i=Find(p,e.Offset,e.Data.Length);
+            if(Object.ReferenceEquals(data[i],p.Regions[i].Zero)) data[i]=(byte[])data[i].Clone(); Buffer.BlockCopy(e.Data,0,data[i],(int)(e.Offset-p.Regions[i].Offset),e.Data.Length); }
+        foreach(ConditionalEdits c in p.Conditions) if((mask&c.Require)==c.Require && (mask&c.Forbid)==0) foreach(Edit e in c.Edits) { int i=Find(p,e.Offset,e.Data.Length);
             if(Object.ReferenceEquals(data[i],p.Regions[i].Zero)) data[i]=(byte[])data[i].Clone(); Buffer.BlockCopy(e.Data,0,data[i],(int)(e.Offset-p.Regions[i].Offset),e.Data.Length); }
         return data;
     }
@@ -164,12 +179,12 @@ internal static class OggOptionsPatcher
             pack=p; Text="슈퍼로봇대전 OG외전 옵션 패처 "+Version; Font=new Font("맑은 고딕",10); ClientSize=new Size(900,960); MinimumSize=new Size(800,900); StartPosition=FormStartPosition.CenterScreen;
             TableLayoutPanel main=new TableLayoutPanel { Dock=DockStyle.Fill,Padding=new Padding(16),ColumnCount=1,RowCount=5 };
             main.RowStyles.Add(new RowStyle(SizeType.Absolute,60));main.RowStyles.Add(new RowStyle(SizeType.Absolute,44));main.RowStyles.Add(new RowStyle(SizeType.Percent,100));main.RowStyles.Add(new RowStyle(SizeType.Absolute,86));main.RowStyles.Add(new RowStyle(SizeType.Absolute,48)); Controls.Add(main);
-            Label intro=new Label { Dock=DockStyle.Fill,Text="13번은 원본 9화 종료 전에 켜고 유지하세요. 양쪽 분기를 교차 진행합니다.\n25편성 시나리오는 새 게임에서 시작해 주세요. 12번은 원본 34화 종료 전 켜고 모든 추가 전장 종료까지 유지하세요.",AutoSize=false }; main.Controls.Add(intro,0,0);
+            Label intro=new Label { Dock=DockStyle.Fill,Text="시빌워는 1·12번을 함께 켜야 진행합니다. 12번만 켜면 국지전5편·베오울프전만 진행합니다.\n1번은 새 게임부터 유지하세요. 13번은 원본 9화, 12번은 원본 34화 종료 전에 켜고 유지하세요.",AutoSize=false }; main.Controls.Add(intro,0,0);
             TableLayoutPanel picker=new TableLayoutPanel { Dock=DockStyle.Fill,ColumnCount=2 };picker.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100));picker.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,110));path.Dock=DockStyle.Fill;path.Margin=new Padding(0,5,8,5);picker.Controls.Add(path,0,0);
             Button choose=new Button { Text="ISO 선택",Dock=DockStyle.Fill };choose.Click+=delegate { using(OpenFileDialog d=new OpenFileDialog { Filter="PS2 ISO (*.iso)|*.iso",Title="패치할 OG외전 한글판 ISO를 선택하세요" }) if(d.ShowDialog()==DialogResult.OK) path.Text=d.FileName; };picker.Controls.Add(choose,1,0);main.Controls.Add(picker,0,1);actions.Add(choose);actions.Add(path);
             FlowLayoutPanel options=new FlowLayoutPanel { Dock=DockStyle.Fill,FlowDirection=FlowDirection.TopDown,WrapContents=false,AutoScroll=true,Padding=new Padding(0,4,0,0) };
             for(int i=0;i<checks.Length;i++) { Panel row=new Panel { Width=830,Height=50,Margin=new Padding(0,0,0,2) };CheckBox box=new CheckBox { Left=0,Top=0,Width=820,Height=26,Text=(i+1)+". "+p.Names[i] };checks[i]=box;row.Controls.Add(box);row.Controls.Add(new Label { Left=24,Top=27,Width=800,Height=20,ForeColor=Color.DimGray,Font=new Font("맑은 고딕",9),Text=p.Descriptions[i] });options.Controls.Add(row);actions.Add(box); } main.Controls.Add(options,0,2);
-            messages.Dock=DockStyle.Fill;messages.Multiline=true;messages.ReadOnly=true;messages.ScrollBars=ScrollBars.Vertical;messages.Text="v20261121: 13번 독립 옵션으로 지상·우주 루트를 모두 진행할 수 있습니다.\r\n[검사]를 누르면 현재 ISO의 옵션이 표시됩니다. 선택 후 [패치 적용]을 눌러 주세요.";main.Controls.Add(messages,0,3);
+            messages.Dock=DockStyle.Fill;messages.Multiline=true;messages.ReadOnly=true;messages.ScrollBars=ScrollBars.Vertical;messages.Text="v20261121.1: 시빌워7편과 정치 사전 장면에 1번 추가 아군 의존 조건을 적용했습니다.\r\n1번 OFF·12번 ON: 국지전5편+베오울프1편, 총42화(13번 ON은47화). 1번을 자동으로 켜지 않습니다.\r\n[검사]를 누르면 현재 ISO의 옵션이 표시됩니다. 선택 후 [패치 적용]을 눌러 주세요.";main.Controls.Add(messages,0,3);
             FlowLayoutPanel bar=new FlowLayoutPanel { Dock=DockStyle.Fill,FlowDirection=FlowDirection.LeftToRight,Padding=new Padding(0,8,0,0) };
             Button verify=new Button { Text="검사",Width=100,Height=30 },apply=new Button { Text="패치 적용",Width=130,Height=30 },restore=new Button { Text="처음 상태 복원",Width=150,Height=30 };
             verify.Click+=delegate { Start(0); };apply.Click+=delegate { Start(1); };restore.Click+=delegate { Start(2); };bar.Controls.AddRange(new Control[] {verify,apply,restore});actions.Add(verify);actions.Add(apply);actions.Add(restore);progress.Width=230;progress.Height=26;progress.Margin=new Padding(16,2,0,0);bar.Controls.Add(progress);main.Controls.Add(bar,0,4);
